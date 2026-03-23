@@ -6,9 +6,8 @@ namespace poo_ayudante_de_catedra;
 
 public partial class frmCalc : Form
 {
-    // Creamos algunas constantes que nos van a servir para validar posteriormente.
-    List<string> operations = new List<string> { "+", "-", "*", "/", "%", ",", "(", ")" };
-    List<string> numbers = new List<string> { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+    const List<string> operations = new List<string> { "+", "-", "*", "/", "%", ",", "(", ")" };
+    const List<string> numbers = new List<string> { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
     const string SYNTAX_ERROR = "Error de sintaxis";
     public frmCalc()
     {
