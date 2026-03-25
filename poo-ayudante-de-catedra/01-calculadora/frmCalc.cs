@@ -6,8 +6,8 @@ namespace poo_ayudante_de_catedra;
 
 public partial class frmCalc : Form
 {
-    const List<string> operations = new List<string> { "+", "-", "*", "/", "%", ",", "(", ")" };
-    const List<string> numbers = new List<string> { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+    public static readonly List<string> operations = new List<string> { "+", "-", "*", "/", "%", ",", "(", ")" };
+    public static readonly List<string> numbers = new List<string> { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
     const string SYNTAX_ERROR = "Error de sintaxis";
     public frmCalc()
     {
