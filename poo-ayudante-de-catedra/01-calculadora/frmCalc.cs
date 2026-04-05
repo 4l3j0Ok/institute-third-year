@@ -8,7 +8,7 @@ public partial class frmCalc : Form
 {
     public static readonly List<string> operations = new List<string> { "+", "-", "*", "/", "%", ",", "(", ")" };
     public static readonly List<string> numbers = new List<string> { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-    const string SYNTAX_ERROR = "Error de sintaxis";
+    public static readonly string SYNTAX_ERROR = "Error de sintaxis";
     public frmCalc()
     {
         InitializeComponent();
@@ -55,8 +55,10 @@ public partial class frmCalc : Form
 
             // Antes de evaluar la expresión, verificamos que no haya paréntesis sin cerrar,
             // ya que eso causaría un error de sintaxis.
-            if (tbCalc.Text.Contains("(") && !tbCalc.Text.Contains(")")) {
-                if (tbCalc.Text.EndsWith("(")) {
+            if (tbCalc.Text.Contains("(") && !tbCalc.Text.Contains(")"))
+            {
+                if (tbCalc.Text.EndsWith("("))
+                {
                     btnClearClick(sender, e);
                 }
                 else
@@ -95,7 +97,7 @@ public partial class frmCalc : Form
             // Debug.WriteLine es una función que nos permite imprimir mensajes
             // en la consola de depuración de Visual Studio, lo cuales útil para
             // ver qué errores ocurren sin mostrarle al usuario un mensaje de error.
-            Debug.WriteLine( ex.Message );
+            Debug.WriteLine(ex.Message);
             // Si ocurre un error al evaluar la expresión, se muestra el mensaje de error de sintaxis
             // (que definimos como constante al principio de la clase)
             tbResult.Text = SYNTAX_ERROR;
