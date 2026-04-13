@@ -8,12 +8,20 @@
 <p role="status">Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-secondary" @onclick="ResetCount">Reset</button>
 
 @code {
     private int currentCount = 0;
 
     private void IncrementCount()
     {
-        currentCount++;
+        // 5. Modificar el componente para que muestre el doble del contador.
+        currentCount += 2;
+    }
+
+    //• Agregar un botón 'Reiniciar' que lleve el contador a cero.
+    private void ResetCount()
+    {
+        currentCount = 0;
     }
 }

@@ -1,0 +1,14 @@
+@* Agregar página de bienvenida *@
+
+@page "/welcome"
+
+@* Significa que el componente se renderizará en el servidor y se actualizará de forma interactiva en el cliente. *@
+@rendermode InteractiveServer
+
+<PageTitle>Bienvenida</PageTitle>
+
+<h1>Bienvenido a Task Manager</h1>
+<p>Administrador de tareas para tu equipo.</p>
+<footer class="blockquote-footer">
+    Último acceso: @DateTime.Now
+</footer>
