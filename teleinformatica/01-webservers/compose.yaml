@@ -1,0 +1,9 @@
+services:
+  nginx:
+    image: nginx:1.29-alpine
+    restart: no
+    container_name: nginx-clase-2
+    volumes:
+      - ./html:/usr/share/nginx/html
+    ports:
+      - "8080:80"
