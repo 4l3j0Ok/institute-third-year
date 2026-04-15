@@ -1,4 +1,4 @@
-# Tips Visual Studio
+# Clase Get y Set + tips
 
 ## Esquema del documento
 
