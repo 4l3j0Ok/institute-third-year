@@ -1,0 +1,3 @@
+[submodule "practicas-profesionalizantes/InstitutoNet"]
+	path = practicas-profesionalizantes/InstitutoNet
+	url = https://github.com/ISFT93/InstitutoNET.git
