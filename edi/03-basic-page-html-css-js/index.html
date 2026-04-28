@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <!-- =====================================================
+         ACTIVIDAD: Mi Perfil Web
+         Programación Web – HTML, CSS y JavaScript
+         Bibliografía: Ortúñez, M.A. (2025). Programación Web:
+                       HTML, CSS, JavaScript. URJC.
+         ===================================================== -->
+
+    <!-- PASO 1: Metadatos del documento (Cap. 1.5 del libro) -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Perfil Web</title>
+
+    <!-- PASO 2: Vinculamos la hoja de estilos externa (Cap. 2.1) -->
+    <link rel="stylesheet" href="estilos.css" />
+  </head>
+
+  <body>
+    <!-- =====================================================
+         SECCIÓN 1: ENCABEZADO
+         Elementos semánticos: header, h1, p (Cap. 1.6)
+         ===================================================== -->
+    <header class="encabezado">
+      <!-- TODO 1: Cambiá el texto del h1 con tu nombre completo -->
+      <h1 id="nombre-principal">Alejo Sarmiento</h1>
+      <p class="subtitulo">Estudiante de Desarrollo Web con Blazor</p>
+    </header>
+
+    <!-- =====================================================
+         SECCIÓN 2: NAVEGACIÓN
+         Elemento nav y lista no ordenada ul > li > a (Cap. 1.6)
+         ===================================================== -->
+    <nav class="barra-nav">
+      <ul>
+        <li><a href="#sobre-mi">Sobre mí</a></li>
+        <li><a href="#habilidades">Habilidades</a></li>
+        <li><a href="#contador">Contador</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL (elemento main – Cap. 1.6)
+         ===================================================== -->
+    <main>
+      <!-- ── Sección "Sobre mí" ── -->
+      <section id="sobre-mi" class="tarjeta">
+        <h2>Sobre mí</h2>
+
+        <!-- Párrafo con texto (Cap. 1.6) -->
+        <!-- TODO 2: Escribí una presentación tuya (2 o 3 líneas) -->
+        <p>Soy Alejo Sarmiento, SRE y Desarrollador de software.</p>
+        <p>
+          Trabajo actualmente como SRE en
+          <a href="https://leafnoise.io" target="_blank">Leafnoise</a>
+          hace más de 5 años. Primero como desarrollador backend y luego como
+          SRE, donde me especialicé en la gestión de infraestructura en la nube
+          y la automatización de procesos.
+        </p>
+        <p>
+          En cuanto a desarrollo backend, tengo amplia experiencia en Python con
+          FastAPI, aunque también he trabajado con .NET y el ecosistema de
+          JavaScript.
+        </p>
+        <p>
+          En cuanto a desarrollo frontend, tengo experiencia trabajando con
+          Astro, React y Blazor, habiendo desarrollado varios proyectos
+          personales y colaborativos utilizando estas tecnologías, como mi
+          página web personal
+          <a href="https://alejoide.com" target="_blank">alejoide.com</a>, mi
+          página de reparación de computadoras
+          <a href="https://alejoide.tech" target="_blank">alejoide.tech</a>
+          y otros tantos proyectos personales.
+        </p>
+        <p>
+          En cuanto a mi especialidad como SRE, me he enfocado en la gestión de
+          infraestructura en la nube y on-premise, utlizando tecnologías como
+          Docker y Kubernetes, implementando soluciones enfocadas a la
+          integración continua y la entrega continua (CI/CD) para optimizar los
+          procesos de desarrollo y despliegue, y asegurando la alta
+          disponibilidad y el rendimiento de los sistemas a través de prácticas
+          de monitoreo, escalabilidad y gestión de incidentes.
+        </p>
+
+        <!-- Imagen (elemento void – Cap. 1.4) -->
+        <!-- TODO 3: Reemplazá la URL por una imagen tuya o un avatar -->
+        <img
+          src="https://avatars.githubusercontent.com/u/69774461"
+          alt="Foto de perfil"
+          class="foto-perfil"
+        />
+
+        <!-- Lista ordenada: mis lenguajes favoritos (Cap. 1.6) -->
+        <h3>Mis tecnologías favoritas</h3>
+        <ol class="lista-tecnologias">
+          <!-- TODO 4: Completá la lista con tus tecnologías -->
+          <li>Python: FastAPI, Flask, PySide / PyQT</li>
+          <li>JavaScript: Astro, React, Next.js, TypeScript, Tailwind CSS</li>
+          <li>C#: .NET, ASP.NET, Blazor, Windows Forms</li>
+          <li>Contenedores: Docker, Podman, Kubernetes, ArgoCD, Helm</li>
+          <li></li>
+        </ol>
+      </section>
+
+      <!-- ── Sección "Habilidades" ── -->
+      <section id="habilidades" class="tarjeta">
+        <h2>Habilidades</h2>
+        <p>Nivel de conocimiento en cada tecnología:</p>
+
+        <!-- Barras de progreso: combinamos HTML + CSS (Cap. 2.6) -->
+        <div class="habilidad">
+          <span class="etiqueta-habilidad">Python</span>
+          <div class="barra-fondo">
+            <!-- TODO 5: Ajustá el ancho (%) según tu nivel real -->
+            <div class="barra-progreso" style="width: 80%">95%</div>
+          </div>
+        </div>
+        <div class="habilidad">
+          <span class="etiqueta-habilidad">JavaScript</span>
+          <div class="barra-fondo">
+            <div class="barra-progreso" style="width: 60%">75%</div>
+          </div>
+        </div>
+
+        <div class="habilidad">
+          <span class="etiqueta-habilidad">C#</span>
+          <div class="barra-fondo">
+            <div class="barra-progreso" style="width: 70%">60%</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Sección "Contador interactivo" ── -->
+      <!-- Aquí usamos JavaScript para interactuar con el DOM (Cap. 5) -->
+      <section id="contador" class="tarjeta">
+        <h2>Contador Interactivo</h2>
+        <p>
+          Hacé clic en los botones para usar el contador. La lógica está en
+          <strong>script.js</strong>.
+        </p>
+
+        <!-- Elemento que mostrará el valor del contador -->
+        <!-- JavaScript lo leerá con getElementById (Cap. 5.1) -->
+        <div class="caja-contador">
+          <span id="valor-contador">0</span>
+        </div>
+
+        <!-- Botones con evento onclick – Cap. 5.2 del libro -->
+        <div class="botones-contador">
+          <button id="btn-restar" onclick="restar()">− Restar</button>
+          <button id="btn-reiniciar" onclick="reiniciar()">↺ Reiniciar</button>
+          <button id="btn-sumar" onclick="sumar()">+ Sumar</button>
+        </div>
+
+        <!-- Mensaje dinámico que cambia según el valor -->
+        <p id="mensaje-contador" class="mensaje"></p>
+      </section>
+
+      <!-- ── Sección "Formulario de contacto" ── -->
+      <!-- Formularios: action, method, input, label (Cap. 1.7) -->
+      <section id="contacto" class="tarjeta">
+        <h2>Contacto</h2>
+        <p>Completá el formulario y fijate cómo JavaScript lee los datos.</p>
+
+        <!-- Atributo for del label vinculado al id del input (Cap. 1.7) -->
+        <form id="formulario-contacto" onsubmit="procesarFormulario(event)">
+          <div class="campo-form">
+            <label for="campo-nombre">Nombre:</label>
+            <input
+              type="text"
+              id="campo-nombre"
+              name="nombre"
+              placeholder="Tu nombre completo"
+              required
+            />
+          </div>
+
+          <div class="campo-form">
+            <label for="campo-email">Email:</label>
+            <input
+              type="email"
+              id="campo-email"
+              name="email"
+              placeholder="correo@ejemplo.com"
+              required
+            />
+          </div>
+
+          <div class="campo-form">
+            <label for="campo-mensaje">Mensaje:</label>
+            <!-- TODO 6: Fijate cómo textarea difiere de input -->
+            <textarea
+              id="campo-mensaje"
+              name="mensaje"
+              rows="4"
+              placeholder="Escribí tu mensaje aquí..."
+              required
+            ></textarea>
+          </div>
+
+          <!-- Botón de envío del formulario -->
+          <button type="submit" class="btn-enviar">Enviar mensaje</button>
+        </form>
+
+        <!-- Zona donde JavaScript mostrará la confirmación -->
+        <div id="confirmacion" class="confirmacion oculto"></div>
+      </section>
+    </main>
+
+    <!-- =====================================================
+         PIE DE PÁGINA (elemento footer – Cap. 1.6)
+         ===================================================== -->
+    <footer class="pie-pagina">
+      <!-- TODO 7: Cambiá el año y tu nombre -->
+      <p>&copy; 2026 Alejo Sarmiento &mdash; Actividad HTML, CSS y JavaScript</p>
+      <p>
+        Bibliografía:
+        <em
+          >Ortúñez, M.A. (2025). Programación Web: HTML, CSS, JavaScript.
+          URJC.</em
+        >
+      </p>
+    </footer>
+
+    <!-- =====================================================
+         PASO FINAL: vinculamos el script JS al final del body
+         (Cap. 4 y Cap. 5 del libro)
+         Colocarlo al final garantiza que el DOM ya existe
+         cuando JavaScript empiece a ejecutarse.
+         ===================================================== -->
+    <script src="script.js"></script>
+  </body>
+</html>

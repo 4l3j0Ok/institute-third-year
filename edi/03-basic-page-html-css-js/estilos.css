@@ -1,0 +1,476 @@
+/*
+ * ACTIVIDAD: Mi Perfil Web
+ * Archivo: estilos.css
+ *
+ * Bibliografía: Ortúñez, M.A. (2025). Programación Web:
+ *               HTML, CSS, JavaScript. URJC.
+ *               Cap. 2: Hojas de estilo CSS
+ *
+ * Estructura de este archivo:
+ *   1. Variables CSS (custom properties)
+ *   2. Reset y base
+ *   3. Encabezado
+ *   4. Navegación
+ *   5. Main y tarjetas
+ *   6. Sección Sobre mí
+ *   7. Habilidades y barras de progreso
+ *   8. Contador
+ *   9. Formulario de contacto
+ *  10. Pie de página
+ *  11. Utilidades
+ */
+
+
+/* ============================================================
+   1. VARIABLES CSS (Custom Properties)
+   Cap. 2.4 – Unidades y colores
+   Definimos los colores y tamaños en un único lugar.
+   Para cambiar toda la paleta, basta modificar aquí.
+   ============================================================ */
+:root {
+    /* Colores principales */
+    --color-primario:    #1F4E79;   /* Azul oscuro */
+    --color-secundario:  #2E75B6;   /* Azul medio */
+    --color-acento:      #F0A500;   /* Amarillo/dorado */
+    --color-fondo:       #F4F7FB;   /* Gris muy claro */
+    --color-tarjeta:     #FFFFFF;   /* Blanco para tarjetas */
+    --color-texto:       #222222;   /* Texto principal */
+    --color-texto-claro: #666666;   /* Texto secundario */
+    --color-borde:       #DDDDDD;   /* Bordes suaves */
+    --color-exito:       #1E5631;   /* Verde para mensajes ok */
+    --color-exito-bg:    #E2F0D9;
+
+    /* Tipografía (Cap. 2.5) */
+    --fuente-principal: 'Segoe UI', Arial, sans-serif;
+    --tamanio-base:     16px;
+    --tamanio-h1:       2rem;
+    --tamanio-h2:       1.4rem;
+    --tamanio-h3:       1.1rem;
+
+    /* Espaciado – usamos rem para escalabilidad */
+    --espacio-s:   0.5rem;
+    --espacio-m:   1rem;
+    --espacio-l:   1.5rem;
+    --espacio-xl:  2rem;
+
+    /* Bordes redondeados */
+    --radio-borde: 8px;
+
+    /* Sombra suave para las tarjetas */
+    --sombra: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ============================================================
+   2. RESET Y BASE
+   Cap. 2.6 – El Modelo de Cajas (box-sizing)
+   El selector universal * selecciona todos los elementos.
+   box-sizing: border-box hace que padding y border no
+   aumenten el ancho total del elemento (Cap. 2.6).
+   ============================================================ */
+* {
+    box-sizing: border-box;   /* padding y border incluidos en el ancho */
+    margin: 0;
+    padding: 0;
+}
+
+/* Selector de tipo: aplica a todo el body (Cap. 2.3) */
+body {
+    font-family: var(--fuente-principal);
+    font-size:   var(--tamanio-base);
+    color:       var(--color-texto);
+    background-color: var(--color-fondo);
+    line-height: 1.6;          /* interlineado relativo al tamaño de fuente */
+}
+
+/* Selector de tipo: todos los títulos heredan la fuente */
+h1, h2, h3 {
+    font-family: var(--fuente-principal);
+    color:       var(--color-primario);
+}
+
+h1 { font-size: var(--tamanio-h1); }
+h2 { font-size: var(--tamanio-h2); margin-bottom: var(--espacio-s); }
+h3 { font-size: var(--tamanio-h3); margin-bottom: var(--espacio-s); }
+
+/* Selector de tipo: enlaces */
+a {
+    color: var(--color-secundario);
+    text-decoration: none;
+}
+
+/* Pseudo-clase :hover (Cap. 2.3) – cambia estilo al pasar el mouse */
+a:hover {
+    text-decoration: underline;
+    color: var(--color-acento);
+}
+
+/* Imágenes responsivas: nunca superan el ancho del contenedor */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+/* ============================================================
+   3. ENCABEZADO
+   Cap. 2.5 – Atributos de texto
+   Cap. 2.4 – Colores: usamos la notación hexadecimal
+   ============================================================ */
+
+/* Selector de clase: .encabezado (Cap. 2.3) */
+.encabezado {
+    background-color: var(--color-primario);
+    color: white;
+    text-align: center;
+    padding: var(--espacio-xl) var(--espacio-m);
+}
+
+/* Selector descendiente: el h1 dentro de .encabezado (Cap. 2.3) */
+.encabezado h1 {
+    color: white;            /* sobreescribimos el color azul del reset */
+    font-size: var(--tamanio-h1);
+    letter-spacing: 1px;    /* espaciado entre letras (Cap. 2.5) */
+}
+
+/* Selector de clase para el subtítulo */
+.subtitulo {
+    color: rgba(255, 255, 255, 0.80);   /* blanco semitransparente (Cap. 2.4) */
+    font-size: 1.05rem;
+    margin-top: var(--espacio-s);
+    font-style: italic;                 /* cursiva (Cap. 2.5) */
+}
+
+
+/* ============================================================
+   4. BARRA DE NAVEGACIÓN
+   Cap. 2.3 – Selectores de clase, descendiente
+   Cap. 2.6 – Display y modelo de cajas
+   ============================================================ */
+.barra-nav {
+    background-color: var(--color-secundario);
+    position: sticky;    /* se queda pegada arriba al hacer scroll */
+    top: 0;
+    z-index: 100;        /* se superpone sobre otros elementos */
+}
+
+/* Selector descendiente: el ul dentro de .barra-nav */
+.barra-nav ul {
+    list-style: none;          /* eliminamos los puntos de la lista */
+    display: flex;             /* Flexbox: elementos en fila (Cap. 2.6) */
+    justify-content: center;   /* centrado horizontal */
+    gap: var(--espacio-l);     /* espacio entre ítems */
+    padding: var(--espacio-s) var(--espacio-m);
+}
+
+/* Selector descendiente: los enlaces dentro de la nav */
+.barra-nav a {
+    color: white;
+    font-weight: bold;
+    padding: var(--espacio-s) var(--espacio-m);
+    border-radius: var(--radio-borde);
+    transition: background-color 0.2s ease;  /* animación suave */
+}
+
+/* Pseudo-clase :hover en los enlaces de la nav */
+.barra-nav a:hover {
+    background-color: var(--color-primario);
+    text-decoration: none;
+    color: var(--color-acento);
+}
+
+
+/* ============================================================
+   5. MAIN Y TARJETAS
+   Cap. 2.6 – El Modelo de Cajas: margin, padding, border
+   ============================================================ */
+main {
+    max-width: 800px;            /* ancho máximo del contenido */
+    margin: var(--espacio-xl) auto;   /* centrado con margin auto */
+    padding: 0 var(--espacio-m);
+    display: flex;               /* Flexbox en columna */
+    flex-direction: column;
+    gap: var(--espacio-l);       /* espacio entre secciones */
+}
+
+/* Selector de clase: .tarjeta – modelo de cajas completo (Cap. 2.6) */
+.tarjeta {
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-borde);   /* border */
+    border-radius: var(--radio-borde);
+    padding: var(--espacio-l);              /* padding interior */
+    box-shadow: var(--sombra);
+    transition-duration: 0.4s;
+    /* El margin lo maneja el gap del flex padre */
+}
+
+/*
+ * TODO 8 – DESAFÍO DE CSS:
+ * Hacé que al pasar el mouse sobre una .tarjeta,
+ * la sombra se vuelva más intensa y la tarjeta suba 2px.
+ * Pista: usá :hover y la propiedad transform: translateY(-2px)
+ */
+
+.tarjeta:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    transition-duration: 0.4s;
+}
+
+.tarjeta
+
+/* ============================================================
+   6. SECCIÓN SOBRE MÍ
+   ============================================================ */
+.foto-perfil {
+    display: block;          /* ocupa su propia línea */
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;      /* hace la imagen circular */
+    border: 4px solid var(--color-secundario);
+    margin: var(--espacio-m) 0;
+    object-fit: cover;       /* recorta sin deformar */
+}
+
+.lista-tecnologias {
+    margin-left: var(--espacio-l);   /* sangría de la lista */
+    margin-top: var(--espacio-s);
+}
+
+.lista-tecnologias li {
+    margin-bottom: var(--espacio-s);
+    color: var(--color-texto);
+}
+
+
+/* ============================================================
+   7. HABILIDADES Y BARRAS DE PROGRESO
+   Cap. 2.6 – Modelo de cajas y display
+   ============================================================ */
+.habilidad {
+    display: flex;           /* etiqueta + barra en la misma fila */
+    align-items: center;     /* alineación vertical centrada */
+    gap: var(--espacio-m);
+    margin-bottom: var(--espacio-m);
+}
+
+.etiqueta-habilidad {
+    width: 110px;            /* ancho fijo para alinear las barras */
+    font-weight: bold;
+    color: var(--color-primario);
+    font-size: 0.9rem;
+    flex-shrink: 0;          /* no se encoge en pantallas pequeñas */
+}
+
+/* Contenedor gris de la barra */
+.barra-fondo {
+    flex: 1;                 /* ocupa el espacio restante (Flexbox) */
+    background-color: #E0E0E0;
+    border-radius: 20px;
+    height: 22px;
+    overflow: hidden;        /* la barra interior no sale del contenedor */
+}
+
+/* Barra de progreso interior – su ancho viene del atributo style del HTML */
+.barra-progreso {
+    height: 100%;
+    background-color: var(--color-secundario);
+    border-radius: 20px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    /* Animación: la barra 'crece' al cargar la página */
+    transition: width 1s ease-in-out;
+}
+
+
+/* ============================================================
+   8. CONTADOR
+   ============================================================ */
+.caja-contador {
+    text-align: center;
+    margin: var(--espacio-m) 0;
+}
+
+/* Selector de id: #valor-contador (Cap. 2.3) */
+#valor-contador {
+    font-size: 4rem;
+    font-weight: bold;
+    color: var(--color-primario);
+    display: inline-block;
+    min-width: 100px;
+    padding: var(--espacio-s) var(--espacio-m);
+    border: 3px solid var(--color-borde);
+    border-radius: var(--radio-borde);
+    background-color: var(--color-fondo);
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.botones-contador {
+    display: flex;
+    justify-content: center;
+    gap: var(--espacio-m);
+    margin-bottom: var(--espacio-m);
+}
+
+/* Selector de tipo button – estilos base para todos los botones */
+button {
+    padding: var(--espacio-s) var(--espacio-l);
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: var(--radio-borde);
+    cursor: pointer;               /* cursor de mano al pasar el mouse */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);   /* sube 2px al hacer hover */
+}
+
+button:active {
+    transform: translateY(0);      /* vuelve al lugar al hacer clic */
+}
+
+/* Selector de id: botones individuales con colores específicos */
+#btn-sumar {
+    background-color: var(--color-primario);
+    color: white;
+}
+
+#btn-sumar:hover { background-color: var(--color-secundario); }
+
+#btn-restar {
+    background-color: #C00000;
+    color: white;
+}
+
+#btn-restar:hover { background-color: #A00000; }
+
+#btn-reiniciar {
+    background-color: #888;
+    color: white;
+}
+
+#btn-reiniciar:hover { background-color: #666; }
+
+/* Mensaje dinámico del contador */
+.mensaje {
+    text-align: center;
+    font-weight: bold;
+    min-height: 1.5rem;   /* evita que el layout salte cuando aparece texto */
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+
+/* ============================================================
+   9. FORMULARIO DE CONTACTO
+   Cap. 1.7 – Formularios
+   Cap. 2.3 – Selectores de clase
+   ============================================================ */
+.campo-form {
+    display: flex;
+    flex-direction: column;   /* label arriba, input abajo */
+    gap: 4px;
+    margin-bottom: var(--espacio-m);
+}
+
+label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: var(--color-primario);
+}
+
+/* Selector de tipo + atributo: todos los inputs y textarea */
+input[type="text"],
+input[type="email"],
+textarea {
+    width: 100%;
+    padding: var(--espacio-s) var(--espacio-m);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-borde);
+    font-size: 1rem;
+    font-family: var(--fuente-principal);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Pseudo-clase :focus – cuando el campo está seleccionado (Cap. 2.3) */
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus {
+    outline: none;                           /* quitamos el borde por defecto */
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 3px rgba(46, 117, 182, 0.25);   /* resplandor azul */
+}
+
+textarea {
+    resize: vertical;   /* solo se puede redimensionar verticalmente */
+}
+
+/* Botón de envío */
+.btn-enviar {
+    background-color: var(--color-acento);
+    color: var(--color-primario);
+    padding: var(--espacio-s) var(--espacio-xl);
+    font-size: 1rem;
+    margin-top: var(--espacio-s);
+}
+
+.btn-enviar:hover {
+    background-color: #D4930A;
+    color: white;
+}
+
+/* Zona de confirmación (oculta por defecto, JS la activa) */
+.confirmacion {
+    margin-top: var(--espacio-m);
+    padding: var(--espacio-m);
+    border-radius: var(--radio-borde);
+    background-color: var(--color-exito-bg);
+    color: var(--color-exito);
+    border: 1px solid var(--color-exito);
+    font-weight: bold;
+}
+
+
+/* ============================================================
+   10. PIE DE PÁGINA
+   ============================================================ */
+.pie-pagina {
+    background-color: var(--color-primario);
+    color: rgba(255, 255, 255, 0.80);
+    text-align: center;
+    padding: var(--espacio-l) var(--espacio-m);
+    margin-top: var(--espacio-xl);
+    font-size: 0.9rem;
+}
+
+.pie-pagina p { margin-bottom: var(--espacio-s); }
+.pie-pagina em { color: rgba(255, 255, 255, 0.65); }
+
+
+/* ============================================================
+   11. UTILIDADES
+   ============================================================ */
+
+/* Clase utilitaria para ocultar elementos (usada por JS) */
+.oculto {
+    display: none;
+}
+
+/* Clase para resaltar el contador en rojo (usada por JS) */
+.contador-negativo {
+    color: #C00000 !important;
+    border-color: #C00000 !important;
+}
+
+/* Clase para resaltar el contador en verde (usada por JS) */
+.contador-positivo {
+    color: var(--color-exito) !important;
+    border-color: var(--color-exito) !important;
+}
