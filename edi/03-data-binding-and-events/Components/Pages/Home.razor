@@ -1,0 +1,27 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<h3>Calculadora de IMC</h3>
+<label>Peso (kg): <input type="number" @bind="peso" @bind:event="oninput"
+/></label>
+<label>Altura (m): <input type="number" @bind="altura" @bind:event="oninput"
+/></label>
+
+@if (altura > 0)
+{
+    <p>IMC: @(Math.Round(peso / (altura * altura), 2))</p>
+}
+
+<Card
+Title="Resumen"
+Description="@($"Altura ingresada: {altura} m\nPeso ingresado: {peso} kg")"
+/>
+
+@code {
+    private double peso = 70;
+    private double altura = 1.75;
+
+
+}

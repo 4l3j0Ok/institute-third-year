@@ -1,0 +1,12 @@
+
+<article class="card">
+    <h2>@Title</h2>
+    <p>@Description</p>
+</article>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; } = string.Empty;
+    [Parameter]
+    public string? Description { get; set; }
+}
