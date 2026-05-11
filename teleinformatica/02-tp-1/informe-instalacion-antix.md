@@ -1,13 +1,11 @@
-<head>
-    <style>
-        img {
-            max-width: 10px;
-            height: auto;
-        }
-    </style>
-</head>
 
 # Instalación de AntiX Linux en VirtualBox
+
+
+> **Autor**: Alejo Sarmiento  
+> **Fecha de creación**: 2026-04-28  
+> **Materia**: Teleinformática  
+> **Curso y división**: 3° A
 
 ## Introducción
 
