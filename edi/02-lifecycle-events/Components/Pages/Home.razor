@@ -11,7 +11,11 @@
     @foreach (var i in Enumerable.Range(0, 5))
     {
         @* card numero i *@
-        <Card Titulo="@($"Título de la card {i + 1}")" Descripcion="@($"Card número {i + 1}")" @rendermode="InteractiveServer"/>
+        <Card
+            Titulo="@($"Título de la card {i + 1}")"
+            Descripcion="@($"Card número {i + 1}")"
+            @rendermode="InteractiveServer"
+        />
     }
 </section>
 @code {
