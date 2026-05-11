@@ -2,11 +2,18 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>02 - Eventos de Ciclo de Vida</h1>
 
-<p>Welcome to your new app.</p>
-<p>Environment: @environment</p>
+<p>Entorno: @environment</p>
 
+<h2>Acá hay algunas cards:</h2>
+<section class=cards>
+    @foreach (var i in Enumerable.Range(0, 5))
+    {
+        @* card numero i *@
+        <Card Titulo="@($"Título de la card {i + 1}")" Descripcion="@($"Card número {i + 1}")" @rendermode="InteractiveServer"/>
+    }
+</section>
 @code {
     public string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 }
