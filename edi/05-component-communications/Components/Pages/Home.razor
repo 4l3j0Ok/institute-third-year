@@ -1,0 +1,23 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>05 - Comunicación entre Componentes</h1>
+
+<p>Entorno: @environment</p>
+
+<h2>Acá hay algunas cards:</h2>
+<section class=cards>
+    @foreach (var i in Enumerable.Range(0, 5))
+    {
+        @* card numero i *@
+        <Card
+            Titulo="@($"Título de la card {i + 1}")"
+            Descripcion="@($"Card número {i + 1}")"
+            @rendermode="InteractiveServer"
+        />
+    }
+</section>
+@code {
+    public string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+}

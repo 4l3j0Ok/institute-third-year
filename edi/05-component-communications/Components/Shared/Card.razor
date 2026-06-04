@@ -1,0 +1,39 @@
+@implements IDisposable
+
+<div class="card">
+    <div class="card-body">
+        @if (isLoading)
+        {
+            <div class="custom-loader"></div>
+        }
+        else {
+            <h5 class="card-title">@Titulo</h5>
+            <p class="card-text">@Descripcion</p>
+        }
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public string Titulo { get; set; }
+
+    [Parameter]
+    public string Descripcion { get; set; }
+
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Este método es el estándar para cargas iniciales
+        await Task.Delay(5000);
+        isLoading = false;
+        // Aquí no hace falta StateHasChanged() usualmente, 
+        // Blazor lo hace solo al terminar el Task en este método.
+    }
+    public void Dispose()
+    {
+        // Aquí puedes limpiar recursos si es necesario
+    }
+}
