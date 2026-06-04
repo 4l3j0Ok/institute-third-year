@@ -1,0 +1,2 @@
+ALTER TABLE dbo.Cliente
+ADD CONSTRAINT UQ_Cliente_DNI UNIQUE (DNI);
