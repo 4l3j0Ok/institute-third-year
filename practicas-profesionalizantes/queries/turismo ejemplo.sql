@@ -117,7 +117,7 @@ BEGIN
             NULL,
             '',
             '',
-            1952,
+            1792,
             3,
             1,
             1
@@ -185,7 +185,7 @@ DECLARE @MateriasCodBloqSuma VARCHAR(5);
 SELECT @MateriasCodBloqSuma = CONCAT(0, @MateriasCodigoBloque)
 
 -----------------------------------
--- Materias 1er Anio --
+-- Materias 1er Año --
 
 SELECT @MateriasCodBloq = ISNULL(MAX(CAST(MateriasCodigoBloque AS INT)), CONCAT(@AniosCarrerasCodBloq1, '00')) FROM Materias WHERE CarreraId = @CarreraID AND AnioCarreraId = @AnioCarreraId1;
 SELECT @MateriasCodigoBloque = CAST(@MateriasCodBloq AS INT) + 1
