@@ -2,7 +2,9 @@ import json
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
+from schemas.history import HistoryModule
 from schemas.table import Table, TableItem, TableType
+from services import history_service
 from services.calculator import TableCalculator
 from services.parser import (
     TableParseError,
@@ -58,7 +60,7 @@ class CalculadoraController(QObject):
             self._set_error(str(exc))
             return
 
-        self._calcular(items, TableType.NO_AGRUPADOS)
+        self._calcular(items, TableType.NO_AGRUPADOS, valores_str)
 
     @Slot(str)
     def calcularAgrupadosPorValor(self, filas_json: str) -> None:
@@ -73,7 +75,7 @@ class CalculadoraController(QObject):
             self._set_error(str(exc))
             return
 
-        self._calcular(items, TableType.AGRUPADOS_VALOR)
+        self._calcular(items, TableType.AGRUPADOS_VALOR, filas_json)
 
     @Slot(str)
     def calcularAgrupadosPorIntervalo(self, filas_json: str) -> None:
@@ -88,7 +90,7 @@ class CalculadoraController(QObject):
             self._set_error(str(exc))
             return
 
-        self._calcular(items, TableType.AGRUPADOS_INTERVALO)
+        self._calcular(items, TableType.AGRUPADOS_INTERVALO, filas_json)
 
     @Slot(str)
     def calcularDesdeFilas(self, filas_json: str) -> None:
@@ -115,12 +117,21 @@ class CalculadoraController(QObject):
             return None
         return filas
 
-    def _calcular(self, items: list[TableItem], data_type: TableType) -> None:
+    def _calcular(
+        self, items: list[TableItem], data_type: TableType, input_payload: str
+    ) -> None:
         self._error = ""
         table = Table(data_type=data_type, items=items)
         self._calculator.calculate(table)
         self._table_model = self._build_table_model(table)
         self.tableModelChanged.emit()
+
+        history_service.insert_entry(
+            module=HistoryModule.FRECUENCIAS,
+            data_type=data_type.value,
+            input_payload=input_payload,
+            result_summary=json.dumps(self._table_model),
+        )
 
     def _build_table_model(self, table: Table) -> list[dict]:
         rows: list[dict] = []

@@ -79,6 +79,45 @@ Item {
         intervaloModel.append({ lower: "", upper: "", frecuencia: "" });
     }
 
+    // ── Historial ───────────────────────────────────────────────────────
+    readonly property var historyEntries: {
+        var todas = historyController.entries;
+        var propias = [];
+        for (var i = 0; i < todas.length; i++)
+            if (todas[i].module === "frecuencias")
+                propias.push(todas[i]);
+        return propias;
+    }
+
+    function cargarDesdeHistorial(entry) {
+        var filas;
+        root.dataType = entry.dataType;
+
+        if (entry.dataType === "no_agrupados") {
+            root.valoresText = entry.inputPayload;
+        } else if (entry.dataType === "agrupados_valor") {
+            filas = JSON.parse(entry.inputPayload);
+            valorModel.clear();
+            for (var i = 0; i < filas.length; i++)
+                valorModel.append({
+                    xi: filas[i].xi.toString(),
+                    frecuencia: filas[i].frecuencia.toString()
+                });
+        } else if (entry.dataType === "agrupados_intervalo") {
+            filas = JSON.parse(entry.inputPayload);
+            intervaloModel.clear();
+            for (var j = 0; j < filas.length; j++)
+                intervaloModel.append({
+                    lower: filas[j].lower.toString(),
+                    upper: filas[j].upper.toString(),
+                    frecuencia: filas[j].frecuencia.toString()
+                });
+        }
+
+        historyPopup.close();
+        root.calcular();
+    }
+
     RowLayout {
         anchors.fill: parent
         spacing: 0
@@ -96,11 +135,39 @@ Item {
                 anchors.margins: 16
                 spacing: 10
 
-                Label {
-                    text: "Carga de datos"
-                    color: Theme.primary_text
-                    font.bold: true
-                    font.pixelSize: 15
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Label {
+                        text: "Carga de datos"
+                        color: Theme.primary_text
+                        font.bold: true
+                        font.pixelSize: 15
+                        Layout.fillWidth: true
+                    }
+
+                    Button {
+                        text: "Historial"
+                        implicitHeight: 28
+                        onClicked: {
+                            historyController.cargarHistorial();
+                            historyPopup.open();
+                        }
+
+                        background: Rectangle {
+                            radius: 4
+                            color: parent.hovered ? Theme.accent_hover : Theme.accent_subtle
+                            border.color: Theme.accent
+                            border.width: 1
+                        }
+                        contentItem: Text {
+                            text: parent.text
+                            color: Theme.accent
+                            font.pixelSize: 11
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
                 }
 
                 // ── Selector de tipo de datos ─────────────────────────────
@@ -610,6 +677,88 @@ Item {
                     visible: calculadoraController.tableModel.length > 0
                     dataType: root.dataType
                     model: calculadoraController.tableModel
+                }
+            }
+        }
+    }
+
+    // ── Popup: historial de operaciones de este módulo ─────────────────────
+    Popup {
+        id: historyPopup
+        anchors.centerIn: parent
+        width: Math.min(720, root.width * 0.9)
+        height: Math.min(480, root.height * 0.85)
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.window_background
+            radius: 6
+            border.color: Theme.border_color
+            border.width: 1
+        }
+
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 14
+            spacing: 10
+
+            RowLayout {
+                Layout.fillWidth: true
+
+                Label {
+                    text: "Historial — Frecuencias"
+                    color: Theme.primary_text
+                    font.bold: true
+                    font.pixelSize: 14
+                    Layout.fillWidth: true
+                }
+
+                Button {
+                    text: "Limpiar"
+                    implicitHeight: 26
+                    enabled: root.historyEntries.length > 0
+                    onClicked: historyController.limpiarHistorialModulo("frecuencias")
+
+                    background: Rectangle {
+                        radius: 4
+                        color: parent.hovered ? Theme.destructive_hover : Theme.destructive_bg
+                        border.color: Theme.destructive_border
+                        border.width: 1
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: Theme.error_text
+                        font.pixelSize: 11
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+                Button {
+                    text: "✕"
+                    implicitWidth: 26
+                    implicitHeight: 26
+                    onClicked: historyPopup.close()
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: Theme.panel_background
+                radius: 4
+                border.color: Theme.border_color
+                border.width: 1
+                clip: true
+
+                HistoryTable {
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    model: root.historyEntries
+                    onDeleteRequested: (entryId) => historyController.eliminarEntrada(entryId)
+                    onLoadRequested: (entry) => root.cargarDesdeHistorial(entry)
                 }
             }
         }

@@ -3,6 +3,8 @@ import json
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
 from schemas.dispersion import DispersionItem, DispersionResult, DispersionType
+from schemas.history import HistoryModule
+from services import history_service
 from services.calculator import DispersionCalculator
 from services.parser import (
     DispersionParseError,
@@ -57,7 +59,7 @@ class DispersionController(QObject):
             self._set_error(str(exc))
             return
 
-        self._calcular(items, DispersionType.NO_AGRUPADOS, poblacional)
+        self._calcular(items, DispersionType.NO_AGRUPADOS, poblacional, valores_str)
 
     @Slot(str, bool)
     def calcularAgrupadosPorValor(self, filas_json: str, poblacional: bool) -> None:
@@ -72,7 +74,7 @@ class DispersionController(QObject):
             self._set_error(str(exc))
             return
 
-        self._calcular(items, DispersionType.AGRUPADOS_VALOR, poblacional)
+        self._calcular(items, DispersionType.AGRUPADOS_VALOR, poblacional, filas_json)
 
     @Slot(str, bool)
     def calcularAgrupadosPorIntervalo(self, filas_json: str, poblacional: bool) -> None:
@@ -87,7 +89,7 @@ class DispersionController(QObject):
             self._set_error(str(exc))
             return
 
-        self._calcular(items, DispersionType.AGRUPADOS_INTERVALO, poblacional)
+        self._calcular(items, DispersionType.AGRUPADOS_INTERVALO, poblacional, filas_json)
 
     @Slot()
     def limpiar(self) -> None:
@@ -113,6 +115,7 @@ class DispersionController(QObject):
         items: list[DispersionItem],
         data_type: DispersionType,
         poblacional: bool,
+        input_payload: str,
     ) -> None:
         self._error = ""
         res = self._calculator.calculate(items, data_type=data_type, poblacional=poblacional)
@@ -122,14 +125,22 @@ class DispersionController(QObject):
         self.tableModelChanged.emit()
         self.resultChanged.emit()
 
+        history_service.insert_entry(
+            module=HistoryModule.DISPERSION,
+            data_type=data_type.value,
+            poblacional=poblacional,
+            input_payload=input_payload,
+            result_summary=json.dumps(self._result),
+        )
+
     def _build_table_model(self, res: DispersionResult) -> list[dict]:
         rows: list[dict] = []
         for item in res.items:
             row = {
                 "xi": item.xi,
                 "f": item.f,
-                "diff": round(item.diff or 0.0, 4),
-                "diffSq": round(item.diff_sq or 0.0, 4),
+                "diff": item.diff or 0.0,
+                "diffSq": item.diff_sq or 0.0,
                 "fDiffSq": round(item.f_diff_sq or 0.0, 4),
             }
             if res.data_type == DispersionType.AGRUPADOS_INTERVALO:
