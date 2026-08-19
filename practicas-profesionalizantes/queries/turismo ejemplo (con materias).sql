@@ -26,31 +26,31 @@ GO
 ---------------------------------
 
 -- CARGA DE ESPACIOS --
-IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formaci�n General')
+IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formación General')
 BEGIN
 	INSERT INTO Espacios (Descripcion)
-	VALUES ('Espacio de Formaci�n General')
+	VALUES ('Espacio de Formación General')
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formaci�n de Fundamento')
+IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formación de Fundamento')
 BEGIN
 	INSERT INTO Espacios (Descripcion)
-	VALUES ('Espacio de Formaci�n de Fundamento')
+	VALUES ('Espacio de Formación de Fundamento')
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formaci�n Espec�fica')
+IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formación Específica')
 BEGIN
 	INSERT INTO Espacios (Descripcion)
-	VALUES ('Espacio de Formaci�n Espec�fica')
+	VALUES ('Espacio de Formación Específica')
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formaci�n de Pr�cticas Profesionalizant')
+IF NOT EXISTS (SELECT * FROM Espacios WHERE Descripcion = 'Espacio de Formación de Prácticas Profesionalizant')
 BEGIN
     INSERT INTO Espacios (Descripcion) 
-	VALUES ('Espacio de Formaci�n de Pr�cticas Profesionalizant')
+	VALUES ('Espacio de Formación de Prácticas Profesionalizant')
 END
 GO
 
@@ -133,7 +133,7 @@ SELECT @CarreraID = CarreraID FROM Carreras WHERE Nombre = 'Tecnicatura Superior
 DECLARE @CarreraCodBloqId Varchar(2);
 SELECT @CarreraCodBloqId = CarrerasCodigoBloque FROM Carreras WHERE CarreraId = @CarreraID
 
--- 1er A�o
+-- 1er Año
 
 DECLARE @AniosCarrerasCodBloq1 VARCHAR(3);
 SELECT @AniosCarrerasCodBloq1 = CONCAT(@CarreraCodBloqId, '1')
@@ -145,7 +145,7 @@ IF NOT EXISTS (SELECT * FROM AniosCarreras WHERE CarreraId = @CarreraID AND Anio
 DECLARE @AnioCarreraId1 INT;
 SELECT @AnioCarreraId1 = AnioCarreraId FROM AniosCarreras WHERE CarreraId = @CarreraID AND AnioCarrera = 1
 
--- 2do A�o
+-- 2do Año
 
 DECLARE @AniosCarrerasCodBloq2 VARCHAR(3);
 SELECT @AniosCarrerasCodBloq2 = CONCAT(@CarreraCodBloqId, '2')
@@ -157,7 +157,7 @@ IF NOT EXISTS (SELECT * FROM AniosCarreras WHERE CarreraId = @CarreraID AND Anio
 DECLARE @AnioCarreraId2 INT;
 SELECT @AnioCarreraId2 = AnioCarreraId FROM AniosCarreras WHERE CarreraId = @CarreraID AND AnioCarrera = 2
 
--- 3er A�o
+-- 3er Año
 
 DECLARE @AniosCarrerasCodBloq3 VARCHAR(3);
 SELECT @AniosCarrerasCodBloq3 = CONCAT(@CarreraCodBloqId, '3')

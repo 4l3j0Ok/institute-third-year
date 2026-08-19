@@ -1,5 +1,5 @@
 /* Estados de carrera */
-
+use instituto_db;
 IF NOT EXISTS (
     SELECT 1
 FROM CarreraEstados
