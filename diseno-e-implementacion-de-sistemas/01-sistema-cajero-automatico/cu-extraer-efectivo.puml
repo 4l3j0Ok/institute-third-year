@@ -1,0 +1,23 @@
+@startuml Extraer Efectivo
+left to right direction
+skinparam packageStyle rectangle
+
+actor Cliente
+actor "Red Central" as RedCentral
+
+rectangle "Sistema de Cajero Automático" {
+    usecase "Extraer efectivo" as UCExtraer
+    usecase "Verificar saldo y\nautorizar débito" as UCVerificar
+}
+
+Cliente --> UCExtraer
+
+UCExtraer .> UCVerificar : <<include>>
+RedCentral --> UCVerificar
+
+note bottom of UCExtraer
+Precondición:
+Usuario autenticado y cajero
+con efectivo disponible.
+end note
+@enduml
