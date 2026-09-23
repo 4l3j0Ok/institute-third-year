@@ -1,31 +1,31 @@
-using SkiaPagination.Demo.Models;
+using Pagination.Demo.Models;
 
-namespace SkiaPagination.Demo;
+namespace Pagination.Demo;
 
 /// <summary>Diálogo de Alta/Modificación de un cliente. Reutilizable para ambos casos:
-/// se instancia sin argumentos para Alta, o con un <see cref="Models.Customer"/> existente para Modificación.</summary>
-public partial class CustomerEditForm : Form
+/// se instancia sin argumentos para Alta, o con un <see cref="Models.Cliente"/> existente para Modificación.</summary>
+public partial class ClienteEditForm : Form
 {
     private readonly long _id;
 
     /// <summary>Cliente resultante, disponible cuando <see cref="Form.DialogResult"/> es <see cref="DialogResult.OK"/>.</summary>
-    public Customer? Customer { get; private set; }
+    public Cliente? Cliente { get; private set; }
 
-    public CustomerEditForm() : this(null)
+    public ClienteEditForm() : this(null)
     {
     }
 
-    public CustomerEditForm(Customer? customer)
+    public ClienteEditForm(Cliente? cliente)
     {
         InitializeComponent();
-        _id = customer?.Id ?? 0;
-        Text = customer is null ? "Nuevo cliente" : "Editar cliente";
+        _id = cliente?.Id ?? 0;
+        Text = cliente is null ? "Nuevo cliente" : "Editar cliente";
 
-        if (customer is not null)
+        if (cliente is not null)
         {
-            _nameBox.Text = customer.Name;
-            _emailBox.Text = customer.Email;
-            _cityBox.Text = customer.City;
+            _nameBox.Text = cliente.Name;
+            _emailBox.Text = cliente.Email;
+            _cityBox.Text = cliente.City;
         }
 
         _saveButton.Click += OnSave;
@@ -57,7 +57,7 @@ public partial class CustomerEditForm : Form
 
         if (!valid) return;
 
-        Customer = new Customer(_id, name, email, city);
+        Cliente = new Cliente(_id, name, email, city);
         DialogResult = DialogResult.OK;
         Close();
     }

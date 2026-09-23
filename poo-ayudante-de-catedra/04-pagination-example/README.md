@@ -1,11 +1,10 @@
-# SkiaPagination Demo
+# Pagination Demo
 
-Solución WinForms para .NET 10 con un control de paginación reutilizable dibujado por SkiaSharp y una app de ejemplo sobre SQL Server.
+Aplicación WinForms para .NET 10 con un control de paginación reutilizable (`Paginator`) y un ejemplo de grilla paginada sobre SQL Server.
 
-## Proyectos
+## Proyecto
 
-- `SkiaPagination.WinForms`: librería de componentes. Incluye `SkiaPaginator`, `PaginationStyle` y el evento `PageChanged`.
-- `SkiaPagination.Demo`: aplicación WinForms con una grilla paginada de clientes.
+- `Pagination.Demo`: aplicación WinForms con una grilla paginada de clientes. El control `Paginator` vive en `src/Pagination.Demo/Views/UserControls` junto con `PaginationStyle` y `PageChangedEventArgs`, y se compila directamente dentro de esta app (no es una librería separada).
 
 ## Ejecutar
 
@@ -21,10 +20,10 @@ En PowerShell configurá la cadena de conexión y, opcionalmente, cargá los dat
 ```powershell
 $env:PAGINATION_DEMO_CONNECTION_STRING = "Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
 $env:PAGINATION_DEMO_SEED = "true" # solo la primera vez que quieras datos demo
-dotnet run --project .\src\SkiaPagination.Demo
+dotnet run --project .\src\Pagination.Demo
 ```
 
-`PAGINATION_DEMO_CONNECTION_STRING` es obligatoria y debe apuntar a la base SQL Server creada. Al iniciar, la aplicación crea `dbo.Customers` si no existe. `PAGINATION_DEMO_SEED` es opt-in: únicamente con el valor booleano `true` crea los 123 clientes iniciales y no duplica datos si la tabla ya contiene filas.
+`PAGINATION_DEMO_CONNECTION_STRING` es obligatoria y debe apuntar a la base SQL Server creada. Al iniciar, la aplicación crea la tabla `Clientes` si no existe. `PAGINATION_DEMO_SEED` es opt-in: únicamente con el valor booleano `true` crea los 123 clientes iniciales y no duplica datos si la tabla ya contiene filas.
 
 ## Uso del componente
 
@@ -34,4 +33,4 @@ paginator.PageSize = 10;
 paginator.PageChanged += (_, e) => CargarPagina(e.Page);
 ```
 
-El componente calcula automáticamente páginas tentativas desde el `count`; cuando hay muchas páginas muestra el primer/último número y elipsis, y resalta la página activa.
+El componente calcula automáticamente páginas tentativas desde el `count`; cuando hay muchas páginas muestra el primer/último número y elipsis, y resalta la página activa. Es un `UserControl` editable desde el diseñador de Visual Studio: su diseño (flechas `‹`/`›` y el panel donde se agregan los botones de página) está en `Paginator.Designer.cs`, mientras que `Paginator.cs` contiene solo el comportamiento.

@@ -1,9 +1,9 @@
 using Microsoft.Data.SqlClient;
-using SkiaPagination.Demo.Models;
+using Pagination.Demo.Models;
 
-namespace SkiaPagination.Demo.Data;
+namespace Pagination.Demo.Data;
 
-public sealed class CustomerRepository(string connectionString)
+public sealed class ClienteRepository(string connectionString)
 {
     public void Initialize()
     {
@@ -11,9 +11,9 @@ public sealed class CustomerRepository(string connectionString)
         connection.Open();
         using var command = connection.CreateCommand();
         command.CommandText = """
-            IF OBJECT_ID(N'dbo.Customers', N'U') IS NULL
+            IF OBJECT_ID(N'Clientes', N'U') IS NULL
             BEGIN
-                CREATE TABLE dbo.Customers (
+                CREATE TABLE Clientes (
                     Id BIGINT IDENTITY(1, 1) PRIMARY KEY,
                     Name NVARCHAR(200) NOT NULL,
                     Email NVARCHAR(320) NOT NULL,
@@ -30,52 +30,52 @@ public sealed class CustomerRepository(string connectionString)
         using var connection = new SqlConnection(connectionString);
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM dbo.Customers";
+        command.CommandText = "SELECT COUNT(*) FROM Clientes";
         return Convert.ToInt32(command.ExecuteScalar());
     }
 
-    public IReadOnlyList<Customer> GetPage(int page, int pageSize)
+    public IReadOnlyList<Cliente> GetPage(int page, int pageSize)
     {
         using var connection = new SqlConnection(connectionString);
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "SELECT Id, Name, Email, City FROM dbo.Customers ORDER BY Id OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
+        command.CommandText = "SELECT Id, Name, Email, City FROM Clientes ORDER BY Id OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
         command.Parameters.AddWithValue("@pageSize", pageSize);
         command.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
         using var reader = command.ExecuteReader();
-        var customers = new List<Customer>();
-        while (reader.Read()) customers.Add(new Customer(reader.GetInt64(0), reader.GetString(1), reader.GetString(2), reader.GetString(3)));
-        return customers;
+        var clientes = new List<Cliente>();
+        while (reader.Read()) clientes.Add(new Cliente(reader.GetInt64(0), reader.GetString(1), reader.GetString(2), reader.GetString(3)));
+        return clientes;
     }
 
     /// <summary>Alta: inserta un cliente nuevo y devuelve el Id generado.</summary>
-    public long Insert(Customer customer)
+    public long Insert(Cliente cliente)
     {
         using var connection = new SqlConnection(connectionString);
         connection.Open();
         using var command = connection.CreateCommand();
         command.CommandText = """
-            INSERT INTO dbo.Customers(Name, Email, City)
+            INSERT INTO Clientes(Name, Email, City)
             OUTPUT INSERTED.Id
             VALUES (@name, @email, @city);
             """;
-        command.Parameters.AddWithValue("@name", customer.Name);
-        command.Parameters.AddWithValue("@email", customer.Email);
-        command.Parameters.AddWithValue("@city", customer.City);
+        command.Parameters.AddWithValue("@name", cliente.Name);
+        command.Parameters.AddWithValue("@email", cliente.Email);
+        command.Parameters.AddWithValue("@city", cliente.City);
         return Convert.ToInt64(command.ExecuteScalar());
     }
 
     /// <summary>Modificación: actualiza los datos de un cliente existente.</summary>
-    public void Update(Customer customer)
+    public void Update(Cliente cliente)
     {
         using var connection = new SqlConnection(connectionString);
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "UPDATE dbo.Customers SET Name = @name, Email = @email, City = @city WHERE Id = @id";
-        command.Parameters.AddWithValue("@name", customer.Name);
-        command.Parameters.AddWithValue("@email", customer.Email);
-        command.Parameters.AddWithValue("@city", customer.City);
-        command.Parameters.AddWithValue("@id", customer.Id);
+        command.CommandText = "UPDATE Clientes SET Name = @name, Email = @email, City = @city WHERE Id = @id";
+        command.Parameters.AddWithValue("@name", cliente.Name);
+        command.Parameters.AddWithValue("@email", cliente.Email);
+        command.Parameters.AddWithValue("@city", cliente.City);
+        command.Parameters.AddWithValue("@id", cliente.Id);
         command.ExecuteNonQuery();
     }
 
@@ -85,7 +85,7 @@ public sealed class CustomerRepository(string connectionString)
         using var connection = new SqlConnection(connectionString);
         connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "DELETE FROM dbo.Customers WHERE Id = @id";
+        command.CommandText = "DELETE FROM Clientes WHERE Id = @id";
         command.Parameters.AddWithValue("@id", id);
         command.ExecuteNonQuery();
     }
@@ -95,7 +95,7 @@ public sealed class CustomerRepository(string connectionString)
     private static void Seed(SqlConnection connection)
     {
         using var count = connection.CreateCommand();
-        count.CommandText = "SELECT COUNT(*) FROM dbo.Customers";
+        count.CommandText = "SELECT COUNT(*) FROM Clientes";
         if (Convert.ToInt32(count.ExecuteScalar()) > 0) return;
 
         using var transaction = connection.BeginTransaction();
@@ -103,7 +103,7 @@ public sealed class CustomerRepository(string connectionString)
         {
             using var insert = connection.CreateCommand();
             insert.Transaction = transaction;
-            insert.CommandText = "INSERT INTO dbo.Customers(Name, Email, City) VALUES (@name, @email, @city)";
+            insert.CommandText = "INSERT INTO Clientes(Name, Email, City) VALUES (@name, @email, @city)";
             insert.Parameters.AddWithValue("@name", $"Cliente {i:000}");
             insert.Parameters.AddWithValue("@email", $"cliente{i:000}@ejemplo.com");
             insert.Parameters.AddWithValue("@city", new[] { "Buenos Aires", "La Plata", "Córdoba", "Rosario" }[i % 4]);

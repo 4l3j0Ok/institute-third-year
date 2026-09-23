@@ -1,6 +1,6 @@
-namespace SkiaPagination.Demo;
+namespace Pagination.Demo;
 
-partial class CustomerEditForm
+partial class ClienteEditForm
 {
     /// <summary>Variable del diseñador necesaria.</summary>
     private System.ComponentModel.IContainer components = null;
@@ -157,7 +157,7 @@ partial class CustomerEditForm
         _cancelButton.Text = "Cancelar";
         _cancelButton.UseVisualStyleBackColor = true;
         //
-        // CustomerEditForm
+        // ClienteEditForm
         //
         AcceptButton = _saveButton;
         CancelButton = _cancelButton;
@@ -166,7 +166,7 @@ partial class CustomerEditForm
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
-        Name = "CustomerEditForm";
+        Name = "ClienteEditForm";
         Padding = new Padding(16);
         ShowIcon = false;
         ShowInTaskbar = false;

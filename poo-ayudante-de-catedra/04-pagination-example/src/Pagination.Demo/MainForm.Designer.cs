@@ -1,4 +1,4 @@
-namespace SkiaPagination.Demo;
+namespace Pagination.Demo;
 
 partial class MainForm
 {
@@ -26,7 +26,7 @@ partial class MainForm
     {
         _grid = new DataGridView();
         _status = new Label();
-        _paginator = new SkiaPagination.WinForms.SkiaPaginator();
+        _paginator = new Pagination.Demo.Views.UserControls.Paginator();
         _footer = new TableLayoutPanel();
         _toolbar = new FlowLayoutPanel();
         _addButton = new Button();
@@ -142,7 +142,7 @@ partial class MainForm
         MinimumSize = new Size(720, 480);
         Name = "MainForm";
         StartPosition = FormStartPosition.CenterScreen;
-        Text = "SkiaPagination · Demo";
+        Text = "Pagination · Demo";
         ((System.ComponentModel.ISupportInitialize)_grid).EndInit();
         _footer.ResumeLayout(false);
         _toolbar.ResumeLayout(false);
@@ -153,7 +153,7 @@ partial class MainForm
 
     private DataGridView _grid;
     private Label _status;
-    private SkiaPagination.WinForms.SkiaPaginator _paginator;
+    private Pagination.Demo.Views.UserControls.Paginator _paginator;
     private TableLayoutPanel _footer;
     private FlowLayoutPanel _toolbar;
     private Button _addButton;

@@ -2,9 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiaPagination.WinForms", "src\SkiaPagination.WinForms\SkiaPagination.WinForms.csproj", "{74D64CF3-BBAE-4D23-8E7A-9EB3F0D99312}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiaPagination.Demo", "src\SkiaPagination.Demo\SkiaPagination.Demo.csproj", "{E0A71E2C-B1B7-4A0D-AB2E-C5035631F412}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pagination.Demo", "src\Pagination.Demo\Pagination.Demo.csproj", "{E0A71E2C-B1B7-4A0D-AB2E-C5035631F412}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,10 +10,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{74D64CF3-BBAE-4D23-8E7A-9EB3F0D99312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{74D64CF3-BBAE-4D23-8E7A-9EB3F0D99312}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{74D64CF3-BBAE-4D23-8E7A-9EB3F0D99312}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{74D64CF3-BBAE-4D23-8E7A-9EB3F0D99312}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E0A71E2C-B1B7-4A0D-AB2E-C5035631F412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E0A71E2C-B1B7-4A0D-AB2E-C5035631F412}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0A71E2C-B1B7-4A0D-AB2E-C5035631F412}.Release|Any CPU.ActiveCfg = Release|Any CPU

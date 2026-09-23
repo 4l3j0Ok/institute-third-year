@@ -1,4 +1,4 @@
-namespace SkiaPagination.Demo;
+namespace Pagination.Demo;
 
 internal static class Program
 {
