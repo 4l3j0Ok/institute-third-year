@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SkiaPagination.WinForms\SkiaPagination.WinForms.csproj" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Asocia MainForm.Designer.cs con MainForm.cs para que Visual Studio
+         habilite el botón "Ver diseñador" y anide el archivo en el Explorador de soluciones. -->
+    <Compile Update="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Update="CustomerEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="CustomerEditForm.Designer.cs">
+      <DependentUpon>CustomerEditForm.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+</Project>
