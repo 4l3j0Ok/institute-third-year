@@ -1,3 +1,5 @@
+using Pagination.Demo.Views.Forms;
+
 namespace Pagination.Demo;
 
 internal static class Program

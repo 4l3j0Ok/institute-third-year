@@ -1,7 +1,7 @@
 using Pagination.Demo.Data;
 using Pagination.Demo.Models;
 
-namespace Pagination.Demo;
+namespace Pagination.Demo.Views.Forms;
 
 public partial class MainForm : Form
 {

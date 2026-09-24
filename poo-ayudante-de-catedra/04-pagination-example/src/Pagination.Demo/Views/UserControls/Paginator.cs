@@ -26,6 +26,7 @@ public partial class Paginator : UserControl
         _style.Changed += OnStyleChanged;
         _previousButton.Click += (_, _) => GoTo(CurrentPage - 1);
         _nextButton.Click += (_, _) => GoTo(CurrentPage + 1);
+        _layout.Layout += (_, _) => CenterPagesPanel();
         Rebuild();
     }
 
@@ -70,7 +71,7 @@ public partial class Paginator : UserControl
     public int TotalPages => Math.Max(1, (int)Math.Ceiling((double)TotalItems / PageSize));
 
     /// <summary>Calcula un rango de páginas visible: 1, 2, …, 10, 11 según el total y la página actual.</summary>
-    public IReadOnlyList<int?> GetTentativePages(int maxButtons = 7)
+    public IReadOnlyList<int?> GetTentativePages(int maxButtons = 5)
     {
         if (TotalPages <= maxButtons) return Enumerable.Range(1, TotalPages).Select(x => (int?)x).ToList();
         var pages = new List<int?> { 1 };
@@ -107,10 +108,25 @@ public partial class Paginator : UserControl
         foreach (var item in GetTentativePages())
             _pagesPanel.Controls.Add(item is null ? CreateEllipsis() : CreatePageButton(item.Value));
         _pagesPanel.ResumeLayout();
+        CenterPagesPanel();
 
         _previousButton.Enabled = CurrentPage > 1;
         _nextButton.Enabled = CurrentPage < TotalPages;
         ApplyStyle();
+    }
+
+    /// <summary>Centra horizontalmente <see cref="_pagesPanel"/> dentro de la columna central de
+    /// <see cref="_layout"/>, ya que un <see cref="FlowLayoutPanel"/> no ofrece alineación nativa.</summary>
+    private void CenterPagesPanel()
+    {
+        var widths = _layout.GetColumnWidths();
+        if (widths.Length < 2) return;
+
+        var cellX = widths[0];
+        var cellWidth = widths[1];
+        var x = cellX + Math.Max(0, (cellWidth - _pagesPanel.Width) / 2);
+        if (_pagesPanel.Location.X != x)
+            _pagesPanel.Location = new Point(x, _pagesPanel.Location.Y);
     }
 
     private Button CreatePageButton(int page)

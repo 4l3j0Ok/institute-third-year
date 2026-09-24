@@ -12,16 +12,16 @@
   <ItemGroup>
     <!-- Asocia cada *.Designer.cs con su *.cs para que Visual Studio habilite el botón
          "Ver diseñador" y anide el archivo en el Explorador de soluciones. -->
-    <Compile Update="MainForm.cs">
+    <Compile Update="Views\Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="MainForm.Designer.cs">
+    <Compile Update="Views\Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Update="ClienteEditForm.cs">
+    <Compile Update="Views\Forms\ClienteEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="ClienteEditForm.Designer.cs">
+    <Compile Update="Views\Forms\ClienteEditForm.Designer.cs">
       <DependentUpon>ClienteEditForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Views\UserControls\Paginator.cs">

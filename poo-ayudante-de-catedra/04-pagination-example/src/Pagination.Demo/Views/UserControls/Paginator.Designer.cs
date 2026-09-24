@@ -32,9 +32,9 @@ partial class Paginator
         _nextButton = new Button();
         _layout.SuspendLayout();
         SuspendLayout();
-        //
+        // 
         // _layout
-        //
+        // 
         _layout.ColumnCount = 3;
         _layout.ColumnStyles.Add(new ColumnStyle());
         _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -49,44 +49,47 @@ partial class Paginator
         _layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         _layout.Size = new Size(240, 40);
         _layout.TabIndex = 0;
-        //
+        // 
         // _previousButton
-        //
+        // 
         _previousButton.FlatStyle = FlatStyle.Flat;
+        _previousButton.Location = new Point(0, 3);
         _previousButton.Margin = new Padding(0, 3, 6, 3);
         _previousButton.Name = "_previousButton";
         _previousButton.Size = new Size(36, 34);
         _previousButton.TabIndex = 0;
         _previousButton.Text = "‹";
         _previousButton.UseVisualStyleBackColor = false;
-        //
+        // 
         // _pagesPanel
-        //
-        _pagesPanel.AutoSize = false;
-        _pagesPanel.Dock = DockStyle.Fill;
-        _pagesPanel.FlowDirection = FlowDirection.LeftToRight;
+        // 
+        _pagesPanel.Anchor = AnchorStyles.None;
+        _pagesPanel.AutoSize = true;
+        _pagesPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        _pagesPanel.Location = new Point(42, 0);
         _pagesPanel.Margin = new Padding(0);
         _pagesPanel.Name = "_pagesPanel";
-        _pagesPanel.Size = new Size(150, 40);
+        _pagesPanel.Size = new Size(156, 40);
         _pagesPanel.TabIndex = 1;
         _pagesPanel.WrapContents = false;
-        //
+        // 
         // _nextButton
-        //
+        // 
         _nextButton.FlatStyle = FlatStyle.Flat;
+        _nextButton.Location = new Point(204, 3);
         _nextButton.Margin = new Padding(6, 3, 0, 3);
         _nextButton.Name = "_nextButton";
         _nextButton.Size = new Size(36, 34);
         _nextButton.TabIndex = 2;
         _nextButton.Text = "›";
         _nextButton.UseVisualStyleBackColor = false;
-        //
+        // 
         // Paginator
-        //
+        // 
+        AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
         Controls.Add(_layout);
         Cursor = Cursors.Hand;
-        Height = 40;
         MinimumSize = new Size(240, 40);
         Name = "Paginator";
         Size = new Size(240, 40);
