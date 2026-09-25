@@ -1,21 +1,19 @@
 # Paginación en una aplicación WinForms
 
-## Objetivo
+## De qué se trata esto
 
-Esta guía explica cómo mostrar una lista grande de registros por bloques en una aplicación WinForms. En lugar de cargar todos los clientes en el `DataGridView`, la aplicación consulta únicamente los registros de la página seleccionada y permite navegar entre ellas con `Paginator`.
+Esta guía muestra cómo se construyó la paginación de una aplicación WinForms que lista clientes. La tabla `Clientes` tiene 123 filas y se muestran en un `DataGridView`. Traerlas todas de una sola consulta y dejar que la grilla se las arregle es una opción, pero implica viajar 123 filas por la red cada vez que se abre la ventana, y esa cantidad solo va a crecer con el tiempo. Por eso se aplica paginación: se piden bloques de 10 registros, se muestran botones para moverse entre páginas, y la base de datos hace el trabajo de recortar el bloque que corresponde en cada momento. Con 123 clientes y 10 por página, el resultado son 13 páginas: las primeras 12 completas y la última con 3.
 
-El ejemplo trabaja con 123 clientes y muestra 10 por página. Por eso genera 13 páginas: las primeras 12 contienen 10 registros y la última contiene 3.
+Antes de entrar en el código, se repasan algunas ideas de C# y ADO.NET que aparecen todo el tiempo más abajo y que quizás no se vieron todavía en la cursada. Si ya son conocidas, se puede saltar directamente a [Pensando primero en la base de datos](#pensando-primero-en-la-base-de-datos).
 
-## Conceptos previos
-
-El código usa algunas ideas de C# y de ADO.NET (la forma en que .NET habla con una base de datos) que quizás todavía no viste en la cursada. Antes de seguir, repasemos cada una.
+## Conceptos nuevos a tener en cuenta utilizados en este ejemplo
 
 ### Conexión y comando SQL (ADO.NET)
 
 ADO.NET es la biblioteca de .NET para hablar con una base de datos relacional. Trabaja con dos objetos principales:
 
 - `SqlConnection`: representa la conexión abierta hacia el servidor de base de datos (dirección, usuario, base a usar, etc.). Sin una conexión abierta no se puede ejecutar ninguna instrucción.
-- `SqlCommand` (`command`: "orden" o "instrucción"): representa una instrucción SQL puntual (un `SELECT`, un `INSERT`, etc.) que se ejecuta sobre esa conexión. Se obtiene con `connection.CreateCommand()` y su texto se define en la propiedad `CommandText`.
+- `SqlCommand`: representa una instrucción SQL puntual (un `SELECT`, un `INSERT`, etc.) que se ejecuta sobre esa conexión. Se obtiene con `connection.CreateCommand()` y su texto se define en la propiedad `CommandText`.
 
 Una vez armado el comando, existe un método distinto según lo que se espera como resultado:
 
@@ -25,7 +23,7 @@ Una vez armado el comando, existe un método distinto según lo que se espera co
 | `ExecuteReader()`   | La consulta devuelve varias filas                            | Un `SqlDataReader` para recorrerlas una por una con `while (reader.Read())` |
 | `ExecuteNonQuery()` | La instrucción modifica datos (`INSERT`, `UPDATE`, `DELETE`) | La cantidad de filas afectadas; no hay filas para leer                      |
 
-> `Scalar` viene del término matemático "escalar": un único valor, a diferencia de una lista. Por eso `ExecuteScalar` devuelve un solo dato. `NonQuery` es literalmente "no consulta" (`non` = no, `query` = consulta): se usa cuando la instrucción no devuelve filas para leer.
+> `ExecuteScalar` devuelve un único valor, como el resultado de `COUNT(*)`. `ExecuteNonQuery` se usa cuando la instrucción no devuelve filas para leer, solo la cantidad de filas afectadas.
 
 ### Consultas parametrizadas
 
@@ -43,9 +41,9 @@ Esto tiene dos ventajas frente a concatenar strings:
 
 ### `using` e `IDisposable`
 
-Algunos objetos representan recursos "caros" que el sistema operativo debe liberar explícitamente cuando se dejan de usar: conexiones de red, archivos abiertos, handles, etc. En .NET, esos objetos implementan la interfaz `IDisposable`, que define un método `Dispose()` (de "deshacerse de algo", no de "disponer" en el sentido de "tener disponible", un falso amigo frecuente) para liberarlos.
+Algunos objetos representan recursos "caros" que el sistema operativo debe liberar explícitamente cuando se dejan de usar: conexiones de red, archivos abiertos, handles, etc. En .NET, esos objetos implementan la interfaz `IDisposable`, que define un método `Dispose()` (de "deshacerse de algo", no de "disponer") para liberarlos.
 
-`SqlConnection` es uno de esos objetos. En vez de acordarse de llamar a `Dispose()` a mano (y arriesgarse a olvidarlo si ocurre una excepción en el medio), C# ofrece la palabra clave `using`:
+`SqlConnection` es uno de esos objetos. En vez de llamar a `Dispose()` a mano —con el riesgo de olvidarlo si ocurre una excepción en el medio—, se usa la palabra clave `using`:
 
 ```csharp
 using var connection = new SqlConnection(connectionString);
@@ -54,75 +52,25 @@ connection.Open();
 // Dispose() se llama automáticamente al salir del bloque, incluso si hubo una excepción.
 ```
 
-Por eso en el código vas a ver `using var connection = ...` y `using var command = ...` en casi todos los métodos del repositorio.
+Por eso aparece `using var connection = ...` y `using var command = ...` en casi todos los métodos del repositorio.
 
 **Ojo con una fuente común de confusión:** la palabra `using` se usa en C# para dos cosas completamente distintas. Arriba de todo del archivo, `using System;` importa un espacio de nombres (namespace). Acá, `using var connection = ...` es otra cosa: un _statement_ que garantiza la liberación del recurso. Se llama igual por casualidad del diseño del lenguaje, pero no tienen relación entre sí.
 
-### Propiedades con campo de respaldo (_backing field_)
+### Suscribirse a un evento con una lambda, sin pasar por el Designer
 
-Ya conocés las propiedades automáticas, donde el compilador genera el campo privado por vos:
-
-```csharp
-public int PageSize { get; set; } = 10;
-```
-
-Cuando una propiedad necesita **validar o transformar** el valor antes de guardarlo, hay que declarar el campo privado a mano (el _backing field_ o "campo de respaldo" —`backing` viene de "to back up", respaldar o sostener algo desde atrás—, por convención con guion bajo) y escribir la lógica en el `set`:
-
-```csharp
-private int _totalItems;
-
-public int TotalItems
-{
-    get => _totalItems;
-    set { _totalItems = Math.Max(0, value); ClampPage(); Invalidate(); }
-}
-```
-
-Acá `TotalItems` nunca puede quedar en negativo: cualquier valor que se le asigne pasa primero por `Math.Max(0, value)`. Es la misma idea de una propiedad automática, pero con una regla de negocio agregada.
-
-### Eventos y expresiones lambda
-
-Un **evento** es la forma en que un objeto avisa a otros que "algo pasó", sin necesidad de conocerlos de antemano. Se declara así:
-
-```csharp
-public event EventHandler<PageChangedEventArgs>? PageChanged;
-```
-
-- `EventHandler<T>` (`handler`: "manejador", de "to handle" = manejar/atender) es el tipo estándar de .NET para eventos: siempre recibe dos parámetros, el objeto que dispara el evento (`sender`, literalmente "quien envía") y un objeto con los datos del evento (en este caso, `PageChangedEventArgs`, que trae la página elegida).
-- Otro objeto se **suscribe** al evento con el operador `+=`, pasando un método o una función anónima (**lambda**) que se va a ejecutar cada vez que el evento se dispare.
-
-> `Lambda` no viene del inglés cotidiano sino de la letra griega λ. En los años 30, el matemático Alonzo Church la usó para representar funciones en un sistema lógico llamado "cálculo lambda". Los lenguajes de programación heredaron el nombre para las funciones anónimas y cortas, como la que sigue.
+Hasta ahora, la forma habitual de manejar un evento fue doble clic sobre un control en el Diseñador: Visual Studio genera un método (por ejemplo, `button1_Click`) y lo suscribe automáticamente en `InitializeComponent()`. Esa no es la única manera de hacerlo. El mismo `+=` que se usa ahí se puede escribir a mano en el constructor, pasando directamente una expresión **lambda** en vez de un método con nombre:
 
 ```csharp
 _paginator.PageChanged += (_, args) => LoadPage(args.Page);
 ```
 
-Esa línea se lee así: "cuando `_paginator` dispare `PageChanged`, ejecutá `LoadPage(args.Page)`". La lambda `(_, args) => ...` recibe los dos parámetros de `EventHandler<T>`; el `_` es un _discard_ (descarte, de "to discard": tirar algo que no se va a usar) que indica "no me interesa este parámetro" —en este caso, el `sender`—, mientras que `args` sí se usa para leer `args.Page`.
+Esa línea logra lo mismo que hacer doble clic en el Diseñador, pero sin generar un método aparte ni tocar el archivo `.Designer.cs`: se lee como "cuando `_paginator` dispare `PageChanged`, ejecutá `LoadPage(args.Page)`". La lambda `(_, args) => ...` recibe los dos parámetros que trae `EventHandler<PageChangedEventArgs>` (el `sender` y los datos del evento); el `_` es un _discard_ que indica que ese parámetro no se necesita —en este caso, el `sender`—, mientras que `args` sí se usa para leer `args.Page`.
 
-### Data binding
-
-_Data binding_ (enlace de datos; `binding` viene de "to bind" = atar/vincular) es la técnica por la cual un control visual muestra automáticamente el contenido de una colección de objetos, sin que el programador tenga que agregar filas o columnas a mano.
-
-```csharp
-_grid.DataSource = _repository.GetPage(page, PageSize);
-```
-
-Al asignar una lista de `Cliente` a `DataSource`, el `DataGridView` inspecciona las propiedades públicas de `Cliente` (`Id`, `Name`, `Email`, `City`) y genera una columna por cada una, más una fila por cada elemento de la lista. El control queda literalmente "atado" a la colección: si la lista cambia, alcanza con volver a asignar `DataSource` para que la grilla se actualice sola.
-
-### Clases parciales (`partial class`)
-
-El modificador `partial` permite dividir la definición de una misma clase en varios archivos `.cs`; en tiempo de compilación, C# los combina como si fueran uno solo.
-
-WinForms aprovecha esto para separar dos responsabilidades:
-
-- `MainForm.Designer.cs`: generado automáticamente por el Diseñador de Visual Studio. Contiene la declaración de los controles y su configuración (posición, tamaño, nombre) dentro de `InitializeComponent()`.
-- `MainForm.cs`: donde el desarrollador escribe la lógica propia (qué hacer cuando se hace clic en un botón, cómo cargar una página, etc.).
-
-Ambos archivos empiezan con `public partial class MainForm : Form`, y juntos forman una única clase `MainForm`.
+Esta forma es útil cuando el evento se suscribe a un control que no viene del Diseñador (como pasa más abajo con `_paginator`, que es un `UserControl` propio) o simplemente cuando conviene mantener la lógica junto al resto del constructor en vez de repartirla en dos archivos.
 
 ### `sealed`
 
-`Sealed` viene del verbo "to seal": sellar, como sellar un sobre o un frasco. Una vez que algo está sellado, queda cerrado: nadie puede abrirlo para agregarle o sacarle algo por encima. En C#, el modificador `sealed` marca una clase (o un `record`) como **no heredable**: ninguna otra clase puede escribir `class Otra : ClienteRepository`. Se usa así:
+El modificador `sealed` marca una clase (o un `record`) como **no heredable**: ninguna otra clase puede escribir `class Otra : ClienteRepository`. Se usa así:
 
 ```csharp
 public sealed class ClienteRepository(string connectionString)
@@ -133,32 +81,31 @@ public sealed class ClienteRepository(string connectionString)
 public sealed record Cliente(long Id, string Name, string Email, string City);
 ```
 
-En este proyecto casi todas las clases son `sealed` (`Cliente`, `ClienteRepository`, `PaginationStyle`, `PageChangedEventArgs`) porque ninguna fue diseñada para ser una clase base: no tienen miembros `protected` ni `virtual` pensados para que una subclase los redefina. Marcarlas como `sealed` dos beneficios:
+En este proyecto casi todas las clases están marcadas como `sealed` (`Cliente`, `ClienteRepository`, `PaginationStyle`, `PageChangedEventArgs`) porque ninguna fue diseñada para ser una clase base: no tienen miembros `protected` ni `virtual` pensados para que una subclase los redefina. Esto trae dos beneficios:
 
 - **Comunica la intención:** cualquiera que lea el código sabe que esa clase se usa "tal cual", sin extenderla.
 - **Evita errores de herencia accidental:** nadie puede heredar de `ClienteRepository` y romper su comportamiento interno sin darse cuenta.
 
-Si más adelante una clase necesita ser extendida, simplemente se le quita el `sealed`.
+Si más adelante alguna clase necesitara ser extendida, alcanza con quitarle el `sealed`.
 
-## ¿Para qué sirve paginar?
+## Qué es paginar y cuándo conviene
 
-La paginación mejora la experiencia de uso y reduce el trabajo de la aplicación y de la base de datos cuando existen muchos registros. Sus beneficios principales son:
+Paginar es dividir un conjunto grande de datos en bloques (páginas) y trabajar con un bloque por vez, en lugar de traer y mostrar todo de una sola vez. Es una técnica común en cualquier lista larga —clientes, productos, pedidos, resultados de búsqueda— que aparece tanto en aplicaciones de escritorio como en sitios web y APIs.
 
-- Evita traer y enlazar todos los registros al `DataGridView`.
-- Mantiene una cantidad de filas manejable para el usuario.
-- Permite indicar con precisión qué parte del total se está visualizando.
-- Hace que cada consulta solicite solo los datos necesarios mediante `OFFSET` y `FETCH NEXT`.
+Conviene paginar cuando:
 
-En esta implementación las páginas se numeran desde 1. Para una página `p` y un tamaño `s`, el desplazamiento de la consulta es `(p - 1) * s`.
+- La cantidad de registros es grande o va a seguir creciendo con el tiempo (una tabla con 100 filas hoy puede tener 100.000 mañana).
+- Solo hace falta mostrar una porción a la vez, como ocurre en un `DataGridView`, una lista en una página web o los resultados de un buscador.
+- Traer todo junto sería lento o consumiría demasiada memoria, tanto en el cliente como en el servidor.
 
-## Fundamentos de base de datos
+No tiene mucho sentido paginar cuando el conjunto de datos es chico y estable —por ejemplo, una lista fija de 20 categorías—, porque ahí el costo de agregar la lógica de paginación supera el beneficio.
 
-Antes de escribir código de WinForms, conviene separar el problema en dos preguntas que resuelve la base de datos:
+Antes de tocar WinForms conviene definir qué se le va a pedir a SQL Server, porque toda la paginación depende de eso. Hay dos preguntas para resolver:
 
-1. ¿Cuántos registros existen? El total permite saber cuántas páginas hay y mostrar el estado de la grilla.
-2. ¿Qué registros corresponden a la página actual? La consulta devuelve solamente ese bloque, no la tabla completa.
+1. ¿Cuántos registros hay en total? Sin ese número no se puede calcular cuántas páginas existen ni mostrar el estado de la grilla.
+2. ¿Qué registros corresponden a la página que el usuario está mirando? La consulta tiene que devolver solo ese bloque, nunca la tabla completa.
 
-La tabla `Clientes` tiene la siguiente estructura:
+En nuestro ejemplo, la tabla `Clientes` tiene esta estructura:
 
 | Columna | Tipo                      | Descripción                                       |
 | ------- | ------------------------- | ------------------------------------------------- |
@@ -167,21 +114,22 @@ La tabla `Clientes` tiene la siguiente estructura:
 | `Email` | `NVARCHAR(320)`           | Correo electrónico del cliente.                   |
 | `City`  | `NVARCHAR(100)`           | Ciudad del cliente.                               |
 
-Supongamos esa tabla, una página 3 y 10 registros por página. El desplazamiento se calcula una única vez en la aplicación antes de ejecutar la consulta:
+Para traer el bloque correcto, la aplicación necesita saber cuántos registros hay que saltear antes de empezar a leer la página pedida. Ese número se llama **desplazamiento** (_offset_), y es simplemente la cantidad de registros que ocupan todas las páginas anteriores a la actual:
 
-```sql
--- page = 3, pageSize = 10
--- offset = (page - 1) * pageSize = 20
+```
+offset = (page - 1) * pageSize
 ```
 
-Primero se consulta el total. Si la grilla permite filtrar, el `WHERE` de esta consulta debe ser el mismo que el de la consulta de la página.
+Por ejemplo, con páginas de 10 registros: la página 1 no salta nada (offset 0, porque no hay páginas anteriores), la página 2 salta la página 1 completa (offset 10), y la página 3 salta las dos páginas anteriores (offset 20). Este cálculo se hace una sola vez en la aplicación, antes de armar la consulta.
+
+Primero se pide el total. Si la grilla tuviera filtros, el `WHERE` de esta consulta tendría que ser idéntico al de la consulta de la página, porque si no los números no coinciden entre sí.
 
 ```sql
 SELECT COUNT(*) AS TotalRegistros
 FROM Clientes;
 ```
 
-En SQL Server, la página se obtiene con `OFFSET ... FETCH NEXT`. `ORDER BY` define un orden estable y es obligatorio al usar esta forma de paginación; sin él, la noción de "página 3" no sería confiable.
+Para traer la página en sí, se usa `OFFSET ... FETCH NEXT`, que es la forma que ofrece SQL Server para este tipo de recorte. El `ORDER BY` acá no es opcional: sin un orden estable, la noción de "página 3" no significa nada, porque el motor podría devolver las filas en cualquier orden entre una consulta y la siguiente.
 
 ```sql
 SELECT Id, Name, Email, City
@@ -191,13 +139,13 @@ OFFSET @Desplazamiento ROWS
 FETCH NEXT @TamanoPagina ROWS ONLY;
 ```
 
-Con el ejemplo anterior, SQL Server omite los primeros 20 clientes ordenados por `Id` y devuelve los siguientes 10: los registros 21 a 30. Si el total fuera 123, la cantidad de páginas sería `CEILING(123.0 / 10)`, es decir, 13. En una grilla con filtros, el mismo `WHERE` debe aplicarse tanto al `COUNT(*)` como a la consulta paginada.
+Con offset 20 y tamaño 10, SQL Server descarta los primeros 20 clientes ordenados por `Id` y devuelve los siguientes 10: los registros 21 a 30. Con un total de 123, la cantidad de páginas sale de `CEILING(123.0 / 10)`, o sea 13.
 
-El flujo se mantiene siempre igual: contar, calcular el desplazamiento, ordenar y solicitar solo el bloque necesario.
+El patrón se repite siempre igual: se cuenta, se calcula el desplazamiento, se ordena y se pide solo el bloque necesario. Con esto resuelto del lado de la base, se puede pasar a la aplicación.
 
-Ahora que el concepto de paginación en la base de datos está claro, vamos con el código que conecta esas consultas con la grilla y el control de navegación de WinForms.
+## Armando las piezas
 
-## Componentes de la solución
+Para que esto funcione en WinForms se necesitan tres piezas que se reparten el trabajo:
 
 | Componente          | Responsabilidad                                                                 |
 | ------------------- | ------------------------------------------------------------------------------- |
@@ -205,21 +153,60 @@ Ahora que el concepto de paginación en la base de datos está claro, vamos con 
 | `Paginator`         | Crea los botones de página, calcula las páginas visibles y emite `PageChanged`. |
 | `MainForm`          | Coordina la consulta, el `DataGridView`, el paginador y el texto de estado.     |
 
-## Paso 1: preparar la conexión a SQL Server
+### Cómo está organizado el proyecto
 
-La aplicación usa el proveedor `Microsoft.Data.SqlClient`. Agregá la referencia a este paquete en el proyecto de la demo:
+Antes de entrar en cada pieza, conviene mirar cómo se acomodan los archivos dentro de `src/Pagination.Demo`, porque los nombres de carpetas y de clases no son arbitrarios: siguen convenciones habituales en proyectos .NET que ayudan a ubicar rápido dónde vive cada responsabilidad.
+
+```
+Pagination.Demo/
+├── Data/
+│   └── ClienteRepository.cs
+├── Models/
+│   └── Cliente.cs
+├── Views/
+│   ├── Forms/
+│   │   ├── MainForm.cs
+│   │   ├── MainForm.Designer.cs
+│   │   ├── ClienteEditForm.cs
+│   │   └── ClienteEditForm.Designer.cs
+│   └── UserControls/
+│       ├── Paginator.cs
+│       ├── Paginator.Designer.cs
+│       ├── PaginationStyle.cs
+│       └── PageChangedEventArgs.cs
+└── Program.cs
+```
+
+- **`Models/`**: guarda las clases que representan datos, sin lógica de acceso a la base ni de interfaz. `Cliente` es un `record` con las propiedades `Id`, `Name`, `Email` y `City`: nada más que eso.
+- **`Data/`**: guarda las clases que saben hablar con la base de datos. Por convención, una clase que centraliza el acceso a una tabla o entidad se llama `<Entidad>Repository` —de ahí `ClienteRepository`—, siguiendo el **patrón Repository**: el resto de la aplicación le pide clientes a `ClienteRepository` sin necesidad de saber que atrás hay SQL, `SqlConnection` o `SqlCommand`. Si el día de mañana se cambiara de SQL Server a otro motor, en teoría alcanzaría con reescribir esta clase.
+- **`Views/`**: agrupa todo lo relacionado con la interfaz gráfica. Adentro se separa por tipo de control:
+  - **`Forms/`**: las ventanas completas de la aplicación, `MainForm` y `ClienteEditForm`. Por convención, cada una termina en `Form` (o se llama directamente `MainForm` cuando es la ventana principal).
+  - **`UserControls/`**: controles reutilizables como `Paginator`, que no son una ventana completa sino un componente que se inserta dentro de otras ventanas.
+- **`Program.cs`**: es el punto de entrada de la aplicación (el método `Main`), que arranca WinForms y muestra el primer formulario.
+
+Otros nombres también siguen una convención reconocible:
+
+- `PageChangedEventArgs` termina en `EventArgs` porque es la clase que viaja como segundo parámetro de un evento (ver [Eventos y expresiones lambda](#suscribirse-a-un-evento-con-una-lambda-sin-pasar-por-el-designer)); es el mismo patrón que usa .NET con `EventArgs` en toda su biblioteca estándar.
+- `PaginationStyle` agrupa únicamente propiedades de apariencia (colores, fuente, radio de esquina): el sufijo `Style` indica que no tiene comportamiento, solo configuración visual.
+- Los archivos `.Designer.cs` (`MainForm.Designer.cs`, `Paginator.Designer.cs`) siempre acompañan a un archivo sin ese sufijo y son generados por el Diseñador de Visual Studio (ver [Clases parciales](#clases-parciales-partial-class)); nunca se edita ese archivo a mano.
+
+Ninguna de estas convenciones es obligatoria para que el código compile: son acuerdos que facilitan que cualquiera que conozca el patrón Repository o la estructura típica de un proyecto WinForms pueda orientarse sin tener que leer todo el código primero.
+
+### La conexión a SQL Server
+
+Se usa el proveedor `Microsoft.Data.SqlClient`, así que lo primero es agregar la referencia al paquete:
 
 ```xml
 <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
 ```
 
-Antes de ejecutar, creá una base SQL Server y configurá su cadena de conexión. La aplicación crea la tabla `Clientes` en esa base cuando se inicia.
+Antes de correr nada hace falta una base SQL Server y su cadena de conexión. La aplicación se encarga de crear la tabla `Clientes` cuando arranca, así que no hace falta scriptearla a mano:
 
 ```powershell
 $env:PAGINATION_DEMO_CONNECTION_STRING = "Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
 ```
 
-`MainForm` obtiene esa configuración y la entrega al repositorio. Si no se define, la aplicación se detiene con un mensaje que indica cómo configurarla.
+`MainForm` lee esa variable de entorno y se la pasa al repositorio. Si no está definida, la aplicación falla rápido con un mensaje claro, en vez de arrastrar el problema más adelante:
 
 ```csharp
 var connectionString = Environment.GetEnvironmentVariable(
@@ -231,28 +218,20 @@ _repository = new ClienteRepository(connectionString);
 _repository.Initialize();
 ```
 
-## Paso 2: definir el tamaño de página
-
-En `MainForm` se declara una constante para que la misma cantidad se use al consultar la base y al calcular las páginas.
+En `MainForm` también se declara una constante para el tamaño de página, porque la misma cantidad se necesita tanto para consultar la base como para calcular las páginas:
 
 ```csharp
 private const int PageSize = 10;
 ```
 
-> **[CAPTURA PENDIENTE DEL DESIGNER 1]**
->
-> Insertar una captura de `MainForm` en el Diseñador con el `DataGridView` y el panel inferior que contendrá el paginador.
+### El repositorio: contar y traer una página
 
-## Paso 3: consultar solo los registros necesarios
+Con la conexión resuelta, el repositorio necesita exactamente dos operaciones:
 
-El repositorio necesita dos operaciones distintas:
+1. `Count()`, que devuelve el total de filas para calcular cuántas páginas existen.
+2. `GetPage(page, pageSize)`, que trae solo el bloque que corresponde a la página pedida.
 
-1. `Count()` obtiene el total de filas. Ese valor permite calcular cuántas páginas existen.
-2. `GetPage(page, pageSize)` recupera solo el bloque que corresponde a la página solicitada.
-
-La consulta usa parámetros para enviar el tamaño y el desplazamiento. `OFFSET` omite las filas de las páginas anteriores y `FETCH NEXT` restringe las filas devueltas.
-
-`connection.CreateCommand()` crea el `SqlCommand` que va a ejecutar la consulta sobre esa conexión; `command.CommandText` es el texto SQL y `command.Parameters` son los valores que reemplazan a `@offset` y `@pageSize` (ver [Conceptos previos](#conceptos-previos)). El método devuelve `IReadOnlyList<Cliente>`, es decir, una lista que quien la recibe puede leer pero no modificar.
+Para esta segunda consulta se usan parámetros para enviar el tamaño y el desplazamiento: `connection.CreateCommand()` crea el `SqlCommand`, `command.CommandText` lleva el SQL, y `command.Parameters` reemplaza a `@offset` y `@pageSize` (ver [Conceptos previos](#conceptos-previos) si esto no resulta familiar). El método devuelve `IReadOnlyList<Cliente>` porque quien lo llama solo necesita leer la lista, no modificarla.
 
 ```csharp
 public IReadOnlyList<Cliente> GetPage(int page, int pageSize)
@@ -269,15 +248,13 @@ public IReadOnlyList<Cliente> GetPage(int page, int pageSize)
 }
 ```
 
-Si se solicita la página 3 con 10 elementos por página, el desplazamiento será `(3 - 1) * 10`, es decir, 20. SQL Server devolverá los registros 21 a 30 según el orden definido por `ORDER BY Id`.
+Si se pide la página 3 con 10 elementos por página, el desplazamiento sale `(3 - 1) * 10 = 20`, y SQL Server devuelve los registros 21 a 30 según el `ORDER BY Id`. Vale la pena repetirlo porque es fácil olvidarlo en el código real: sin `ORDER BY`, un mismo registro podría aparecer en distintas páginas entre una consulta y otra.
 
-> **Importante:** el `ORDER BY` es obligatorio en una lista paginada. Sin un orden estable, un mismo registro podría aparecer en distintas páginas entre una consulta y otra.
+### El paginador: un `UserControl` para no reinventar la rueda en cada formulario
 
-## Paso 4: agregar y configurar el paginador en el Designer
+En vez de dibujar los botones de página a mano dentro de `MainForm`, esa lógica se encapsula en un `UserControl` propio, `Paginator`, que vive en `src/Pagination.Demo/Views/UserControls` dentro del mismo proyecto. Una vez compilado queda disponible en el cuadro de herramientas, y se arrastra a `MainForm` como cualquier otro control.
 
-`Paginator` es un `UserControl` que vive en `src/Pagination.Demo/Views/UserControls`, dentro del mismo proyecto de la aplicación (no es una librería separada). Después de compilar, queda disponible en el cuadro de herramientas para arrastrarlo a cualquier formulario del proyecto, igual que cualquier otro control de WinForms.
-
-Configurá estas propiedades desde la ventana **Propiedades**:
+Se configuran estas propiedades desde la ventana **Propiedades**:
 
 | Propiedad     | Valor        | Propósito                                        |
 | ------------- | ------------ | ------------------------------------------------ |
@@ -287,13 +264,11 @@ Configurá estas propiedades desde la ventana **Propiedades**:
 | `Dock`        | `Fill`       | Hace que el control ocupe la celda del pie.      |
 | `MinimumSize` | `240, 40`    | Conserva espacio suficiente para los botones.    |
 
-Ubicá el control debajo de la grilla, junto con un `Label` llamado `_status`. En el ejemplo, ambos controles están dentro de un `TableLayoutPanel` con dos columnas: una para el paginador y otra para el estado.
+Se ubica debajo de la grilla, dentro de un `TableLayoutPanel` llamado `_footer` con una sola columna y dos filas: la primera fila tiene al paginador y la segunda a un `Label` llamado `_status` que muestra el rango mostrado.
 
-> **[CAPTURA PENDIENTE DEL DESIGNER 2]**
->
-> Insertar una captura del `TableLayoutPanel` inferior mostrando `_paginator` y `_status`.
+> ![](image.png)
 
-El control expone `TotalItems`, `PageSize` y `CurrentPage`. A partir de los dos primeros calcula `TotalPages`; por ejemplo, 123 elementos con tamaño 10 producen 13 páginas.
+Del lado del código, el control expone `TotalItems`, `PageSize` y `CurrentPage`, y a partir de los dos primeros calcula `TotalPages` (123 elementos con tamaño 10 dan 13 páginas):
 
 ```csharp
 public partial class Paginator : UserControl
@@ -309,32 +284,32 @@ public partial class Paginator : UserControl
 }
 ```
 
-Estas propiedades no son automáticas (`{ get; set; }`): cada una guarda su valor en un campo privado (`_totalItems`, `_pageSize`) y el `set` valida ese valor antes de guardarlo —por ejemplo, `TotalItems` no puede quedar negativo, y `CurrentPage` no puede superar `TotalPages` (ver `ClampPage` y `GoTo` más abajo). Los atributos que aparecen arriba de cada propiedad en el código real (`[Category]`, `[Description]`, `[DefaultValue]`, `[ToolboxItem(true)]`) no afectan el comportamiento del control: son metadatos que usa Visual Studio para mostrar el control en el cuadro de herramientas y organizar sus propiedades en la ventana **Propiedades** del Diseñador.
+Ninguna de estas propiedades es automática: el `set` de cada una valida el valor antes de guardarlo —por ejemplo, si `TotalItems` recibe un número negativo, simplemente se guarda 0 en su lugar; y `CurrentPage` no puede superar `TotalPages` (esto se resuelve en `ClampPage` y `GoTo`, más abajo). Los atributos que aparecen arriba de cada propiedad en el código real (`[Category]`, `[Description]`, `[DefaultValue]`, `[ToolboxItem(true)]`) no cambian el comportamiento del control: son metadatos que usa Visual Studio para mostrarlo en el cuadro de herramientas y organizar sus propiedades en el Diseñador.
 
 Igual que `MainForm` y `ClienteEditForm`, `Paginator` está dividido en dos archivos: `Paginator.Designer.cs` (generado por el Diseñador, define las flechas `‹`/`›` y el panel donde se agregan los botones de página dentro de `InitializeComponent()`) y `Paginator.cs` (la lógica: `TotalItems`, `PageSize`, `CurrentPage`, `GetTentativePages`, y la creación dinámica de los botones numéricos según la página actual).
 
-## Paso 5: conectar el evento y cargar la primera página
+### Conectando el paginador con el formulario
 
-En el constructor de `MainForm`, asociá el evento `PageChanged` y cargá la página 1 cuando el formulario ya se mostró. Esto evita consultar datos antes de que los controles estén listos.
+Ya con el control en el formulario, en el constructor de `MainForm` se suscribe el evento `PageChanged` y se dispara la carga de la página 1 recién cuando el formulario ya se mostró, para no consultar datos antes de que los controles estén listos:
 
 ```csharp
 _paginator.PageChanged += (_, args) => LoadPage(args.Page);
 Shown += (_, _) => LoadPage(1);
 ```
 
-La primera línea suscribe una lambda al evento `PageChanged` de `_paginator`: cada vez que el paginador dispare ese evento, se va a ejecutar `LoadPage(args.Page)`, donde `args.Page` es la página que el usuario eligió. El primer parámetro de la lambda (el objeto que disparó el evento) se ignora con `_` porque no se necesita. La segunda línea hace lo mismo con el evento `Shown` del formulario, que se dispara una sola vez cuando la ventana ya es visible; ahí se ignoran los dos parámetros porque tampoco se usan.
+La primera línea dice: cada vez que `_paginator` dispare `PageChanged`, se ejecuta `LoadPage(args.Page)`, donde `args.Page` es la página que el usuario eligió. El primer parámetro (el objeto que disparó el evento) se ignora con `_` porque no se necesita. La segunda línea hace lo mismo con `Shown`, que se dispara una sola vez cuando la ventana ya es visible; ahí se ignoran los dos parámetros porque tampoco se usan.
 
-Cada vez que el usuario selecciona un número, la flecha anterior o la flecha siguiente, `Paginator` actualiza `CurrentPage` y publica `PageChanged` con el número de destino.
+De acá en más, cada vez que el usuario toca un número, la flecha anterior o la siguiente, `Paginator` actualiza `CurrentPage` internamente y publica `PageChanged` con el número de destino. Todo lo demás pasa por `LoadPage`.
 
-## Paso 6: centralizar la carga de una página
+### `LoadPage`: donde se junta todo
 
-`LoadPage` es el punto central de la paginación. Debe realizar estas tareas, siempre en este orden:
+Este método es el corazón de la paginación, y está escrito para que siempre haga lo mismo, en el mismo orden:
 
-1. Contar los registros actuales.
-2. Asignar el total al paginador para que calcule y valide sus páginas.
-3. Consultar la página solicitada.
-4. Enlazar el resultado al `DataGridView`.
-5. Actualizar el texto que informa el rango mostrado.
+1. Cuenta los registros actuales.
+2. Le pasa el total al paginador para que calcule y valide sus páginas.
+3. Consulta la página solicitada.
+4. Enlaza el resultado al `DataGridView`.
+5. Actualiza el texto que informa el rango mostrado.
 
 ```csharp
 private void LoadPage(int page)
@@ -355,11 +330,11 @@ private void LoadPage(int page)
 }
 ```
 
-`_grid.DataSource = _repository.GetPage(page, PageSize);` es donde ocurre el _data binding_: al asignar la lista de `Cliente` al `DataSource`, el `DataGridView` genera solo una columna por cada propiedad pública de `Cliente` (`Id`, `Name`, `Email`, `City`) y una fila por cada elemento de la lista, sin que haya que escribir código para dibujar filas o columnas.
+La línea `_grid.DataSource = _repository.GetPage(page, PageSize);` es donde ocurre el _data binding_: al asignar la lista de `Cliente`, el `DataGridView` genera solo una columna por cada propiedad pública de `Cliente` (`Id`, `Name`, `Email`, `City`) y una fila por cada elemento de la lista, sin que haya que escribir código para dibujar nada.
 
-La condición sobre `CurrentPage` sincroniza al control cuando se pide una página distinta. Al asignar la propiedad, el paginador dispara `PageChanged`; por ello el método sale con `return` y la segunda invocación realiza la consulta. Así se evita cargar dos veces la misma página.
+La condición sobre `CurrentPage` existe porque hace falta sincronizar el control cuando se pide una página distinta de la que tiene guardada: al asignar la propiedad, el paginador dispara `PageChanged` de nuevo, así que en ese caso se sale con `return` y se deja que sea la segunda invocación la que haga la consulta. De lo contrario, la misma página terminaría cargándose dos veces.
 
-El rango mostrado se calcula de la siguiente forma:
+Para el rango que se muestra en el estado, se calcula:
 
 ```csharp
 var from = total == 0 ? 0 : (page - 1) * PageSize + 1;
@@ -367,11 +342,11 @@ var to = Math.Min(page * PageSize, total);
 _status.Text = $"Mostrando {from}–{to} de {total}";
 ```
 
-Para la última página de 123 clientes, el estado será `Mostrando 121–123 de 123`.
+Con esto, en la última página de 123 clientes el estado queda `Mostrando 121–123 de 123`.
 
-## Paso 7: mostrar una ventana de páginas cuando hay muchas
+### Cuando hay demasiadas páginas para mostrar un botón por cada una
 
-No es conveniente dibujar un botón por cada página si hay decenas o cientos. `GetTentativePages` mantiene siempre visibles la primera y la última página, muestra una ventana alrededor de la página actual y agrega elipsis cuando hay páginas intermedias ocultas.
+Con 13 páginas todavía es viable dibujar un botón por cada una, pero si la tabla creciera a cientos de páginas eso se volvería inmanejable. Por eso `GetTentativePages` no devuelve todas las páginas: mantiene siempre visibles la primera y la última, muestra una ventana alrededor de la página actual, y agrega elipsis cuando quedan páginas intermedias ocultas.
 
 ```csharp
 public IReadOnlyList<int?> GetTentativePages(int maxButtons = 7)
@@ -390,25 +365,27 @@ public IReadOnlyList<int?> GetTentativePages(int maxButtons = 7)
 }
 ```
 
-Por ejemplo, cerca de la página 10 se puede presentar `1, ..., 8, 9, 10, 11, 12, ..., 30`. Las flechas también se deshabilitan en los extremos para impedir que el usuario navegue a una página inválida.
+Por ejemplo, cerca de la página 10 de 30 esto termina mostrando `1, ..., 8, 9, 10, 11, 12, ..., 30`. También se deshabilitan las flechas en los extremos, para que no se pueda navegar a una página que no existe.
 
-> **[CAPTURA PENDIENTE DEL DESIGNER 3]**
+> ![](image_1.png)
 >
 > Insertar una captura de la ventana **Propiedades** del control `Paginator`, con `PageSize`, `CurrentPage`, `TotalItems` y `Style` visibles.
 
-## Paso 8: refrescar después de altas, modificaciones y bajas
+### Qué pasa cuando cambian los datos
 
-El total puede cambiar después de insertar o eliminar registros, por lo que la grilla no debe conservar datos antiguos.
+Todavía queda un detalle: el total de registros no es fijo, cambia cada vez que se agrega, edita o borra un cliente, y la grilla no puede quedarse con datos viejos. Esto se resuelve así:
 
-- Después de un alta, se cuenta de nuevo y se navega a la última página para mostrar el registro creado.
-- Después de una modificación, se recarga la página actual para mostrar los valores editados.
-- Después de una baja, se recarga la página actual. Si era la última y quedó sin filas, `TotalItems` ajusta internamente `CurrentPage` a la última página válida.
+- Después de un alta, se vuelve a contar y se navega a la última página, para que el registro recién creado quede a la vista.
+- Después de una modificación, se recarga la página actual para reflejar los valores editados.
+- Después de una baja, también se recarga la página actual. Si esa era la última página y se quedó sin filas, `TotalItems` ya se encarga de ajustar `CurrentPage` a la última página válida por su cuenta.
 
-Este último ajuste es importante: si se eliminan los últimos registros de la página 13, no debe quedar seleccionada una página que ya no existe.
+Este último ajuste evita un bug típico: si se borran los últimos registros de la página 13, no debe quedar seleccionada una página que ya no existe.
 
-## Verificación manual
+## Cómo se probó
 
-1. Creá una base de datos SQL Server, por ejemplo `PaginationDemo`, y configurá una cadena de conexión. Para LocalDB:
+Para verificar que todo esto funciona como se espera, se siguen estos pasos:
+
+1. Se crea una base de datos SQL Server, por ejemplo `PaginationDemo`, y se configura la cadena de conexión. Con LocalDB:
 
    ```powershell
    $env:PAGINATION_DEMO_CONNECTION_STRING = "Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
@@ -416,11 +393,11 @@ Este último ajuste es importante: si se eliminan los últimos registros de la p
    dotnet run --project .\src\Pagination.Demo
    ```
 
-2. Confirmá que la aplicación cree `Clientes`, se muestren 10 filas y el estado `Mostrando 1–10 de 123`.
-3. Navegá a la página 2 y verificá que el estado cambie a `Mostrando 11–20 de 123`.
-4. Navegá a la última página y verificá que se muestren 3 filas.
-5. Eliminá los registros de la última página y comprobá que el control vuelva automáticamente a la última página válida.
+2. Se confirma que la aplicación cree `Clientes`, que se muestren 10 filas y que el estado diga `Mostrando 1–10 de 123`.
+3. Se navega a la página 2 y se verifica que el estado cambie a `Mostrando 11–20 de 123`.
+4. Se navega a la última página y se verifica que se muestren 3 filas.
+5. Se eliminan los registros de la última página y se comprueba que el control vuelva automáticamente a la última página válida.
 
-## Resultado
+## Cómo queda todo
 
-La aplicación mantiene la grilla, el estado y el paginador sincronizados. El repositorio obtiene únicamente la página necesaria, mientras que `Paginator` encapsula la navegación, el cálculo de páginas y la prevención de valores fuera de rango.
+Al final, la grilla, el estado y el paginador quedan sincronizados entre sí: el repositorio solo trae la página que hace falta, y `Paginator` se encarga de la navegación, del cálculo de páginas y de que nunca quede seleccionado un valor fuera de rango.
