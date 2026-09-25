@@ -1,16 +1,17 @@
 # Paginación en una aplicación WinForms
 
-## De qué se trata esto
+## Resúmen
 
-Esta guía muestra cómo se construyó la paginación de una aplicación WinForms que lista clientes. La tabla `Clientes` tiene 123 filas y se muestran en un `DataGridView`. Traerlas todas de una sola consulta y dejar que la grilla se las arregle es una opción, pero implica viajar 123 filas por la red cada vez que se abre la ventana, y esa cantidad solo va a crecer con el tiempo. Por eso se aplica paginación: se piden bloques de 10 registros, se muestran botones para moverse entre páginas, y la base de datos hace el trabajo de recortar el bloque que corresponde en cada momento. Con 123 clientes y 10 por página, el resultado son 13 páginas: las primeras 12 completas y la última con 3.
+Esta guía muestra cómo se construyó la paginación de una aplicación WinForms que lista clientes. La tabla `Clientes` tiene 123 filas y se muestran en un `DataGridView`.  
+Traerlas todas de una sola consulta y dejar que la grilla se las arregle es una opción, pero implica viajar 123 filas por la red cada vez que se abre la ventana, y esa cantidad solo va a crecer con el tiempo. Por eso aplicamos paginación: se piden bloques de 10 registros, se muestran botones para moverse entre páginas, y la base de datos hace el trabajo de recortar el bloque que corresponde en cada momento. Con 123 clientes y 10 por página, el resultado son 13 páginas: las primeras 12 completas y la última con 3.
 
 Antes de entrar en el código, se repasan algunas ideas de C# y ADO.NET que aparecen todo el tiempo más abajo y que quizás no se vieron todavía en la cursada. Si ya son conocidas, se puede saltar directamente a [Pensando primero en la base de datos](#pensando-primero-en-la-base-de-datos).
 
-## Conceptos nuevos a tener en cuenta utilizados en este ejemplo
+## Conceptos a tener en cuenta utilizados en este ejemplo
 
 ### Conexión y comando SQL (ADO.NET)
 
-ADO.NET es la biblioteca de .NET para hablar con una base de datos relacional. Trabaja con dos objetos principales:
+Trabajaremos con dos objetos principales de ADO.NET, la librería que nos permite interactuar con bases de datos relacionales:
 
 - `SqlConnection`: representa la conexión abierta hacia el servidor de base de datos (dirección, usuario, base a usar, etc.). Sin una conexión abierta no se puede ejecutar ninguna instrucción.
 - `SqlCommand`: representa una instrucción SQL puntual (un `SELECT`, un `INSERT`, etc.) que se ejecuta sobre esa conexión. Se obtiene con `connection.CreateCommand()` y su texto se define en la propiedad `CommandText`.
@@ -34,10 +35,11 @@ command.CommandText = "SELECT * FROM Clientes WHERE Id = @id";
 command.Parameters.AddWithValue("@id", id);
 ```
 
-Esto tiene dos ventajas frente a concatenar strings:
+Esto tiene tres ventajas frente a concatenar strings:
 
-1. **Seguridad:** evita la _inyección SQL_, un ataque donde un usuario malicioso escribe SQL dentro de un campo de texto para alterar la consulta original.
-2. **Correctitud:** evita errores de formato al mezclar texto SQL con comillas, fechas o números, que ADO.NET resuelve automáticamente según el tipo del parámetro.
+1. **Es SQL Puro**: el uso de variables con `@` es propio del lenguaje SQL.
+2. **Seguridad:** evita la _inyección SQL_, un ataque donde un usuario malicioso escribe SQL dentro de un campo de texto para alterar la consulta original.
+3. **Correctitud:** evita errores de formato al mezclar texto SQL con comillas, fechas o números, que ADO.NET resuelve automáticamente según el tipo del parámetro.
 
 ### `using` e `IDisposable`
 
@@ -54,7 +56,7 @@ connection.Open();
 
 Por eso aparece `using var connection = ...` y `using var command = ...` en casi todos los métodos del repositorio.
 
-**Ojo con una fuente común de confusión:** la palabra `using` se usa en C# para dos cosas completamente distintas. Arriba de todo del archivo, `using System;` importa un espacio de nombres (namespace). Acá, `using var connection = ...` es otra cosa: un _statement_ que garantiza la liberación del recurso. Se llama igual por casualidad del diseño del lenguaje, pero no tienen relación entre sí.
+> **Ojo con una fuente común de confusión:** la palabra `using` se usa en C# para dos cosas completamente distintas. Arriba de todo del archivo, `using System;` importa un espacio de nombres (namespace). Acá, `using var connection = ...` es otra cosa: un _statement_ que garantiza la liberación del recurso. Se llama igual por casualidad del diseño del lenguaje, pero no tienen relación entre sí.
 
 ### Suscribirse a un evento con una lambda, sin pasar por el Designer
 
@@ -155,10 +157,10 @@ Para que esto funcione en WinForms se necesitan tres piezas que se reparten el t
 
 ### Cómo está organizado el proyecto
 
-Antes de entrar en cada pieza, conviene mirar cómo se acomodan los archivos dentro de `src/Pagination.Demo`, porque los nombres de carpetas y de clases no son arbitrarios: siguen convenciones habituales en proyectos .NET que ayudan a ubicar rápido dónde vive cada responsabilidad.
+Antes de entrar en cada pieza, conviene mirar cómo se acomodan los archivos dentro de `PaginationDemo`, porque los nombres de carpetas y de clases no son arbitrarios: siguen convenciones habituales en proyectos .NET que ayudan a ubicar rápido dónde vive cada responsabilidad.
 
 ```
-Pagination.Demo/
+PaginationDemo/
 ├── Data/
 │   └── ClienteRepository.cs
 ├── Models/
@@ -184,12 +186,6 @@ Pagination.Demo/
   - **`UserControls/`**: controles reutilizables como `Paginator`, que no son una ventana completa sino un componente que se inserta dentro de otras ventanas.
 - **`Program.cs`**: es el punto de entrada de la aplicación (el método `Main`), que arranca WinForms y muestra el primer formulario.
 
-Otros nombres también siguen una convención reconocible:
-
-- `PageChangedEventArgs` termina en `EventArgs` porque es la clase que viaja como segundo parámetro de un evento (ver [Eventos y expresiones lambda](#suscribirse-a-un-evento-con-una-lambda-sin-pasar-por-el-designer)); es el mismo patrón que usa .NET con `EventArgs` en toda su biblioteca estándar.
-- `PaginationStyle` agrupa únicamente propiedades de apariencia (colores, fuente, radio de esquina): el sufijo `Style` indica que no tiene comportamiento, solo configuración visual.
-- Los archivos `.Designer.cs` (`MainForm.Designer.cs`, `Paginator.Designer.cs`) siempre acompañan a un archivo sin ese sufijo y son generados por el Diseñador de Visual Studio (ver [Clases parciales](#clases-parciales-partial-class)); nunca se edita ese archivo a mano.
-
 Ninguna de estas convenciones es obligatoria para que el código compile: son acuerdos que facilitan que cualquiera que conozca el patrón Repository o la estructura típica de un proyecto WinForms pueda orientarse sin tener que leer todo el código primero.
 
 ### La conexión a SQL Server
@@ -200,19 +196,34 @@ Se usa el proveedor `Microsoft.Data.SqlClient`, así que lo primero es agregar l
 <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
 ```
 
-Antes de correr nada hace falta una base SQL Server y su cadena de conexión. La aplicación se encarga de crear la tabla `Clientes` cuando arranca, así que no hace falta scriptearla a mano:
+Antes de correr nada hace falta una base SQL Server y su cadena de conexión. La aplicación se encarga de crear la tabla `Clientes` cuando arranca, así que no hace falta scriptearla a mano.
 
-```powershell
-$env:PAGINATION_DEMO_CONNECTION_STRING = "Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
+La configuración se guarda en un archivo `src/PaginationDemo/.env`. Se puede crear copiando `src/PaginationDemo/.env.example` y completando los valores:
+
+Un archivo `.env` es un formato simple y extendido para guardar configuración como pares `NOMBRE=valor`. Se usa para separar datos que cambian según cada computadora —por ejemplo, una conexión a la base— del código fuente y para no versionar credenciales.
+
+```dotenv
+PAGINATION_DEMO_CONNECTION_STRING="Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
+PAGINATION_DEMO_SEED=true
 ```
 
-`MainForm` lee esa variable de entorno y se la pasa al repositorio. Si no está definida, la aplicación falla rápido con un mensaje claro, en vez de arrastrar el problema más adelante:
+El archivo `.env` se copia junto al ejecutable y se carga al iniciar la aplicación. Está ignorado por Git para no compartir datos de conexión; el archivo `.env.example` sí se versiona como plantilla.
+
+`Program` lee el archivo antes de abrir el formulario y deja cada valor disponible como una variable de entorno del proceso:
 
 ```csharp
+LoadEnvironmentFile();
+Application.Run(new MainForm());
+```
+
+Después, `MainForm` obtiene la cadena ya cargada y se la pasa al repositorio. Si falta, la aplicación falla rápido con un mensaje claro, en vez de arrastrar el problema más adelante:
+
+```csharp
+
 var connectionString = Environment.GetEnvironmentVariable(
     "PAGINATION_DEMO_CONNECTION_STRING");
 if (string.IsNullOrWhiteSpace(connectionString))
-    throw new InvalidOperationException(...);
+    throw new InvalidOperationException("Creá src/PaginationDemo/.env con la conexión a SQL Server.");
 
 _repository = new ClienteRepository(connectionString);
 _repository.Initialize();
@@ -250,58 +261,30 @@ public IReadOnlyList<Cliente> GetPage(int page, int pageSize)
 
 Si se pide la página 3 con 10 elementos por página, el desplazamiento sale `(3 - 1) * 10 = 20`, y SQL Server devuelve los registros 21 a 30 según el `ORDER BY Id`. Vale la pena repetirlo porque es fácil olvidarlo en el código real: sin `ORDER BY`, un mismo registro podría aparecer en distintas páginas entre una consulta y otra.
 
-### El paginador: un `UserControl` para no reinventar la rueda en cada formulario
+### Diseño del formulario
 
-En vez de dibujar los botones de página a mano dentro de `MainForm`, esa lógica se encapsula en un `UserControl` propio, `Paginator`, que vive en `src/Pagination.Demo/Views/UserControls` dentro del mismo proyecto. Una vez compilado queda disponible en el cuadro de herramientas, y se arrastra a `MainForm` como cualquier otro control.
+![](./image.png)
 
-Se configuran estas propiedades desde la ventana **Propiedades**:
+El formulario se organiza en dos zonas: la grilla ocupa el espacio principal y, debajo, aparece el pie con el paginador y el texto de estado. La grilla muestra únicamente los clientes de la página actual; el estado indica qué rango se está viendo, por ejemplo `Mostrando 11–20 de 123`.
 
-| Propiedad     | Valor        | Propósito                                        |
-| ------------- | ------------ | ------------------------------------------------ |
-| `Name`        | `_paginator` | Identifica el control desde `MainForm.cs`.       |
-| `PageSize`    | `10`         | Indica cuántos registros representa cada página. |
-| `CurrentPage` | `1`          | Define la página inicial.                        |
-| `Dock`        | `Fill`       | Hace que el control ocupe la celda del pie.      |
-| `MinimumSize` | `240, 40`    | Conserva espacio suficiente para los botones.    |
+El paginador recibe el total de registros y la cantidad que se muestra por página. Con esos datos calcula cuántas páginas existen: por ejemplo, 123 clientes con páginas de 10 producen 13 páginas. El usuario puede elegir un número de página o usar las flechas anterior y siguiente. La página activa queda resaltada y las flechas se deshabilitan en los extremos para impedir una navegación inválida.
 
-Se ubica debajo de la grilla, dentro de un `TableLayoutPanel` llamado `_footer` con una sola columna y dos filas: la primera fila tiene al paginador y la segunda a un `Label` llamado `_status` que muestra el rango mostrado.
+Al seleccionar una página, el paginador emite `PageChanged` con su número. El formulario responde cargando solo ese bloque desde la base, actualiza la grilla y ajusta el texto de estado. Si los datos cambian y la página actual deja de existir, el paginador se ajusta automáticamente a la última página válida.
 
-> ![](image.png)
+Cuando hay muchas páginas, no se muestran todos los botones: se mantienen visibles la primera, la última y las cercanas a la actual, mientras que las elipsis indican las páginas intermedias. Por ejemplo, cerca de la página 10 de 30 se vería `1, ..., 8, 9, 10, 11, 12, ..., 30`.
 
-Del lado del código, el control expone `TotalItems`, `PageSize` y `CurrentPage`, y a partir de los dos primeros calcula `TotalPages` (123 elementos con tamaño 10 dan 13 páginas):
+El paginador es un `UserControl` reutilizable y configurable desde el Diseñador de Visual Studio. Internamente separa la disposición visual de la lógica, pero ese detalle no cambia su uso desde el formulario.
 
-```csharp
-public partial class Paginator : UserControl
-{
-    ...
-    public int TotalItems { get => _totalItems; set { ... } }
-    public int PageSize { get => _pageSize; set { ... } }
-    public int CurrentPage { get => _currentPage; set => GoTo(value); }
-
-    public int TotalPages => Math.Max(1,
-        (int)Math.Ceiling((double)TotalItems / PageSize));
-    ...
-}
-```
-
-Ninguna de estas propiedades es automática: el `set` de cada una valida el valor antes de guardarlo —por ejemplo, si `TotalItems` recibe un número negativo, simplemente se guarda 0 en su lugar; y `CurrentPage` no puede superar `TotalPages` (esto se resuelve en `ClampPage` y `GoTo`, más abajo). Los atributos que aparecen arriba de cada propiedad en el código real (`[Category]`, `[Description]`, `[DefaultValue]`, `[ToolboxItem(true)]`) no cambian el comportamiento del control: son metadatos que usa Visual Studio para mostrarlo en el cuadro de herramientas y organizar sus propiedades en el Diseñador.
-
-Igual que `MainForm` y `ClienteEditForm`, `Paginator` está dividido en dos archivos: `Paginator.Designer.cs` (generado por el Diseñador, define las flechas `‹`/`›` y el panel donde se agregan los botones de página dentro de `InitializeComponent()`) y `Paginator.cs` (la lógica: `TotalItems`, `PageSize`, `CurrentPage`, `GetTentativePages`, y la creación dinámica de los botones numéricos según la página actual).
-
-### Conectando el paginador con el formulario
-
-Ya con el control en el formulario, en el constructor de `MainForm` se suscribe el evento `PageChanged` y se dispara la carga de la página 1 recién cuando el formulario ya se mostró, para no consultar datos antes de que los controles estén listos:
+Para iniciar el flujo, el formulario escucha `PageChanged` y carga la primera página cuando ya está visible:
 
 ```csharp
 _paginator.PageChanged += (_, args) => LoadPage(args.Page);
 Shown += (_, _) => LoadPage(1);
 ```
 
-La primera línea dice: cada vez que `_paginator` dispare `PageChanged`, se ejecuta `LoadPage(args.Page)`, donde `args.Page` es la página que el usuario eligió. El primer parámetro (el objeto que disparó el evento) se ignora con `_` porque no se necesita. La segunda línea hace lo mismo con `Shown`, que se dispara una sola vez cuando la ventana ya es visible; ahí se ignoran los dos parámetros porque tampoco se usan.
+Cada vez que el usuario toca un número o una flecha, se ejecuta `LoadPage` con la página de destino. El detalle de los parámetros de los eventos no es relevante para entender el diseño: lo importante es que ese evento conecta la navegación con la actualización de la grilla.
 
-De acá en más, cada vez que el usuario toca un número, la flecha anterior o la siguiente, `Paginator` actualiza `CurrentPage` internamente y publica `PageChanged` con el número de destino. Todo lo demás pasa por `LoadPage`.
-
-### `LoadPage`: donde se junta todo
+### `LoadPage`: donde se unifica todo
 
 Este método es el corazón de la paginación, y está escrito para que siempre haga lo mismo, en el mismo orden:
 
@@ -344,33 +327,6 @@ _status.Text = $"Mostrando {from}–{to} de {total}";
 
 Con esto, en la última página de 123 clientes el estado queda `Mostrando 121–123 de 123`.
 
-### Cuando hay demasiadas páginas para mostrar un botón por cada una
-
-Con 13 páginas todavía es viable dibujar un botón por cada una, pero si la tabla creciera a cientos de páginas eso se volvería inmanejable. Por eso `GetTentativePages` no devuelve todas las páginas: mantiene siempre visibles la primera y la última, muestra una ventana alrededor de la página actual, y agrega elipsis cuando quedan páginas intermedias ocultas.
-
-```csharp
-public IReadOnlyList<int?> GetTentativePages(int maxButtons = 7)
-{
-    if (TotalPages <= maxButtons)
-        return Enumerable.Range(1, TotalPages).Select(x => (int?)x).ToList();
-
-    var pages = new List<int?> { 1 };
-    var start = Math.Max(2, CurrentPage - 2);
-    var end = Math.Min(TotalPages - 1, CurrentPage + 2);
-    if (start > 2) pages.Add(null); // null representa "..."
-    for (var page = start; page <= end; page++) pages.Add(page);
-    if (end < TotalPages - 1) pages.Add(null);
-    pages.Add(TotalPages);
-    return pages;
-}
-```
-
-Por ejemplo, cerca de la página 10 de 30 esto termina mostrando `1, ..., 8, 9, 10, 11, 12, ..., 30`. También se deshabilitan las flechas en los extremos, para que no se pueda navegar a una página que no existe.
-
-> ![](image_1.png)
->
-> Insertar una captura de la ventana **Propiedades** del control `Paginator`, con `PageSize`, `CurrentPage`, `TotalItems` y `Style` visibles.
-
 ### Qué pasa cuando cambian los datos
 
 Todavía queda un detalle: el total de registros no es fijo, cambia cada vez que se agrega, edita o borra un cliente, y la grilla no puede quedarse con datos viejos. Esto se resuelve así:
@@ -385,12 +341,17 @@ Este último ajuste evita un bug típico: si se borran los últimos registros de
 
 Para verificar que todo esto funciona como se espera, se siguen estos pasos:
 
-1. Se crea una base de datos SQL Server, por ejemplo `PaginationDemo`, y se configura la cadena de conexión. Con LocalDB:
+1. Se crea una base de datos SQL Server, por ejemplo `PaginationDemo`, y se crea `src/PaginationDemo/.env` a partir de `.env.example`. Con LocalDB, el archivo debe incluir:
+
+   ```dotenv
+   PAGINATION_DEMO_CONNECTION_STRING="Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
+   PAGINATION_DEMO_SEED=true
+   ```
+
+   Después se ejecuta:
 
    ```powershell
-   $env:PAGINATION_DEMO_CONNECTION_STRING = "Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
-   $env:PAGINATION_DEMO_SEED = "true"
-   dotnet run --project .\src\Pagination.Demo
+   dotnet run --project .\src\PaginationDemo
    ```
 
 2. Se confirma que la aplicación cree `Clientes`, que se muestren 10 filas y que el estado diga `Mostrando 1–10 de 123`.

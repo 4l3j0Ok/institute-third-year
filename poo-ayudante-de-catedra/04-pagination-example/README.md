@@ -15,15 +15,20 @@ CREATE DATABASE PaginationDemo;
 GO
 ```
 
-En PowerShell configurá la cadena de conexión y, opcionalmente, cargá los datos de ejemplo:
+Creá `src/PaginationDemo/.env` a partir de `src/PaginationDemo/.env.example` y completá la conexión a tu base de datos:
 
-```powershell
-$env:PAGINATION_DEMO_CONNECTION_STRING = "Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
-$env:PAGINATION_DEMO_SEED = "true" # solo la primera vez que quieras datos demo
-dotnet run --project .\src\Pagination.Demo
+```dotenv
+PAGINATION_DEMO_CONNECTION_STRING="Server=(localdb)\MSSQLLocalDB;Database=PaginationDemo;Integrated Security=True;TrustServerCertificate=True"
+PAGINATION_DEMO_SEED=true
 ```
 
-`PAGINATION_DEMO_CONNECTION_STRING` es obligatoria y debe apuntar a la base SQL Server creada. Al iniciar, la aplicación crea la tabla `Clientes` si no existe. `PAGINATION_DEMO_SEED` es opt-in: únicamente con el valor booleano `true` crea los 123 clientes iniciales y no duplica datos si la tabla ya contiene filas.
+Después ejecutá:
+
+```powershell
+dotnet run --project .\src\PaginationDemo
+```
+
+`PAGINATION_DEMO_CONNECTION_STRING` es obligatoria y debe apuntar a la base SQL Server creada. Al iniciar, la aplicación lee el archivo `.env`, crea la tabla `Clientes` si no existe y no sube ese archivo al repositorio. `PAGINATION_DEMO_SEED` es opt-in: únicamente con el valor booleano `true` crea los 123 clientes iniciales y no duplica datos si la tabla ya contiene filas.
 
 ## Uso del componente
 

@@ -10,6 +10,9 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <None Update=".env" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- Asocia cada *.Designer.cs con su *.cs para que Visual Studio habilite el botón
          "Ver diseñador" y anide el archivo en el Explorador de soluciones. -->
     <Compile Update="Views\Forms\MainForm.cs">
