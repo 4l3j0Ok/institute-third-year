@@ -19,5 +19,11 @@
     <Compile Update="Views\Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Update="Views\Forms\ClienteEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Views\Forms\ClienteEditForm.Designer.cs">
+      <DependentUpon>ClienteEditForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -5,6 +5,10 @@ partial class MainForm
     private void InitializeComponent()
     {
         _grid = new DataGridView();
+        _toolbar = new FlowLayoutPanel();
+        _addButton = new Button();
+        _editButton = new Button();
+        _deleteButton = new Button();
         _footer = new TableLayoutPanel();
         _paginator = new FlowLayoutPanel();
         _previousButton = new Button();
@@ -14,6 +18,7 @@ partial class MainForm
         _nextButton = new Button();
         _status = new Label();
         ((System.ComponentModel.ISupportInitialize)_grid).BeginInit();
+        _toolbar.SuspendLayout();
         _footer.SuspendLayout();
         _paginator.SuspendLayout();
         SuspendLayout();
@@ -28,7 +33,36 @@ partial class MainForm
         _grid.Name = "_grid";
         _grid.ReadOnly = true;
         _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        _grid.TabIndex = 0;
+        _grid.TabIndex = 1;
+        // _toolbar
+        _toolbar.Controls.Add(_addButton);
+        _toolbar.Controls.Add(_editButton);
+        _toolbar.Controls.Add(_deleteButton);
+        _toolbar.Dock = DockStyle.Top;
+        _toolbar.Name = "_toolbar";
+        _toolbar.Padding = new Padding(20, 8, 20, 8);
+        _toolbar.Size = new Size(884, 44);
+        _toolbar.TabIndex = 0;
+        // _addButton
+        _addButton.Name = "_addButton";
+        _addButton.Size = new Size(96, 28);
+        _addButton.TabIndex = 0;
+        _addButton.Text = "Nuevo";
+        _addButton.UseVisualStyleBackColor = true;
+        // _editButton
+        _editButton.Enabled = false;
+        _editButton.Name = "_editButton";
+        _editButton.Size = new Size(96, 28);
+        _editButton.TabIndex = 1;
+        _editButton.Text = "Editar";
+        _editButton.UseVisualStyleBackColor = true;
+        // _deleteButton
+        _deleteButton.Enabled = false;
+        _deleteButton.Name = "_deleteButton";
+        _deleteButton.Size = new Size(96, 28);
+        _deleteButton.TabIndex = 2;
+        _deleteButton.Text = "Eliminar";
+        _deleteButton.UseVisualStyleBackColor = true;
         // _footer
         _footer.ColumnCount = 3;
         _footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -96,12 +130,14 @@ partial class MainForm
         BackColor = Color.FromArgb(248, 250, 252);
         ClientSize = new Size(884, 585);
         Controls.Add(_grid);
+        Controls.Add(_toolbar);
         Controls.Add(_footer);
         MinimumSize = new Size(720, 480);
         Name = "MainForm";
         StartPosition = FormStartPosition.CenterScreen;
         Text = "Pagination · Demo";
         ((System.ComponentModel.ISupportInitialize)_grid).EndInit();
+        _toolbar.ResumeLayout(false);
         _footer.ResumeLayout(false);
         _footer.PerformLayout();
         _paginator.ResumeLayout(false);
@@ -110,6 +146,10 @@ partial class MainForm
     }
 
     private DataGridView _grid;
+    private FlowLayoutPanel _toolbar;
+    private Button _addButton;
+    private Button _editButton;
+    private Button _deleteButton;
     private TableLayoutPanel _footer;
     private FlowLayoutPanel _paginator;
     private Button _previousButton;

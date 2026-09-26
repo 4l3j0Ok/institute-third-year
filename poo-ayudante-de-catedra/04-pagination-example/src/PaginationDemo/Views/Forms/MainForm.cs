@@ -1,4 +1,5 @@
 using Pagination.Demo.Data;
+using Pagination.Demo.Models;
 
 namespace Pagination.Demo.Views.Forms;
 
@@ -25,6 +26,11 @@ public partial class MainForm : Form
         _currentPageButton.Click += PageButtonClicked;
         _nextPageButton.Click += PageButtonClicked;
         _nextButton.Click += (_, _) => LoadPage(_currentPage + 1);
+        _grid.SelectionChanged += (_, _) => UpdateActionButtons();
+        _grid.CellDoubleClick += (_, e) => { if (e.RowIndex >= 0) EditSelected(); };
+        _addButton.Click += (_, _) => AddCliente();
+        _editButton.Click += (_, _) => EditSelected();
+        _deleteButton.Click += (_, _) => DeleteSelected();
         Shown += (_, _) => LoadPage(_currentPage);
     }
 
@@ -41,6 +47,7 @@ public partial class MainForm : Form
         UpdatePageButtons(totalPages);
         _previousButton.Enabled = _currentPage > 1;
         _nextButton.Enabled = _currentPage < totalPages;
+        UpdateActionButtons();
     }
 
     // Carga la página indicada por el botón numérico que se presionó.
@@ -64,6 +71,52 @@ public partial class MainForm : Form
         button.Tag = page;
         button.Text = page.ToString();
         button.Visible = page <= totalPages;
+    }
+
+    // Activa Editar y Eliminar únicamente cuando la grilla tiene una fila seleccionada.
+    private void UpdateActionButtons()
+    {
+        var hasSelection = SelectedCliente() is not null;
+        _editButton.Enabled = hasSelection;
+        _deleteButton.Enabled = hasSelection;
+    }
+
+    private Cliente? SelectedCliente() => _grid.CurrentRow?.DataBoundItem as Cliente;
+
+    // Abre un diálogo vacío y agrega el cliente si se confirma.
+    private void AddCliente()
+    {
+        using var dialog = new ClienteEditForm();
+        if (dialog.ShowDialog(this) != DialogResult.OK || dialog.Cliente is null) return;
+
+        _repository.Insert(dialog.Cliente);
+        LoadPage(_currentPage);
+    }
+
+    // Edita los datos de la fila seleccionada.
+    private void EditSelected()
+    {
+        var cliente = SelectedCliente();
+        if (cliente is null) return;
+
+        using var dialog = new ClienteEditForm(cliente);
+        if (dialog.ShowDialog(this) != DialogResult.OK || dialog.Cliente is null) return;
+
+        _repository.Update(dialog.Cliente);
+        LoadPage(_currentPage);
+    }
+
+    // Pide confirmación antes de eliminar la fila seleccionada.
+    private void DeleteSelected()
+    {
+        var cliente = SelectedCliente();
+        if (cliente is null) return;
+
+        var result = MessageBox.Show(this, $"¿Eliminar a \"{cliente.Name}\"?", "Eliminar cliente", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        if (result != DialogResult.Yes) return;
+
+        _repository.Delete(cliente.Id);
+        LoadPage(_currentPage);
     }
 
 }

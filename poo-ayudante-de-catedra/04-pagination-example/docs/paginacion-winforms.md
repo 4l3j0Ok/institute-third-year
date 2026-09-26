@@ -172,12 +172,14 @@ PaginationDemo/
 │   └── Forms/
 │       ├── MainForm.cs
 │       └── MainForm.Designer.cs
+│       ├── ClienteEditForm.cs
+│       └── ClienteEditForm.Designer.cs
 └── Program.cs
 ```
 
 - **`Models/`** guarda las clases que representan datos, sin lógica de acceso a la base ni de interfaz. `Cliente` es un `record` con las propiedades `Id`, `Name`, `Email` y `City`.
 - **`Data/`** guarda las clases que saben hablar con la base de datos. `ClienteRepository` sigue el patrón Repository: el resto de la aplicación le pide clientes sin necesidad de saber que detrás hay SQL, `SqlConnection` o `SqlCommand`.
-- **`Views/Forms/`** guarda las ventanas completas de la aplicación. `MainForm.Designer.cs` contiene la declaración y la disposición visual de los controles; `MainForm.cs` contiene el estado, los eventos y la carga de datos.
+- **`Views/Forms/`** guarda las ventanas completas de la aplicación. `MainForm.Designer.cs` contiene la declaración y la disposición visual de la grilla, la barra ABM y el pie; `MainForm.cs` contiene el estado, los eventos y la carga de datos. `ClienteEditForm` es el diálogo usado para ingresar o modificar un cliente.
 - **`Program.cs`** es el punto de entrada de la aplicación. Carga la configuración y abre `MainForm`.
 
 Estas convenciones no son obligatorias para que el código compile. Son acuerdos que facilitan que cualquier persona pueda ubicar rápido la responsabilidad de cada archivo.
@@ -255,6 +257,8 @@ Si se pide la página 3 con 10 elementos por página, el desplazamiento sale `(3
 ## Diseño del formulario
 
 El formulario se organiza en dos zonas: la grilla ocupa el espacio principal y, debajo, aparece el pie. La grilla muestra únicamente los clientes de la página actual; el pie contiene los botones y el texto de estado.
+
+En la parte superior hay una barra con los botones `Nuevo`, `Editar` y `Eliminar`. `Editar` y `Eliminar` se habilitan únicamente cuando hay una fila seleccionada en la grilla.
 
 ```text
 [<] [1] [2] [3] [>]
@@ -364,6 +368,31 @@ var to = Math.Min(_currentPage * PageSize, total);
 Con esto, en la última página de 123 clientes el estado queda `Mostrando 121–123 de 123`. Si la tabla está vacía, queda `Mostrando 0–0 de 0`.
 
 Finalmente, las flechas se deshabilitan en los extremos. En la primera página no se puede retroceder y en la última no se puede avanzar.
+
+## Alta, baja y modificación
+
+La barra superior de `MainForm.Designer.cs` usa tres botones normales de WinForms:
+
+```csharp
+_toolbar.Controls.Add(_addButton);
+_toolbar.Controls.Add(_editButton);
+_toolbar.Controls.Add(_deleteButton);
+```
+
+La grilla emite `SelectionChanged` cada vez que cambia la fila activa. El formulario usa ese evento para habilitar las acciones que requieren una selección:
+
+```csharp
+private void UpdateActionButtons()
+{
+    var hasSelection = SelectedCliente() is not null;
+    _editButton.Enabled = hasSelection;
+    _deleteButton.Enabled = hasSelection;
+}
+```
+
+`Nuevo` abre `ClienteEditForm` vacío. `Editar` abre el mismo diálogo con los datos de la fila seleccionada. Si el usuario confirma, `MainForm` llama a `Insert` o `Update` en el repositorio y vuelve a cargar la página actual. `Eliminar` pide una confirmación, llama a `Delete` y también recarga la grilla.
+
+El diálogo tiene tres campos: nombre, email y ciudad. Antes de cerrarse valida que los tres tengan un valor. Así se mantiene el ejemplo simple: el formulario principal coordina la operación y el repositorio concentra el SQL.
 
 ## Cómo probarlo
 

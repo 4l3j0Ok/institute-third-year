@@ -48,6 +48,41 @@ public sealed class ClienteRepository(string connectionString)
         return clientes;
     }
 
+    public void Insert(Cliente cliente)
+    {
+        using var connection = new SqlConnection(connectionString);
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "INSERT INTO Clientes(Name, Email, City) VALUES (@name, @email, @city)";
+        command.Parameters.AddWithValue("@name", cliente.Name);
+        command.Parameters.AddWithValue("@email", cliente.Email);
+        command.Parameters.AddWithValue("@city", cliente.City);
+        command.ExecuteNonQuery();
+    }
+
+    public void Update(Cliente cliente)
+    {
+        using var connection = new SqlConnection(connectionString);
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "UPDATE Clientes SET Name = @name, Email = @email, City = @city WHERE Id = @id";
+        command.Parameters.AddWithValue("@name", cliente.Name);
+        command.Parameters.AddWithValue("@email", cliente.Email);
+        command.Parameters.AddWithValue("@city", cliente.City);
+        command.Parameters.AddWithValue("@id", cliente.Id);
+        command.ExecuteNonQuery();
+    }
+
+    public void Delete(long id)
+    {
+        using var connection = new SqlConnection(connectionString);
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "DELETE FROM Clientes WHERE Id = @id";
+        command.Parameters.AddWithValue("@id", id);
+        command.ExecuteNonQuery();
+    }
+
     private static bool IsSeedEnabled() => bool.TryParse(Environment.GetEnvironmentVariable("PAGINATION_DEMO_SEED"), out var enabled) && enabled;
 
     private static void Seed(SqlConnection connection)
