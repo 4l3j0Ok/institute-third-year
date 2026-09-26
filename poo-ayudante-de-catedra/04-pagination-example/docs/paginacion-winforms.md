@@ -257,8 +257,8 @@ Si se pide la página 3 con 10 elementos por página, el desplazamiento sale `(3
 El formulario se organiza en dos zonas: la grilla ocupa el espacio principal y, debajo, aparece el pie. La grilla muestra únicamente los clientes de la página actual; el pie contiene los botones y el texto de estado.
 
 ```text
-[<] [4] [5] [6] [>]
-Mostrando 41-50 de 123
+[<] [1] [2] [3] [>]
+Mostrando 1-10 de 123
 ```
 
 Los botones son controles `Button` normales de WinForms. No existe un `UserControl` ni se generan controles dinámicamente. Los tres botones numéricos reutilizan los mismos controles, pero su texto se actualiza para mostrar la página anterior, la actual y la siguiente. Esta elección reduce el ejemplo para concentrarse en el recorrido completo: evento de clic, consulta de la página y actualización de la grilla.
@@ -273,7 +273,7 @@ private Button _nextPageButton;
 private Button _nextButton;
 
 // En MainForm.cs
-private int _currentPage = 5;
+private int _currentPage = 1;
 ```
 
 `MainForm.Designer.cs` contiene el método `InitializeComponent`. Allí se crea un `FlowLayoutPanel`, se agregan los cinco botones y se lo coloca en la primera fila de un `TableLayoutPanel`. La segunda fila contiene la etiqueta `_status`. Ambos paneles son controles estándar de WinForms.
@@ -308,7 +308,7 @@ _nextButton.Click += (_, _) => LoadPage(_currentPage + 1);
 Shown += (_, _) => LoadPage(_currentPage);
 ```
 
-Las flechas usan `_currentPage` para pedir la anterior o la siguiente. Los tres botones numéricos cargan el número guardado en su propiedad `Tag`. El evento `Shown` carga la página inicial cuando el formulario ya está visible; como `_currentPage` empieza en 5, con los datos de ejemplo los números iniciales son `4`, `5` y `6`, y el rango mostrado es 41 a 50.
+Las flechas usan `_currentPage` para pedir la anterior o la siguiente. Los tres botones numéricos cargan el número guardado en su propiedad `Tag`. El evento `Shown` carga la página inicial cuando el formulario ya está visible; como `_currentPage` empieza en 1, con los datos de ejemplo los números iniciales son `1`, `2` y `3`, y el rango mostrado es 1 a 10.
 
 ## Unificando todo en `LoadPage`
 
@@ -378,7 +378,7 @@ Para verificar que todo funciona como se espera, se siguen estos pasos:
    ```
 
 4. Confirmar que la grilla muestre 10 filas y que al iniciar el estado diga `Mostrando 41–50 de 123`.
-5. Confirmar que al iniciar los números sean `4`, `5` y `6`. Usar `>` y comprobar que pasen a `5`, `6` y `7`, con el estado `Mostrando 51–60 de 123`.
+5. Confirmar que al iniciar los números sean `1`, `2` y `3`. Usar `>` y comprobar que pasen a `1`, `2` y `3`, con el estado `Mostrando 11–20 de 123`.
 6. Usar `<` y `>` para comprobar que cargan la página anterior y siguiente.
 7. Navegar hasta la primera página y verificar que `<` quede deshabilitado. Navegar hasta la última y verificar que `>` quede deshabilitado.
 

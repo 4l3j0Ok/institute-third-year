@@ -6,7 +6,7 @@ public partial class MainForm : Form
 {
     private const int PageSize = 10;
     private readonly ClienteRepository _repository;
-    private int _currentPage = 5;
+    private int _currentPage = 1;
 
     public MainForm()
     {
