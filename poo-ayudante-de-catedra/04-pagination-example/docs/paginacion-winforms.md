@@ -69,7 +69,7 @@ _page4Button.Click += (_, _) => LoadPage(4);
 
 La línea se lee como "cuando se haga clic en `_page4Button`, ejecutar `LoadPage(4)`". La lambda recibe los parámetros del evento: el primer `_` es el control que disparó el evento y el segundo `_` son sus datos. Ambos se descartan porque esta acción no los necesita.
 
-Esta forma permite que la creación de los botones, su suscripción y la lógica de la pantalla estén juntas en `MainForm.cs`, sin depender de un archivo `.Designer.cs`.
+Los controles se declaran y configuran en `MainForm.Designer.cs`. La suscripción de los eventos queda en el constructor de `MainForm.cs`, junto con la lógica que decide qué página cargar.
 
 ### `sealed`
 
@@ -169,13 +169,14 @@ PaginationDemo/
 │   └── Cliente.cs
 ├── Views/
 │   └── Forms/
-│       └── MainForm.cs
+│       ├── MainForm.cs
+│       └── MainForm.Designer.cs
 └── Program.cs
 ```
 
 - **`Models/`** guarda las clases que representan datos, sin lógica de acceso a la base ni de interfaz. `Cliente` es un `record` con las propiedades `Id`, `Name`, `Email` y `City`.
 - **`Data/`** guarda las clases que saben hablar con la base de datos. `ClienteRepository` sigue el patrón Repository: el resto de la aplicación le pide clientes sin necesidad de saber que detrás hay SQL, `SqlConnection` o `SqlCommand`.
-- **`Views/Forms/`** guarda las ventanas completas de la aplicación. En este ejemplo solo está `MainForm`, y allí se creó la interfaz por código para mantener juntos los controles y su comportamiento.
+- **`Views/Forms/`** guarda las ventanas completas de la aplicación. `MainForm.Designer.cs` contiene la declaración y la disposición visual de los controles; `MainForm.cs` contiene el estado, los eventos y la carga de datos.
 - **`Program.cs`** es el punto de entrada de la aplicación. Carga la configuración y abre `MainForm`.
 
 Estas convenciones no son obligatorias para que el código compile. Son acuerdos que facilitan que cualquier persona pueda ubicar rápido la responsabilidad de cada archivo.
@@ -261,31 +262,37 @@ Mostrando 41-50 de 123
 
 Los botones son controles `Button` normales de WinForms. No existe un `UserControl`, no se generan botones dinámicamente y no se muestran elipsis ni números calculados según el total. Esta elección reduce el ejemplo para concentrarse en el recorrido completo: evento de clic, consulta de la página y actualización de la grilla.
 
-`MainForm` declara los cinco botones y la página actual como campos:
+`MainForm.Designer.cs` declara los cinco botones como campos. `MainForm.cs` conserva solamente el estado de navegación:
 
 ```csharp
-private readonly Button _previousButton = new() { Text = "<" };
-private readonly Button _page4Button = new() { Text = "4" };
-private readonly Button _page5Button = new() { Text = "5" };
-private readonly Button _page6Button = new() { Text = "6" };
-private readonly Button _nextButton = new() { Text = ">" };
+private Button _previousButton;
+private Button _page4Button;
+private Button _page5Button;
+private Button _page6Button;
+private Button _nextButton;
+
+// En MainForm.cs
 private int _currentPage = 5;
 ```
 
-El método `InitializeComponent` crea un `FlowLayoutPanel`, agrega los cinco botones y lo coloca en la primera fila de un `TableLayoutPanel`. La segunda fila contiene la etiqueta `_status`. Ambos paneles son controles estándar de WinForms.
+`MainForm.Designer.cs` contiene el método `InitializeComponent`. Allí se crea un `FlowLayoutPanel`, se agregan los cinco botones y se lo coloca en la primera fila de un `TableLayoutPanel`. La segunda fila contiene la etiqueta `_status`. Ambos paneles son controles estándar de WinForms.
 
 ```csharp
-foreach (var button in new[] { _previousButton, _page4Button, _page5Button, _page6Button, _nextButton })
-{
-    button.AutoSize = true;
-    paginator.Controls.Add(button);
-}
+_footer.ColumnCount = 3;
+_footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+_footer.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+_footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+_footer.Controls.Add(_paginator, 1, 0);
 
-footer.Controls.Add(paginator, 0, 0);
-footer.Controls.Add(_status, 0, 1);
+_paginator.AutoSize = true;
+_paginator.Controls.Add(_previousButton);
+_paginator.Controls.Add(_page4Button);
+_paginator.Controls.Add(_page5Button);
+_paginator.Controls.Add(_page6Button);
+_paginator.Controls.Add(_nextButton);
 ```
 
-El bucle evita repetir cinco veces el mismo código de configuración. No crea botones nuevos: solo agrega al panel los cinco que ya fueron declarados.
+El código del diseñador agrega al panel los cinco botones que ya fueron declarados. El `TableLayoutPanel` tiene tres columnas: las columnas externas ocupan el espacio restante y el `FlowLayoutPanel` queda en la columna central con tamaño automático. Por eso los botones quedan centrados, incluso si cambia el ancho de la ventana.
 
 ### Eventos de los botones
 
