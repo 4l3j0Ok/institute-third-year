@@ -1,10 +1,11 @@
 # Pagination Demo
 
-Aplicación WinForms para .NET 10 con un control de paginación reutilizable (`Paginator`) y un ejemplo de grilla paginada sobre SQL Server.
+Aplicación WinForms para .NET 10 con una grilla paginada sobre SQL Server.
 
 ## Proyecto
 
-- `Pagination.Demo`: aplicación WinForms con una grilla paginada de clientes. El control `Paginator` vive en `src/Pagination.Demo/Views/UserControls` junto con `PaginationStyle` y `PageChangedEventArgs`, y se compila directamente dentro de esta app (no es una librería separada).
+- `Pagination.Demo`: aplicación WinForms con una grilla paginada de clientes.
+- La interfaz y la navegación están en `src/PaginationDemo/Views/Forms/MainForm.cs`.
 
 ## Ejecutar
 
@@ -30,12 +31,8 @@ dotnet run --project .\src\PaginationDemo
 
 `PAGINATION_DEMO_CONNECTION_STRING` es obligatoria y debe apuntar a la base SQL Server creada. Al iniciar, la aplicación lee el archivo `.env`, crea la tabla `Clientes` si no existe y no sube ese archivo al repositorio. `PAGINATION_DEMO_SEED` es opt-in: únicamente con el valor booleano `true` crea los 123 clientes iniciales y no duplica datos si la tabla ya contiene filas.
 
-## Uso del componente
+## Navegación
 
-```csharp
-paginator.TotalItems = count;
-paginator.PageSize = 10;
-paginator.PageChanged += (_, e) => CargarPagina(e.Page);
-```
+El pie del formulario muestra únicamente los botones `<`, `4`, `5`, `6` y `>`, además del estado actual, por ejemplo `Mostrando 41–50 de 123`.
 
-El componente calcula automáticamente páginas tentativas desde el `count`; cuando hay muchas páginas muestra el primer/último número y elipsis, y resalta la página activa. Es un `UserControl` editable desde el diseñador de Visual Studio: su diseño (flechas `‹`/`›` y el panel donde se agregan los botones de página) está en `Paginator.Designer.cs`, mientras que `Paginator.cs` contiene solo el comportamiento.
+Los botones numéricos cargan esas páginas directamente. Las flechas cargan la página anterior o siguiente y se deshabilitan al llegar al primer o último bloque disponible. No hay un `UserControl` ni lógica para crear botones, elipsis o estilos de paginación dinámicos.

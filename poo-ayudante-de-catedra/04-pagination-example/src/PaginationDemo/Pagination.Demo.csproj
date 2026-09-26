@@ -13,25 +13,5 @@
     <None Update=".env" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Asocia cada *.Designer.cs con su *.cs para que Visual Studio habilite el botón
-         "Ver diseñador" y anide el archivo en el Explorador de soluciones. -->
-    <Compile Update="Views\Forms\MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Views\Forms\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Forms\ClienteEditForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Views\Forms\ClienteEditForm.Designer.cs">
-      <DependentUpon>ClienteEditForm.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UserControls\Paginator.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Update="Views\UserControls\Paginator.Designer.cs">
-      <DependentUpon>Paginator.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>
