@@ -8,9 +8,9 @@ partial class MainForm
         _footer = new TableLayoutPanel();
         _paginator = new FlowLayoutPanel();
         _previousButton = new Button();
-        _page4Button = new Button();
-        _page5Button = new Button();
-        _page6Button = new Button();
+        _previousPageButton = new Button();
+        _currentPageButton = new Button();
+        _nextPageButton = new Button();
         _nextButton = new Button();
         _status = new Label();
         ((System.ComponentModel.ISupportInitialize)_grid).BeginInit();
@@ -48,9 +48,9 @@ partial class MainForm
         // _paginator
         _paginator.AutoSize = true;
         _paginator.Controls.Add(_previousButton);
-        _paginator.Controls.Add(_page4Button);
-        _paginator.Controls.Add(_page5Button);
-        _paginator.Controls.Add(_page6Button);
+        _paginator.Controls.Add(_previousPageButton);
+        _paginator.Controls.Add(_currentPageButton);
+        _paginator.Controls.Add(_nextPageButton);
         _paginator.Controls.Add(_nextButton);
         _paginator.FlowDirection = FlowDirection.LeftToRight;
         _paginator.Name = "_paginator";
@@ -62,24 +62,21 @@ partial class MainForm
         _previousButton.TabIndex = 0;
         _previousButton.Text = "<";
         _previousButton.UseVisualStyleBackColor = true;
-        // _page4Button
-        _page4Button.AutoSize = true;
-        _page4Button.Name = "_page4Button";
-        _page4Button.TabIndex = 1;
-        _page4Button.Text = "4";
-        _page4Button.UseVisualStyleBackColor = true;
-        // _page5Button
-        _page5Button.AutoSize = true;
-        _page5Button.Name = "_page5Button";
-        _page5Button.TabIndex = 2;
-        _page5Button.Text = "5";
-        _page5Button.UseVisualStyleBackColor = true;
-        // _page6Button
-        _page6Button.AutoSize = true;
-        _page6Button.Name = "_page6Button";
-        _page6Button.TabIndex = 3;
-        _page6Button.Text = "6";
-        _page6Button.UseVisualStyleBackColor = true;
+        // _previousPageButton
+        _previousPageButton.AutoSize = true;
+        _previousPageButton.Name = "_previousPageButton";
+        _previousPageButton.TabIndex = 1;
+        _previousPageButton.UseVisualStyleBackColor = true;
+        // _currentPageButton
+        _currentPageButton.AutoSize = true;
+        _currentPageButton.Name = "_currentPageButton";
+        _currentPageButton.TabIndex = 2;
+        _currentPageButton.UseVisualStyleBackColor = true;
+        // _nextPageButton
+        _nextPageButton.AutoSize = true;
+        _nextPageButton.Name = "_nextPageButton";
+        _nextPageButton.TabIndex = 3;
+        _nextPageButton.UseVisualStyleBackColor = true;
         // _nextButton
         _nextButton.AutoSize = true;
         _nextButton.Name = "_nextButton";
@@ -116,9 +113,9 @@ partial class MainForm
     private TableLayoutPanel _footer;
     private FlowLayoutPanel _paginator;
     private Button _previousButton;
-    private Button _page4Button;
-    private Button _page5Button;
-    private Button _page6Button;
+    private Button _previousPageButton;
+    private Button _currentPageButton;
+    private Button _nextPageButton;
     private Button _nextButton;
     private Label _status;
 }

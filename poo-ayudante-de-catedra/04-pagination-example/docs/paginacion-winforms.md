@@ -64,10 +64,11 @@ Por eso aparece `using var connection = ...` y `using var command = ...` en los 
 Una forma habitual de manejar un evento en WinForms es hacer doble clic sobre un control en el Diseñador. Visual Studio genera un método, por ejemplo `button1_Click`, y lo suscribe automáticamente. También se puede hacer la suscripción en el constructor, pasando una expresión lambda en lugar de un método con nombre:
 
 ```csharp
-_page4Button.Click += (_, _) => LoadPage(4);
+_previousButton.Click += (_, _) => LoadPage(_currentPage - 1);
+_currentPageButton.Click += PageButtonClicked;
 ```
 
-La línea se lee como "cuando se haga clic en `_page4Button`, ejecutar `LoadPage(4)`". La lambda recibe los parámetros del evento: el primer `_` es el control que disparó el evento y el segundo `_` son sus datos. Ambos se descartan porque esta acción no los necesita.
+La primera línea se lee como "cuando se haga clic en la flecha anterior, cargar la página anterior". La segunda reutiliza `PageButtonClicked` para los botones numéricos: el método lee de `Tag` el número de página que el botón representa en ese momento. Esta reutilización evita tener un manejador distinto para cada número.
 
 Los controles se declaran y configuran en `MainForm.Designer.cs`. La suscripción de los eventos queda en el constructor de `MainForm.cs`, junto con la lógica que decide qué página cargar.
 
@@ -260,15 +261,15 @@ El formulario se organiza en dos zonas: la grilla ocupa el espacio principal y, 
 Mostrando 41-50 de 123
 ```
 
-Los botones son controles `Button` normales de WinForms. No existe un `UserControl`, no se generan botones dinámicamente y no se muestran elipsis ni números calculados según el total. Esta elección reduce el ejemplo para concentrarse en el recorrido completo: evento de clic, consulta de la página y actualización de la grilla.
+Los botones son controles `Button` normales de WinForms. No existe un `UserControl` ni se generan controles dinámicamente. Los tres botones numéricos reutilizan los mismos controles, pero su texto se actualiza para mostrar la página anterior, la actual y la siguiente. Esta elección reduce el ejemplo para concentrarse en el recorrido completo: evento de clic, consulta de la página y actualización de la grilla.
 
 `MainForm.Designer.cs` declara los cinco botones como campos. `MainForm.cs` conserva solamente el estado de navegación:
 
 ```csharp
 private Button _previousButton;
-private Button _page4Button;
-private Button _page5Button;
-private Button _page6Button;
+private Button _previousPageButton;
+private Button _currentPageButton;
+private Button _nextPageButton;
 private Button _nextButton;
 
 // En MainForm.cs
@@ -286,9 +287,9 @@ _footer.Controls.Add(_paginator, 1, 0);
 
 _paginator.AutoSize = true;
 _paginator.Controls.Add(_previousButton);
-_paginator.Controls.Add(_page4Button);
-_paginator.Controls.Add(_page5Button);
-_paginator.Controls.Add(_page6Button);
+_paginator.Controls.Add(_previousPageButton);
+_paginator.Controls.Add(_currentPageButton);
+_paginator.Controls.Add(_nextPageButton);
 _paginator.Controls.Add(_nextButton);
 ```
 
@@ -300,14 +301,14 @@ En el constructor se conecta cada clic con la página que debe cargar:
 
 ```csharp
 _previousButton.Click += (_, _) => LoadPage(_currentPage - 1);
-_page4Button.Click += (_, _) => LoadPage(4);
-_page5Button.Click += (_, _) => LoadPage(5);
-_page6Button.Click += (_, _) => LoadPage(6);
+_previousPageButton.Click += PageButtonClicked;
+_currentPageButton.Click += PageButtonClicked;
+_nextPageButton.Click += PageButtonClicked;
 _nextButton.Click += (_, _) => LoadPage(_currentPage + 1);
 Shown += (_, _) => LoadPage(_currentPage);
 ```
 
-Los botones `4`, `5` y `6` indican directamente la página a cargar. Las flechas usan `_currentPage` para pedir la anterior o la siguiente. El evento `Shown` carga la página inicial cuando el formulario ya está visible; como `_currentPage` empieza en 5, con los datos de ejemplo se muestra el rango 41 a 50.
+Las flechas usan `_currentPage` para pedir la anterior o la siguiente. Los tres botones numéricos cargan el número guardado en su propiedad `Tag`. El evento `Shown` carga la página inicial cuando el formulario ya está visible; como `_currentPage` empieza en 5, con los datos de ejemplo los números iniciales son `4`, `5` y `6`, y el rango mostrado es 41 a 50.
 
 ## Unificando todo en `LoadPage`
 
@@ -318,7 +319,7 @@ Este método es el corazón de la paginación. Siempre hace el mismo trabajo, en
 3. Mantiene la página pedida dentro de un rango válido.
 4. Consulta y enlaza el bloque correspondiente al `DataGridView`.
 5. Actualiza el texto del pie.
-6. Habilita o deshabilita las flechas según corresponda.
+6. Actualiza los tres números de página y habilita o deshabilita las flechas según corresponda.
 
 ```csharp
 private void LoadPage(int page)
@@ -330,6 +331,7 @@ private void LoadPage(int page)
     var from = total == 0 ? 0 : (_currentPage - 1) * PageSize + 1;
     var to = Math.Min(_currentPage * PageSize, total);
     _status.Text = $"Mostrando {from}–{to} de {total}";
+    UpdatePageButtons(totalPages);
     _previousButton.Enabled = _currentPage > 1;
     _nextButton.Enabled = _currentPage < totalPages;
 }
@@ -337,7 +339,18 @@ private void LoadPage(int page)
 
 `Math.Ceiling` redondea hacia arriba. Con 123 clientes y páginas de 10, `123 / 10` da 12,3 y el redondeo da 13. `Math.Max(1, ...)` hace que exista al menos la página 1, incluso cuando la tabla está vacía.
 
-`Math.Clamp(page, 1, totalPages)` limita el valor pedido al intervalo válido. Por ejemplo, si se hace clic en `6` pero la tabla tiene solo 25 registros, solo existen tres páginas y se cargará la página 3. De esta manera los cinco botones siguen visibles, pero nunca se consulta una página inexistente.
+`Math.Clamp(page, 1, totalPages)` limita el valor pedido al intervalo válido. Así nunca se consulta una página inexistente, incluso si se intenta navegar antes de la primera o después de la última.
+
+Después de cambiar la página, `UpdatePageButtons` calcula la ventana de tres números. Cuando la página actual es 5 y hay 13 páginas, muestra 4, 5 y 6. En la primera página muestra 1, 2 y 3; en la última, 11, 12 y 13.
+
+```csharp
+var firstPage = Math.Clamp(_currentPage - 1, 1, Math.Max(1, totalPages - 2));
+ConfigurePageButton(_previousPageButton, firstPage, totalPages);
+ConfigurePageButton(_currentPageButton, firstPage + 1, totalPages);
+ConfigurePageButton(_nextPageButton, firstPage + 2, totalPages);
+```
+
+Cada botón guarda el número que representa en `Tag`. Si existen menos de tres páginas, `ConfigurePageButton` oculta los botones que no correspondan.
 
 La línea `_grid.DataSource = _repository.GetPage(_currentPage, PageSize);` es donde ocurre el _data binding_: al asignar la lista de `Cliente`, el `DataGridView` genera una columna por cada propiedad pública de `Cliente` y una fila por cada elemento de la lista, sin escribir código para dibujar las filas.
 
@@ -350,7 +363,7 @@ var to = Math.Min(_currentPage * PageSize, total);
 
 Con esto, en la última página de 123 clientes el estado queda `Mostrando 121–123 de 123`. Si la tabla está vacía, queda `Mostrando 0–0 de 0`.
 
-Finalmente, las flechas se deshabilitan en los extremos. En la primera página no se puede retroceder y en la última no se puede avanzar. Los botones numéricos permanecen visibles porque son parte fija del ejemplo.
+Finalmente, las flechas se deshabilitan en los extremos. En la primera página no se puede retroceder y en la última no se puede avanzar.
 
 ## Cómo probarlo
 
@@ -365,7 +378,7 @@ Para verificar que todo funciona como se espera, se siguen estos pasos:
    ```
 
 4. Confirmar que la grilla muestre 10 filas y que al iniciar el estado diga `Mostrando 41–50 de 123`.
-5. Hacer clic en `4`, `5` y `6` y comprobar que el estado cambie a los rangos 31–40, 41–50 y 51–60.
+5. Confirmar que al iniciar los números sean `4`, `5` y `6`. Usar `>` y comprobar que pasen a `5`, `6` y `7`, con el estado `Mostrando 51–60 de 123`.
 6. Usar `<` y `>` para comprobar que cargan la página anterior y siguiente.
 7. Navegar hasta la primera página y verificar que `<` quede deshabilitado. Navegar hasta la última y verificar que `>` quede deshabilitado.
 
