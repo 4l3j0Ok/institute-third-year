@@ -1,0 +1,20 @@
+@startuml Diagrama de contexto
+
+left to right direction
+
+rectangle Cliente
+rectangle Sucursal
+rectangle "Red Central" as RedCentral
+
+usecase "Sistema de Cajero\nAutomático" as Cajero
+
+Cliente --> Cajero : [flujo de entrada]
+Cajero --> Cliente : [flujo de salida]
+
+Sucursal --> Cajero : [flujo de entrada]
+Cajero --> Sucursal : [flujo de salida]
+
+RedCentral --> Cajero : [flujo de entrada]
+Cajero --> RedCentral : [flujo de salida]
+
+@enduml

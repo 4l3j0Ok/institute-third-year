@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<DTSConfiguration>
+    <DTSConfigurationHeading>
+        <DTSConfigurationFileInfo GeneratedBy="qemu\alejo" GeneratedFromPackageName="Lesson 5" GeneratedFromPackageID="{15D1E13B-59FC-4968-A2F7-B1480F20531A}" GeneratedDate="15/10/2026 17:00:53"/>
+    </DTSConfigurationHeading>
+    <Configuration ConfiguredType="Property" Path="\Package.Variables[User::varFolderName].Properties[Value]" ValueType="String">
+        <ConfiguredValue>Z:\institute-third-year\gestion-de-base-de-datos\integration-services-tutorial\Assets\Creating a Simple ETL Package\Sample Data 2</ConfiguredValue>
+    </Configuration>
+</DTSConfiguration>

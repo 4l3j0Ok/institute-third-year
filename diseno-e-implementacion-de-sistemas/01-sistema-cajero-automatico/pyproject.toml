@@ -1,0 +1,16 @@
+[project]
+name = "01-sistema-cajero-automatico"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "4l3j0Ok", email = "alejofsarmiento@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+dev = "dev:main"
+
+[tool.uv]
+package = true
