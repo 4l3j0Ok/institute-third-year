@@ -11,8 +11,8 @@
   DTS:LocaleID="11274"
   DTS:ObjectName="Lesson 3"
   DTS:PackageType="5"
-  DTS:VersionBuild="22"
-  DTS:VersionGUID="{24D72265-F4FF-4324-BE77-E8CA19085AE2}">
+  DTS:VersionBuild="28"
+  DTS:VersionGUID="{DE3294E7-CE12-4711-9FAC-334B8B45718F}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -93,11 +93,23 @@
         <InnerObject />
       </DTS:ObjectData>
     </DTS:LogProvider>
+    <DTS:LogProvider
+      DTS:ConfigString="192.168.122.1.AdventureWorksDW2022.sa"
+      DTS:CreationName="Microsoft.LogProviderSQLServer"
+      DTS:Description="Escribe entradas del registro sobre eventos en una base de datos de SQL Server"
+      DTS:DTSID="{98F7DC53-C1BD-4433-B404-F53DCB0AD42E}"
+      DTS:ObjectName="Proveedor de registro SSIS para SQL Server">
+      <DTS:ObjectData>
+        <InnerObject />
+      </DTS:ObjectData>
+    </DTS:LogProvider>
   </DTS:LogProviders>
   <DTS:Variables>
     <DTS:Variable
       DTS:CreationName=""
       DTS:DTSID="{DD4E28AE-B8C9-4BE1-88E6-7819DAE1F122}"
+      DTS:EvaluateAsExpression="True"
+      DTS:Expression="@[User::varFileName]"
       DTS:IncludeInDebugDump="2345"
       DTS:Namespace="User"
       DTS:ObjectName="varFileName">
@@ -195,6 +207,8 @@
             <DTS:SelectedLogProviders>
               <DTS:SelectedLogProvider
                 DTS:InstanceID="{44D86BC1-B68B-4F4A-8BB2-0AAA87C65AD5}" />
+              <DTS:SelectedLogProvider
+                DTS:InstanceID="{98F7DC53-C1BD-4433-B404-F53DCB0AD42E}" />
             </DTS:SelectedLogProviders>
           </DTS:LoggingOptions>
           <DTS:ObjectData>
@@ -444,8 +458,8 @@ where [refTable].[CurrencyAlternateKey] = ?</property>
                   <connections>
                     <connection
                       refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Currency Key.Connections[OleDbConnection]"
-                      connectionManagerID="{8B935F00-4765-4344-BFC0-211EF1B0B808}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[192.168.122.1.sa]"
+                      connectionManagerID="{3913F912-1DC8-4D7B-BFCC-9D6C1BA3462D}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[192.168.122.1.AdventureWorksDW2022.sa]"
                       description="Administrador de conexiones utilizado para obtener acceso a los datos de búsqueda."
                       name="OleDbConnection" />
                   </connections>
@@ -590,7 +604,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                       containsID="true"
                       dataType="System.String"
                       description="Especifica la lista de identificadores de linaje que están asignados a los parámetros que usa la instrucción SQL de la propiedad SQLCommand. Las entradas de la lista están separadas por puntos y comas."
-                      name="ParameterMap">#{Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Extract Sample Currency Data.Outputs[Salida de origen de archivo plano].Columns[CurrencyDate]};</property>
+                      name="ParameterMap">#{Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Extract Sample Currency Data.Outputs[Salida de origen de archivo plano].Columns[CurrencyID]};</property>
                     <property
                       dataType="System.Int32"
                       description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos."
@@ -603,8 +617,8 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                   <connections>
                     <connection
                       refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Connections[OleDbConnection]"
-                      connectionManagerID="{8B935F00-4765-4344-BFC0-211EF1B0B808}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[192.168.122.1.sa]"
+                      connectionManagerID="{3913F912-1DC8-4D7B-BFCC-9D6C1BA3462D}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[192.168.122.1.AdventureWorksDW2022.sa]"
                       description="Administrador de conexiones utilizado para obtener acceso a los datos de búsqueda."
                       name="OleDbConnection" />
                   </connections>
@@ -614,11 +628,11 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                       name="Entrada de búsqueda">
                       <inputColumns>
                         <inputColumn
-                          refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Inputs[Entrada de búsqueda].Columns[CurrencyDate]"
+                          refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Inputs[Entrada de búsqueda].Columns[CurrencyID]"
                           cachedDataType="wstr"
-                          cachedLength="50"
-                          cachedName="CurrencyDate"
-                          lineageId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Extract Sample Currency Data.Outputs[Salida de origen de archivo plano].Columns[CurrencyDate]">
+                          cachedLength="3"
+                          cachedName="CurrencyID"
+                          lineageId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Extract Sample Currency Data.Outputs[Salida de origen de archivo plano].Columns[CurrencyID]">
                           <properties>
                             <property
                               dataType="System.String"
@@ -642,22 +656,6 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                       exclusionGroup="1"
                       name="Salida de entradas coincidentes de búsqueda"
                       synchronousInputId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Inputs[Entrada de búsqueda]">
-                      <outputColumns>
-                        <outputColumn
-                          refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Outputs[Salida de entradas coincidentes de búsqueda].Columns[DateKey]"
-                          dataType="i4"
-                          errorOrTruncationOperation="Copiar columna"
-                          lineageId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Outputs[Salida de entradas coincidentes de búsqueda].Columns[DateKey]"
-                          name="DateKey"
-                          truncationRowDisposition="FailComponent">
-                          <properties>
-                            <property
-                              dataType="System.String"
-                              description="Especifica la columna de la tabla de referencia de la que se copia una columna."
-                              name="CopyFromReferenceColumn">DateKey</property>
-                          </properties>
-                        </outputColumn>
-                      </outputColumns>
                       <externalMetadataColumns />
                     </output>
                     <output
@@ -708,7 +706,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                     <property
                       dataType="System.String"
                       description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas."
-                      name="OpenRowset">[NewFactCurrencyRate]</property>
+                      name="OpenRowset">[dbo].[NewFactCurrencyRate]</property>
                     <property
                       dataType="System.String"
                       description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas."
@@ -751,8 +749,8 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                   <connections>
                     <connection
                       refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Connections[OleDbConnection]"
-                      connectionManagerID="{8B935F00-4765-4344-BFC0-211EF1B0B808}:external"
-                      connectionManagerRefId="Project.ConnectionManagers[192.168.122.1.sa]"
+                      connectionManagerID="{3913F912-1DC8-4D7B-BFCC-9D6C1BA3462D}:external"
+                      connectionManagerRefId="Project.ConnectionManagers[192.168.122.1.AdventureWorksDW2022.sa]"
                       description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos."
                       name="OleDbConnection" />
                   </connections>
@@ -796,12 +794,6 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                           cachedName="CurrencyKey"
                           externalMetadataColumnId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[CurrencyKey]"
                           lineageId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Currency Key.Outputs[Salida de entradas coincidentes de búsqueda].Columns[CurrencyKey]" />
-                        <inputColumn
-                          refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].Columns[DateKey]"
-                          cachedDataType="i4"
-                          cachedName="DateKey"
-                          externalMetadataColumnId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[DateKey]"
-                          lineageId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Outputs[Salida de entradas coincidentes de búsqueda].Columns[DateKey]" />
                       </inputColumns>
                       <externalMetadataColumns
                         isUsed="True">
@@ -817,7 +809,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                         <externalMetadataColumn
                           refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[CurrencyDate]"
                           dataType="wstr"
-                          length="10"
+                          length="50"
                           name="CurrencyDate" />
                         <externalMetadataColumn
                           refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[EndOfDayRate]"
@@ -827,10 +819,6 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                           refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[CurrencyKey]"
                           dataType="i4"
                           name="CurrencyKey" />
-                        <externalMetadataColumn
-                          refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[DateKey]"
-                          dataType="i4"
-                          name="DateKey" />
                       </externalMetadataColumns>
                     </input>
                   </inputs>
@@ -933,25 +921,25 @@ where [refTable].[FullDateAlternateKey] = ?</property>
         <NodeLayout
           Size="227,42"
           Id="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Extract Sample Currency Data"
-          TopLeft="489.25,157" />
+          TopLeft="488.25,157" />
         <NodeLayout
           Size="227,42"
           Id="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination"
           TopLeft="489.25,453" />
         <EdgeLayout
           Id="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas.Paths[Salida de origen de archivo plano]"
-          TopLeft="602.75,199">
+          TopLeft="602.25,199">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,56.6666666666666"
+              EndConnector="0,56.666666666667"
               Start="0,0"
-              End="0,49.1666666666666">
+              End="0,49.166666666667">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,49.1666666666666" />
+                    End="0,49.166666666667" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -1024,7 +1012,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
       <Property>
         <Name>OverwriteParamsSQLProp</Name>
         <Value
-          type="q2:string">false</Value>
+          type="q2:boolean">false</Value>
       </Property>
       <Property>
         <Name>UsedTableName</Name>
@@ -1034,7 +1022,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
       <Property>
         <Name>TableInfoObjectType</Name>
         <Value
-          type="q4:string">0</Value>
+          type="q4:int">0</Value>
       </Property>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -1047,7 +1035,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
       <Property>
         <Name>OverwriteParamsSQLProp</Name>
         <Value
-          type="q2:string">false</Value>
+          type="q2:boolean">false</Value>
       </Property>
       <Property>
         <Name>UsedTableName</Name>
@@ -1057,7 +1045,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
       <Property>
         <Name>TableInfoObjectType</Name>
         <Value
-          type="q4:string">0</Value>
+          type="q4:int">0</Value>
       </Property>
       <Property>
         <Name>DataSourceViewID</Name>

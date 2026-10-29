@@ -12,8 +12,8 @@
   DTS:LocaleID="11274"
   DTS:ObjectName="Lesson 5"
   DTS:PackageType="5"
-  DTS:VersionBuild="30"
-  DTS:VersionGUID="{D0619438-538C-4557-88D2-ED0FEB2A0E7C}">
+  DTS:VersionBuild="31"
+  DTS:VersionGUID="{583399A7-1C11-4C72-A057-C6BF1B71A85D}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -30,7 +30,7 @@
           <DTS:Password
             DTS:Name="Password"
             Sensitive="1"
-            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA1tDb1l9CSEe9aaj3N73i7AAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAADmuY/XMN8bS7k4anYjF/0OZrBlMozRBZjlr2ZuSPYKewAAAAAOgAAAAAIAACAAAACvuI5+hwCfTSVYg/6sXnVfHsiZzzCHSITvblxmVj0U7DAAAADAOhv/JavS1r13HeaNZKaicCjfOnR/paVp1See3sbUXzaUIOmYWLAx4RZ7RNBTzKhAAAAARC6rxlVjuC0spEezS/Iap07/E86F5VVTQm9+Kau/pATBlZzmR16MuwZNMI3qk8iYBfMlBCHKWO7wl4V7DKJ3gA</DTS:Password>
+            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA1tDb1l9CSEe9aaj3N73i7AAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAADD1WgiKaECN3/T5Lt7k9zWEANhlNZVmx8yLuBsEjHigQAAAAAOgAAAAAIAACAAAADs4ahSOmPSnyPE6PRNSRv/U/Fr7+1SCDGi6UAxNd6fozAAAAC2FaLGKMMKU8pBM987DQQCoRIhEjqeeOht/R2Tk4/4/RZcd1injjau+XPuiGeYLuJAAAAADD474Bvr4OjBtjLW2guwfkw+2jYap9owdz7gIT9yfu12xsWDSW11nCJcQXUenpODWjq9GUohfleNdFUuJdeAyw</DTS:Password>
         </DTS:ConnectionManager>
       </DTS:ObjectData>
     </DTS:ConnectionManager>
@@ -185,6 +185,12 @@
       DTS:CreationName=""
       DTS:DTSID="{2B590F95-726D-4278-AF4F-3B97F691BE11}"
       DTS:ObjectName="Configuración del directorio del Tutorial de SSIS" />
+    <DTS:Configuration
+      DTS:ConfigurationString="&quot;192.168.122.1.sa&quot;;&quot;[dbo].[SSIS Configurations]&quot;;&quot;*&quot;;"
+      DTS:ConfigurationType="7"
+      DTS:CreationName=""
+      DTS:DTSID="{969833B5-1693-4E22-93DE-6BFCFE18BF1C}"
+      DTS:ObjectName="Configuracion SQL Server" />
   </DTS:Configurations>
   <DTS:LogProviders>
     <DTS:LogProvider
@@ -216,8 +222,7 @@
       DTS:Namespace="User"
       DTS:ObjectName="varFolderName">
       <DTS:VariableValue
-        DTS:DataType="8"
-        xml:space="preserve"></DTS:VariableValue>
+        DTS:DataType="8">Z:\institute-third-year\gestion-de-base-de-datos\integration-services-tutorial\Assets\Creating a Simple ETL Package\Sample Data 2</DTS:VariableValue>
     </DTS:Variable>
   </DTS:Variables>
   <DTS:LoggingOptions
@@ -241,7 +246,7 @@
         <DTS:ObjectData>
           <ForEachFileEnumeratorProperties>
             <FEFEProperty
-              Folder="" />
+              Folder="Z:\institute-third-year\gestion-de-base-de-datos\integration-services-tutorial\Assets\Creating a Simple ETL Package\Sample Data 2" />
             <FEFEProperty
               FileSpec="Currency_*.txt" />
             <FEFEProperty
@@ -1928,12 +1933,6 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                           cachedName="CurrencyKey"
                           externalMetadataColumnId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[CurrencyKey]"
                           lineageId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Currency Key.Outputs[Salida de entradas coincidentes de búsqueda].Columns[CurrencyKey]" />
-                        <inputColumn
-                          refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].Columns[DateKey]"
-                          cachedDataType="i4"
-                          cachedName="DateKey"
-                          externalMetadataColumnId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[DateKey]"
-                          lineageId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Lookup Date Key.Outputs[Salida de entradas coincidentes de búsqueda].Columns[DateKey]" />
                       </inputColumns>
                       <externalMetadataColumns
                         isUsed="True">
@@ -1949,7 +1948,7 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                         <externalMetadataColumn
                           refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[CurrencyDate]"
                           dataType="wstr"
-                          length="10"
+                          length="50"
                           name="CurrencyDate" />
                         <externalMetadataColumn
                           refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[EndOfDayRate]"
@@ -1959,10 +1958,6 @@ where [refTable].[FullDateAlternateKey] = ?</property>
                           refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[CurrencyKey]"
                           dataType="i4"
                           name="CurrencyKey" />
-                        <externalMetadataColumn
-                          refId="Package\Foreach File in Folder\Extraer datos de ejemplo de divisas\Sample OLE DB Destination.Inputs[Entrada de destino de OLE DB].ExternalColumns[DateKey]"
-                          dataType="i4"
-                          name="DateKey" />
                       </externalMetadataColumns>
                     </input>
                   </inputs>

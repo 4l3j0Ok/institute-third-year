@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="192.168.122.1.AdventureWorksDW2022.sa"
+  DTS:DTSID="{3913F912-1DC8-4D7B-BFCC-9D6C1BA3462D}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectRetryCount="1"
+      DTS:ConnectRetryInterval="5"
+      DTS:ConnectionString="Data Source=192.168.122.1;User ID=sa;Initial Catalog=AdventureWorksDW2022;Provider=SQLOLEDB.1;Application Name=SSIS-integration-services-tutorial-{3913F912-1DC8-4D7B-BFCC-9D6C1BA3462D}192.168.122.1.AdventureWorksDW2022.sa;Auto Translate=False;">
+      <DTS:Password
+        DTS:Name="Password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA1tDb1l9CSEe9aaj3N73i7AAAAAACAAAAAAAQZgAAAAEAACAAAAAR8+dMzVSWwfX52rvkw6kR+YURZwngbPlvPbVAZjhdwwAAAAAOgAAAAAIAACAAAACiUZCg/bgBEjyLe9OK6sAJHQnrfv831ac/ixv9fGvELoAAAACo4M4hNwUF629uMcgqQpuUxOWTOCdQm6+RslP4GKUacSD0Qli/3pwnLpikVNOoC9nmu84ZOJ7UaeUlwvsCknOjEn+tr2Pj3r8EpQ2m/eMP1wXvjkatqgGcMrMSA8TXtiZ3Yc1+2YxS7nEL55Nlh3OCnDAOXeANmpNakuunfskvr0AAAADSST1c0A+QbetgblSdJS6xhTqWcTcNj+WyQXSxrST12WbobcYgPX/vpIS93wihNF9ySTHZBC34KdyiyRR5GtZT</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
