@@ -18,6 +18,8 @@
         },
         "credential": {
           "AuthenticationKind": "UsernamePassword",
+          "kind": "SQL",
+          "path": "192.168.122.1;AdventureWorksDW2022",
           "Username": "sa",
           "EncryptConnection": false
         }
@@ -113,6 +115,20 @@
             "name": "FiscalSemester",
             "dataType": "int64",
             "sourceColumn": "FiscalSemester"
+          },
+          {
+            "type": "calculated",
+            "name": "MonthCalendar",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RIGHT(\" \" & FORMAT([MonthNumberOfYear],\"#0\"), 2) & \" - \" & [EnglishMonthName]"
+          },
+          {
+            "type": "calculated",
+            "name": "DayOfWeek",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RIGHT(\" \" & FORMAT([DayNumberOfWeek],\"#0\"), 2) & \" - \" & [EnglishDayNameOfWeek]"
           }
         ],
         "partitions": [
@@ -130,6 +146,98 @@
                 "    #\"Columnas quitadas\""
               ]
             }
+          }
+        ],
+        "measures": [
+          {
+            "name": "DaysCurrentQuarterToDate",
+            "expression": "COUNTROWS( DATESQTD( 'DimDate'[Date]))"
+          },
+          {
+            "name": "DaysInCurrentQuarter",
+            "expression": "COUNTROWS( DATESBETWEEN( 'DimDate'[Date], STARTOFQUARTER( LASTDATE('DimDate'[Date])), ENDOFQUARTER('DimDate'[Date])))"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Calendario",
+            "levels": [
+              {
+                "name": "CalendarYear",
+                "ordinal": 0,
+                "column": "CalendarYear"
+              },
+              {
+                "name": "CalendarSemester",
+                "ordinal": 1,
+                "column": "CalendarSemester"
+              },
+              {
+                "name": "CalendarQuarter",
+                "ordinal": 2,
+                "column": "CalendarQuarter"
+              },
+              {
+                "name": "MonthCalendar",
+                "ordinal": 3,
+                "column": "MonthCalendar"
+              },
+              {
+                "name": "DayNumberOfMonth",
+                "ordinal": 4,
+                "column": "DayNumberOfMonth"
+              }
+            ]
+          },
+          {
+            "name": "Fiscal",
+            "levels": [
+              {
+                "name": "FiscalYear",
+                "ordinal": 0,
+                "column": "FiscalYear"
+              },
+              {
+                "name": "FiscalSemester",
+                "ordinal": 1,
+                "column": "FiscalSemester"
+              },
+              {
+                "name": "FiscalQuarter",
+                "ordinal": 2,
+                "column": "FiscalQuarter"
+              },
+              {
+                "name": "MonthCalendar",
+                "ordinal": 3,
+                "column": "MonthCalendar"
+              },
+              {
+                "name": "DayNumberOfMonth",
+                "ordinal": 4,
+                "column": "DayNumberOfMonth"
+              }
+            ]
+          },
+          {
+            "name": "ProductionCalendar",
+            "levels": [
+              {
+                "name": "CalendarYear",
+                "ordinal": 0,
+                "column": "CalendarYear"
+              },
+              {
+                "name": "WeekNumberOfYear",
+                "ordinal": 1,
+                "column": "WeekNumberOfYear"
+              },
+              {
+                "name": "DayNumberOfYear",
+                "ordinal": 2,
+                "column": "DayNumberOfYear"
+              }
+            ]
           }
         ]
       },
@@ -474,6 +582,20 @@
             "name": "Status",
             "dataType": "string",
             "sourceColumn": "Status"
+          },
+          {
+            "type": "calculated",
+            "name": "ProductSubcategoryName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('DimProductSubcategory'[EnglishProductSubcategoryName])"
+          },
+          {
+            "type": "calculated",
+            "name": "ProductCategoryName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('DimProductCategory'[EnglishProductCategoryName])"
           }
         ],
         "partitions": [
@@ -491,6 +613,33 @@
                 "    #\"Columnas quitadas\""
               ]
             }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Categoría",
+            "levels": [
+              {
+                "name": "Categoría",
+                "ordinal": 0,
+                "column": "ProductCategoryName"
+              },
+              {
+                "name": "ProductSubcategoryName",
+                "ordinal": 1,
+                "column": "ProductSubcategoryName"
+              },
+              {
+                "name": "Model",
+                "ordinal": 2,
+                "column": "ModelName"
+              },
+              {
+                "name": "Product",
+                "ordinal": 3,
+                "column": "EnglishProductName"
+              }
+            ]
           }
         ]
       },
@@ -705,22 +854,429 @@
             "name": "ShipDate",
             "dataType": "dateTime",
             "sourceColumn": "ShipDate"
+          },
+          {
+            "type": "calculated",
+            "name": "Margin",
+            "dataType": "decimal",
+            "isDataTypeInferred": true,
+            "expression": "[SalesAmount]-[TotalProductCost]",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
           }
         ],
         "partitions": [
           {
-            "name": "Partition",
-            "dataView": "full",
+            "name": "FactInternetSales2010",
             "source": {
               "type": "m",
               "expression": [
                 "let",
                 "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
-                "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data]",
+                "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20100101 and [OrderDateKey] <= 20101231)",
                 "in",
-                "    dbo_FactInternetSales"
+                "    #\"Filas filtradas\""
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                  "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                  "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20100101 and [OrderDateKey] <= 20101231)",
+                  "in",
+                  "    #\"Filas filtradas\"</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "FactInternetSales2012",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20120101 and [OrderDateKey] <= 20121231)",
+                "in",
+                "    #\"Filas filtradas\""
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                  "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                  "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20120101 and [OrderDateKey] <= 20121231)",
+                  "in",
+                  "    #\"Filas filtradas\"</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "FactInternetSales2003",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20030101 and [OrderDateKey] <= 20031231)",
+                "in",
+                "    #\"Filas filtradas\""
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                  "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                  "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20030101 and [OrderDateKey] <= 20031231)",
+                  "in",
+                  "    #\"Filas filtradas\"</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "FactInternetSales2004",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20040101 and [OrderDateKey] <= 20041231)",
+                "in",
+                "    #\"Filas filtradas\""
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                  "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                  "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20040101 and [OrderDateKey] <= 20041231)",
+                  "in",
+                  "    #\"Filas filtradas\"</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "FactInternetSales2005",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20050101 and [OrderDateKey] <= 20051231)",
+                "in",
+                "    #\"Filas filtradas\""
+              ]
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>let",
+                  "    Source = #\"SQL/192 168 122 1;AdventureWorksDW2022\",",
+                  "    dbo_FactInternetSales = Source{[Schema=\"dbo\",Item=\"FactInternetSales\"]}[Data],",
+                  "    #\"Filas filtradas\" = Table.SelectRows(dbo_FactInternetSales, each [OrderDateKey] >= 20050101 and [OrderDateKey] <= 20051231)",
+                  "in",
+                  "    #\"Filas filtradas\"</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "measures": [
+          {
+            "name": "InternetDistinctCountSalesOrder",
+            "expression": "DISTINCTCOUNT([SalesOrderNumber])"
+          },
+          {
+            "name": "InternetOrderLinesCount",
+            "expression": "COUNTA([SalesOrderLineNumber])"
+          },
+          {
+            "name": "InternetTotalUnits",
+            "expression": "SUM([OrderQuantity])"
+          },
+          {
+            "name": "InternetTotalDiscountAmount",
+            "expression": "SUM([DiscountAmount])"
+          },
+          {
+            "name": "InternetTotalProductCost",
+            "expression": "SUM([TotalProductCost])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetTotalSales",
+            "expression": "SUM([SalesAmount])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "kpi": {
+              "targetExpression": "1000000",
+              "targetFormatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+              "statusGraphic": "Shapes",
+              "statusExpression": [
+                "var x='FactInternetSales'[InternetTotalSales] return",
+                "            if(ISBLANK(x),BLANK(),",
+                "                    If(x<800000,-1,",
+                "\t                If(x<1000000,0,1)",
+                "                )",
+                "            )",
+                "            "
+              ],
+              "annotations": [
+                {
+                  "name": "GoalType",
+                  "value": "StaticValue"
+                },
+                {
+                  "name": "KpiStatusType",
+                  "value": "Linear"
+                },
+                {
+                  "name": "KpiThresholdType",
+                  "value": "Absolute"
+                },
+                {
+                  "name": "KpiThresholdOrdering",
+                  "value": "Ascending"
+                },
+                {
+                  "name": "KpiThresholdCount",
+                  "value": "2"
+                },
+                {
+                  "name": "KpiThreshold_0",
+                  "value": "800000"
+                },
+                {
+                  "name": "KpiThreshold_1",
+                  "value": "1000000"
+                }
+              ]
+            },
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetTotalMargin",
+            "expression": "SUM([Margin])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetTotalTaxAmt",
+            "expression": "SUM([TaxAmt])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetTotalFreight",
+            "expression": "SUM([Freight])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetPreviousQuarterMargin",
+            "expression": "CALCULATE([InternetTotalMargin],PREVIOUSQUARTER('DimDate'[Date]))"
+          },
+          {
+            "name": "InternetCurrentQuarterMargin",
+            "expression": "TOTALQTD([InternetTotalMargin],'DimDate'[Date])"
+          },
+          {
+            "name": "InternetPreviousQuarterMarginProportionToQTD",
+            "expression": "[InternetPreviousQuarterMargin]*([DaysCurrentQuarterToDate]/[DaysInCurrentQuarter])"
+          },
+          {
+            "name": "InternetPreviousQuarterSales",
+            "expression": "CALCULATE([InternetTotalSales],PREVIOUSQUARTER('DimDate'[Date]))"
+          },
+          {
+            "name": "InternetCurrentQuarterSales",
+            "expression": "TOTALQTD([InternetTotalSales],'DimDate'[Date])"
+          },
+          {
+            "name": "InternetPreviousQuarterSalesProportionToQTD",
+            "expression": "[InternetPreviousQuarterSales]*([DaysCurrentQuarterToDate]/[DaysInCurrentQuarter]) "
+          },
+          {
+            "name": "InternetCurrentQuarterSalesPerformance",
+            "expression": "IF([InternetPreviousQuarterSalesProportionToQTD]<>0,([InternetCurrentQuarterSales]-[InternetPreviousQuarterSalesProportionToQTD])/[InternetPreviousQuarterSalesProportionToQTD],BLANK())",
+            "kpi": {
+              "targetExpression": "1,1",
+              "statusGraphic": "Shapes",
+              "statusExpression": [
+                "var x='FactInternetSales'[InternetCurrentQuarterSalesPerformance] return",
+                "            if(ISBLANK(x),BLANK(),",
+                "                    If(x<1,-1,",
+                "\t                If(x<1.07,0,1)",
+                "                )",
+                "            )",
+                "            "
+              ],
+              "annotations": [
+                {
+                  "name": "GoalType",
+                  "value": "StaticValue"
+                },
+                {
+                  "name": "KpiStatusType",
+                  "value": "Linear"
+                },
+                {
+                  "name": "KpiThresholdType",
+                  "value": "Absolute"
+                },
+                {
+                  "name": "KpiThresholdOrdering",
+                  "value": "Ascending"
+                },
+                {
+                  "name": "KpiThresholdCount",
+                  "value": "2"
+                },
+                {
+                  "name": "KpiThreshold_0",
+                  "value": "1"
+                },
+                {
+                  "name": "KpiThreshold_1",
+                  "value": "1.07"
+                }
               ]
             }
+          },
+          {
+            "name": "InternetCurrentQuarterMarginPerformance",
+            "expression": "IF([InternetPreviousQuarterMarginProportionToQTD]<>0,([InternetCurrentQuarterMargin]-[InternetPreviousQuarterMarginProportionToQTD])/[InternetPreviousQuarterMarginProportionToQTD],BLANK())",
+            "kpi": {
+              "targetExpression": "1,25",
+              "statusGraphic": "Shapes",
+              "statusExpression": [
+                "var x='FactInternetSales'[InternetCurrentQuarterMarginPerformance] return",
+                "            if(ISBLANK(x),BLANK(),",
+                "                    If(x<0.8,-1,",
+                "\t                If(x<1.03,0,1)",
+                "                )",
+                "            )",
+                "            "
+              ],
+              "annotations": [
+                {
+                  "name": "GoalType",
+                  "value": "StaticValue"
+                },
+                {
+                  "name": "KpiStatusType",
+                  "value": "Linear"
+                },
+                {
+                  "name": "KpiThresholdType",
+                  "value": "Absolute"
+                },
+                {
+                  "name": "KpiThresholdOrdering",
+                  "value": "Ascending"
+                },
+                {
+                  "name": "KpiThresholdCount",
+                  "value": "2"
+                },
+                {
+                  "name": "KpiThreshold_0",
+                  "value": "0.8"
+                },
+                {
+                  "name": "KpiThreshold_1",
+                  "value": "1.03"
+                }
+              ]
+            }
+          },
+          {
+            "name": "InternetAugSalesAmount",
+            "expression": "SUM([SalesAmount])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetMaxSalesAmount",
+            "expression": "MAX([SalesAmount])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetMinSalesAmount",
+            "expression": "MIN([SalesAmount])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
           }
         ]
       }
@@ -807,6 +1363,400 @@
         "toTable": "DimDate",
         "toColumn": "Date",
         "isActive": false
+      }
+    ],
+    "perspectives": [
+      {
+        "name": "InternetSales",
+        "tables": [
+          {
+            "name": "DimDate",
+            "columns": [
+              {
+                "name": "CalendarQuarter"
+              },
+              {
+                "name": "CalendarSemester"
+              },
+              {
+                "name": "CalendarYear"
+              },
+              {
+                "name": "Date"
+              },
+              {
+                "name": "DateKey"
+              },
+              {
+                "name": "DayNumberOfMonth"
+              },
+              {
+                "name": "DayNumberOfWeek"
+              },
+              {
+                "name": "DayNumberOfYear"
+              },
+              {
+                "name": "DayOfWeek"
+              },
+              {
+                "name": "EnglishDayNameOfWeek"
+              },
+              {
+                "name": "EnglishMonthName"
+              },
+              {
+                "name": "FiscalQuarter"
+              },
+              {
+                "name": "FiscalSemester"
+              },
+              {
+                "name": "FiscalYear"
+              },
+              {
+                "name": "FrenchMonthName"
+              },
+              {
+                "name": "MonthCalendar"
+              },
+              {
+                "name": "MonthNumberOfYear"
+              },
+              {
+                "name": "SpanishMonthName"
+              },
+              {
+                "name": "WeekNumberOfYear"
+              }
+            ],
+            "measures": [
+              {
+                "name": "DaysCurrentQuarterToDate"
+              },
+              {
+                "name": "DaysInCurrentQuarter"
+              }
+            ]
+          },
+          {
+            "name": "DimGeography",
+            "columns": [
+              {
+                "name": "City"
+              },
+              {
+                "name": "CountryRegionCode"
+              },
+              {
+                "name": "EnglishCountryRegionName"
+              },
+              {
+                "name": "GeographyKey"
+              },
+              {
+                "name": "IpAddressLocator"
+              },
+              {
+                "name": "PostalCode"
+              },
+              {
+                "name": "SalesTerritoryKey"
+              },
+              {
+                "name": "StateProvinceCode"
+              },
+              {
+                "name": "StateProvinceName"
+              }
+            ]
+          },
+          {
+            "name": "DimProduct",
+            "columns": [
+              {
+                "name": "Class"
+              },
+              {
+                "name": "Color"
+              },
+              {
+                "name": "DaysToManufacture"
+              },
+              {
+                "name": "DealerPrice"
+              },
+              {
+                "name": "EndDate"
+              },
+              {
+                "name": "EnglishDescription"
+              },
+              {
+                "name": "EnglishProductName"
+              },
+              {
+                "name": "FinishedGoodsFlag"
+              },
+              {
+                "name": "ListPrice"
+              },
+              {
+                "name": "ModelName"
+              },
+              {
+                "name": "ProductAlternateKey"
+              },
+              {
+                "name": "ProductCategoryName"
+              },
+              {
+                "name": "ProductKey"
+              },
+              {
+                "name": "ProductLine"
+              },
+              {
+                "name": "ProductSubcategoryKey"
+              },
+              {
+                "name": "ProductSubcategoryName"
+              },
+              {
+                "name": "ReorderPoint"
+              },
+              {
+                "name": "SafetyStockLevel"
+              },
+              {
+                "name": "Size"
+              },
+              {
+                "name": "SizeRange"
+              },
+              {
+                "name": "SizeUnitMeasureCode"
+              },
+              {
+                "name": "StandardCost"
+              },
+              {
+                "name": "StartDate"
+              },
+              {
+                "name": "Status"
+              },
+              {
+                "name": "Style"
+              },
+              {
+                "name": "Weight"
+              },
+              {
+                "name": "WeightUnitMeasureCode"
+              }
+            ]
+          },
+          {
+            "name": "DimProductCategory",
+            "columns": [
+              {
+                "name": "EnglishProductCategoryName"
+              },
+              {
+                "name": "ProductCategoryAlternateKey"
+              },
+              {
+                "name": "ProductCategoryKey"
+              }
+            ]
+          },
+          {
+            "name": "DimProductSubcategory",
+            "columns": [
+              {
+                "name": "EnglishProductSubcategoryName"
+              },
+              {
+                "name": "ProductCategoryKey"
+              },
+              {
+                "name": "ProductSubcategoryAlternateKey"
+              },
+              {
+                "name": "ProductSubcategoryKey"
+              }
+            ]
+          },
+          {
+            "name": "FactInternetSales",
+            "columns": [
+              {
+                "name": "CarrierTrackingNumber"
+              },
+              {
+                "name": "CurrencyKey"
+              },
+              {
+                "name": "CustomerKey"
+              },
+              {
+                "name": "CustomerPONumber"
+              },
+              {
+                "name": "DiscountAmount"
+              },
+              {
+                "name": "DueDate"
+              },
+              {
+                "name": "DueDateKey"
+              },
+              {
+                "name": "ExtendedAmount"
+              },
+              {
+                "name": "Freight"
+              },
+              {
+                "name": "Margin"
+              },
+              {
+                "name": "OrderDate"
+              },
+              {
+                "name": "OrderDateKey"
+              },
+              {
+                "name": "OrderQuantity"
+              },
+              {
+                "name": "ProductKey"
+              },
+              {
+                "name": "ProductStandardCost"
+              },
+              {
+                "name": "PromotionKey"
+              },
+              {
+                "name": "RevisionNumber"
+              },
+              {
+                "name": "SalesAmount"
+              },
+              {
+                "name": "SalesOrderLineNumber"
+              },
+              {
+                "name": "SalesOrderNumber"
+              },
+              {
+                "name": "SalesTerritoryKey"
+              },
+              {
+                "name": "ShipDate"
+              },
+              {
+                "name": "ShipDateKey"
+              },
+              {
+                "name": "TaxAmt"
+              },
+              {
+                "name": "TotalProductCost"
+              },
+              {
+                "name": "UnitPrice"
+              },
+              {
+                "name": "UnitPriceDiscountPct"
+              }
+            ],
+            "measures": [
+              {
+                "name": "InternetCurrentQuarterMargin"
+              },
+              {
+                "name": "InternetCurrentQuarterSales"
+              },
+              {
+                "name": "InternetDistinctCountSalesOrder"
+              },
+              {
+                "name": "InternetOrderLinesCount"
+              },
+              {
+                "name": "InternetPreviousQuarterMargin"
+              },
+              {
+                "name": "InternetPreviousQuarterMarginProportionToQTD"
+              },
+              {
+                "name": "InternetPreviousQuarterSales"
+              },
+              {
+                "name": "InternetPreviousQuarterSalesProportionToQTD"
+              },
+              {
+                "name": "InternetTotalDiscountAmount"
+              },
+              {
+                "name": "InternetTotalFreight"
+              },
+              {
+                "name": "InternetTotalMargin"
+              },
+              {
+                "name": "InternetTotalProductCost"
+              },
+              {
+                "name": "InternetTotalTaxAmt"
+              },
+              {
+                "name": "InternetTotalUnits"
+              },
+              {
+                "name": "InternetCurrentQuarterMarginPerformance"
+              },
+              {
+                "name": "InternetCurrentQuarterSalesPerformance"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "roles": [
+      {
+        "name": "Jefe de ventas",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "alejo",
+            "memberId": "S-1-5-21-1104117141-1330321748-324296935-1001"
+          }
+        ]
+      },
+      {
+        "name": "Analista de ventas EEUU",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "alejo",
+            "memberId": "S-1-5-21-1104117141-1330321748-324296935-1001"
+          }
+        ],
+        "tablePermissions": [
+          {
+            "name": "DimGeography",
+            "filterExpression": "DimGeography[CountryRegionCode] = \"US\""
+          }
+        ]
+      },
+      {
+        "name": "Administrador",
+        "modelPermission": "administrator"
       }
     ],
     "annotations": [

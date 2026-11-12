@@ -12,10 +12,10 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Development' ">
     <OutputPath>bin\</OutputPath>
-    <DeploymentServerName>localhost</DeploymentServerName>
+    <DeploymentServerName>localhost\MSSQLSERVER2</DeploymentServerName>
     <DeploymentServerEdition>Developer</DeploymentServerEdition>
     <DeploymentServerVersion>Unknown</DeploymentServerVersion>
-    <DeploymentServerDatabase>analysis-services-tutorial</DeploymentServerDatabase>
+    <DeploymentServerDatabase>Adventure Works Internet Sales Model</DeploymentServerDatabase>
     <DeploymentServerCubeName>Modelo</DeploymentServerCubeName>
     <DeploymentOptionProcessing>Default</DeploymentOptionProcessing>
     <DeploymentOptionTransactionalDeployment>False</DeploymentOptionTransactionalDeployment>
