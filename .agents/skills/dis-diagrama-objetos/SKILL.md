@@ -13,30 +13,30 @@ Complementa el ítem 5 de la consigna («los nombres de los OBJETOS van subrayad
 
 ## Reglas
 1. **Un escenario concreto**: una sesión a mitad de ejecución, por ejemplo tras autenticar y extraer. Es una foto, no una definición.
-2. Nombre de instancia en **camelCase** + `: Clase` con una clase del diagrama de clases (`sesion1 : Sesion`), siempre **subrayado** con `<u>…</u>` en el nombre del `object`.
+2. Nombre de instancia en **camelCase** + `: Clase` con una clase del diagrama de clases (`session1 : Session`), siempre **subrayado** con `<u>…</u>` en el nombre del `object`.
 3. Atributos como `_nombreAtributo = valor`, con los mismos nombres que en el diagrama de clases y el código, y valores coherentes con las reglas del negocio (PIN de 4 dígitos, número de tarjeta de 16, CBU de 22).
 4. Cada vínculo corresponde a una asociación del diagrama de clases. Nombre del rol o de la asociación sin subrayar; se puede omitir.
-5. Incluir un objeto de cada rama de la herencia que se use (`extraccion1 : Extraccion`), no clases abstractas (`Operacion` no se instancia).
+5. Incluir un objeto de cada rama de la herencia que se use (`withdrawal1 : CashWithdrawal`), no clases abstractas (`Operation` no se instancia).
 
 ## Sintaxis
 ```
 @startuml 09_objetos
 title Diagrama de Objetos - Sesión con una extracción
-object "<u>sesion1 : Sesion</u>" as sesion1 {
-  _estado = Operando
+object "<u>session1 : Session</u>" as session1 {
+  _state = Operating
 }
-object "tarjeta1 : Tarjeta" as tarjeta1 {
-  _numero = "1234567890123456"
+object "<u>card1 : Card</u>" as card1 {
+  _number = "1234567890123456"
 }
-sesion1 --> tarjeta1 : usa
+session1 --> card1 : uses
 @enduml
 ```
 
 ## Errores frecuentes
-- Instanciar la clase abstracta `Operacion`.
-- Valores incompatibles con el código (estado `Abierta` que no existe en `EstadoSesion`).
+- Instanciar la clase abstracta `Operation`.
+- Valores incompatibles con el código (estado `Open` que no existe en `SessionState`).
 - Vínculos que no existen en el diagrama de clases.
-- Nombres de objeto en PascalCase (son instancias: `sesion1`, no `Sesion1`).
+- Nombres de objeto en PascalCase (son instancias: `session1`, no `Session1`).
 
 ## Verificación
 Renderizar y comprobar en el PNG que los nombres salen subrayados. Cotejar atributos y vínculos con `04_clases.puml`.

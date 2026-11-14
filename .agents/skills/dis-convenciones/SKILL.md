@@ -5,7 +5,7 @@ description: Convenciones obligatorias para construir diagramas (Contexto, DFD, 
 
 # Convenciones del TP Cajero Automático (DIS 2026)
 
-Proyecto: `diseno-e-implementacion-de-sistemas/`. Los diagramas viven en `diagrams/*.puml` (PlantUML) y el código en `src/` (C# + Windows Forms, 3 capas).
+Proyecto: `diseno-e-implementacion-de-sistemas/`. Los diagramas viven en `diagrams/*.puml` (PlantUML) y el código en `src/Atm/` (C# + Windows Forms, 3 capas: `Data`, `Logic`, `Presentation`).
 
 ## 1. Fuentes y su jerarquía
 
@@ -29,9 +29,17 @@ Cada diagrama toma sus nombres del anterior y no los renombra. Un nombre se defi
 | Flujos de datos | Contexto / DFD | Diccionario de Datos |
 | Casos de uso | `resources/CU_*.png` | Casos de Uso, Secuencia, Actividad |
 | Clases, atributos, métodos | Clases | Objetos, Secuencia, Estado, código |
-| Estados de `Sesion` | Estado | enum `EstadoSesion` |
+| Estados de `Session` | Estado | enum `SessionState` |
 
 Los diagramas y el código se mantienen sincronizados: un cambio en uno exige revisar el otro.
+
+## 2b. Idioma: identificadores en inglés, dominio en español
+
+- **Todo identificador está en inglés**: namespaces, clases, enums y sus miembros, métodos, propiedades, campos, parámetros, variables locales, constantes, controles de Windows Forms y pruebas. Lo mismo en los diagramas que los dibujan (Clases, Objetos, Secuencia, Estado).
+- **Queda en español**: los textos que ve el usuario (pantalla, errores, ticket), los comentarios sobre reglas del dominio argentino y el vocabulario de análisis que fija el docente (nombres de flujos, procesos, almacenes, casos de uso, actores y el diccionario de datos).
+- Los nombres que impone la consigna (`FormCajero`, `Sesion`, `Operacion`, `PantallaCajero`…) se traducen según `references/glosario.md`. Toda clase del diagrama cuyo nombre difiera de la consigna lleva en el diagrama una nota con la equivalencia, para que el docente pueda mapearla.
+- Términos sin traducción útil se conservan como siglas: `Cbu`, `DB`, `Pin`.
+- Inglés simple y descriptivo; ningún identificador mezcla idiomas (`CardStatus`, no `EstadoCard`).
 
 ## 3. Reglas comunes de todos los diagramas
 
@@ -51,14 +59,14 @@ Los diagramas y el código se mantienen sincronizados: un cambio en uno exige re
 | Almacén | `Dn` + sustantivo plural | `D1 Sesiones` |
 | Terminador / actor | Nombre propio o sustantivo | `Red Central` |
 | Caso de uso | Infinitivo + objeto, tal como en `CU_*.png` | `Extraer Efectivo` |
-| Clase | Singular, PascalCase, sin tildes | `Transferencia` |
-| Atributo | `- _camelCase : tipoCSharp` | `- _saldoDisponible : decimal` |
-| Método | `+ PascalCase(param : tipo) : retorno` | `+ Ejecutar() : bool` |
-| Objeto | `nombre : Clase`, camelCase, subrayado | `sesion1 : Sesion` |
+| Clase | Singular, PascalCase, inglés | `Transfer` |
+| Atributo | `- _camelCase : tipoCSharp` | `- _availableBalance : decimal` |
+| Método | `+ PascalCase(param : tipo) : retorno` | `+ Execute() : bool` |
+| Objeto | `nombre : Clase`, camelCase, subrayado | `session1 : Session` |
 | Participante de secuencia | `:Clase` subrayado | `:CentralDB` |
-| Mensaje | `PascalCase(args)` sincrónico; retorno discontinuo en itálica | `AutorizarDebito(numeroTarjeta, monto)` |
-| Estado | PascalCase, participio o gerundio | `Validando` |
-| Evento de transición | `Evento() [guarda] / acción` | `Autenticar() [intentos = 3] / BloquearTarjeta` |
+| Mensaje | `PascalCase(args)` sincrónico; retorno discontinuo en itálica | `AuthorizeDebit(cardNumber, amount)` |
+| Estado | PascalCase, gerundio o participio en inglés; la descripción en español de la consigna va como texto del estado | `Validating` (Validando) |
+| Evento de transición | `Evento() [guarda] / acción` | `Authenticate(pin) [intentos = 3] / BlockCard` |
 | Actividad | Verbo en infinitivo + objeto específico | `Validar tarjeta` |
 
 ## 5. Convenciones de C#
@@ -67,20 +75,20 @@ Fuente: Microsoft «Convenciones de nomenclatura» y «Convenciones de código d
 
 | Elemento | Estilo | Ejemplo |
 |---|---|---|
-| Namespace, clase, record, enum, método, propiedad, miembro de enum, constante | PascalCase | `Sesion`, `Ejecutar`, `LimiteDiario` |
-| Interfaz | `I` + PascalCase | `IOperacion` |
-| Parámetro y variable local | camelCase | `numeroTarjeta` |
-| Campo privado/protegido de instancia | `_camelCase` (la consigna exige el guión bajo) | `_saldo` |
-| Campo estático privado | `s_camelCase` | `s_azar` |
-| Controles WinForms | prefijo de 3 letras + PascalCase, los declara el diseñador | `btnAceptar`, `lblMensaje` |
-| Manejador de evento | `Al` + acción, PascalCase | `AlPresionarDigito` |
+| Namespace, clase, record, enum, método, propiedad, miembro de enum, constante | PascalCase | `Session`, `Execute`, `DailyLimit` |
+| Interfaz | `I` + PascalCase | `IOperation` |
+| Parámetro y variable local | camelCase | `cardNumber` |
+| Campo privado/protegido de instancia | `_camelCase` (la consigna exige el guión bajo) | `_balance` |
+| Campo estático privado | `s_camelCase` | `s_random` |
+| Controles WinForms | prefijo de 3 letras + PascalCase, los declara el diseñador | `btnAccept`, `lblMessage` |
+| Manejador de evento | `On` + control + evento, PascalCase | `OnDigitClick` |
 | Booleano | `Esta…`, `Es…`, `Tiene…` | `EstaVigente()` |
 
 Además:
 - Siglas de 2 letras en mayúsculas (`DB`); de 3 o más como palabra (`Cbu`, `Pin`, `Dni`).
-- Nada de abreviaturas (`NumeroComprobante`, no `NroComprobante`) ni tildes o eñes en identificadores.
+- Nada de abreviaturas (`ReferenceNumber`, no `RefNum`) ni tildes o eñes en identificadores.
 - Un tipo por archivo; el archivo se llama como el tipo.
-- Consigna ítem 10: **campos privados `_x`, propiedades públicas con get/set, constructores explícitos** y métodos. `Operacion` es abstracta y las concretas hacen `override` de `Ejecutar()`.
+- Consigna ítem 10: **campos privados `_x`, propiedades públicas con get/set, constructores explícitos** y métodos. `Operation` es abstracta y las concretas hacen `override` de `Execute()`.
 - Capas: Presentación → Lógica → Datos, nunca al revés. La Presentación no contiene reglas de negocio.
 - Se fuerza con `src/.editorconfig` (`dotnet build` marca las violaciones de nombres como error).
 
@@ -102,8 +110,8 @@ Además:
 1. Leer la skill `dis-*` del diagrama y las fuentes que cita.
 2. Escribir o editar `diagrams/NN_*.puml` (el diagrama canónico del repositorio es el ejemplo).
 3. Renderizar: `scripts/render_diagrams.sh` (usa `plantuml` o el jar de la extensión de VS Code; Contexto y DFD requieren Graphviz `dot`).
-4. Verificar reglas automáticas: `python3 scripts/verificar_diagramas.py`. Revisa cada diagrama contra sus reglas, el balanceo Contexto ↔ DFD ↔ Diccionario, y que clases, atributos, métodos, estados y mensajes de los diagramas existan en `src/Cajero/` (y que no haya clases de más en el código). Cierra con código 1 si falla.
-   Para el código: `dotnet build Cajero.slnx && dotnet test Cajero.slnx` en `src/`; el build falla si se rompe una convención de nombres.
+4. Verificar reglas automáticas: `python3 scripts/verificar_diagramas.py`. Revisa cada diagrama contra sus reglas, el balanceo Contexto ↔ DFD ↔ Diccionario, y que clases, atributos, métodos, estados y mensajes de los diagramas existan en `src/Atm/` (y que no haya clases de más en el código). Cierra con código 1 si falla.
+   Para el código: `dotnet build Atm.slnx && dotnet test Atm.slnx` en `src/`; el build falla si se rompe una convención de nombres.
 5. **Mirar el PNG** con la herramienta de lectura de imágenes: el script no detecta solapamientos, flechas cruzadas ni lo que quede ilegible.
 6. Actualizar `DIAGRAMS.md`, `TASKS.md` y, si cambia un nombre, el código y las pruebas.
 

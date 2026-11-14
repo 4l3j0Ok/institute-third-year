@@ -1,0 +1,30 @@
+@startuml 05_secuencia_autenticar
+title Diagrama de Secuencia - CU Autenticar Usuario
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor Cliente
+participant "<u>:AtmForm</u>" as PC
+participant "<u>:BranchDB</u>" as SDB
+participant "<u>:CentralDB</u>" as CDB
+
+note over PC : :AtmForm es la :PantallaCajero de la consigna\n(BranchDB = SucursalDB)
+
+Cliente -> PC : InsertCard(number, expirationDate)
+activate PC
+PC -> SDB : ValidateCard(number, expirationDate)
+activate SDB
+SDB --> PC : //cardStatus//
+deactivate SDB
+PC --> Cliente : //pinRequest//
+deactivate PC
+
+Cliente -> PC : EnterPin(pin)
+activate PC
+PC -> CDB : ValidatePin(cardNumber, encryptedPin)
+activate CDB
+CDB --> PC : //pinConfirmation//
+deactivate CDB
+PC --> Cliente : //operationsMenu//
+deactivate PC
+@enduml

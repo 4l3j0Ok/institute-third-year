@@ -1,0 +1,93 @@
+@startuml 04_clases
+title Diagrama de Clases - Cajero Automático (capa Logic)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+class Customer {
+  - _name : string
+  - _nationalId : string
+  + Customer(name : string, nationalId : string)
+}
+
+class Card {
+  + {static} MaximumPinAttempts : int = 3
+  - _number : string {readOnly}
+  - _expirationDate : DateTime {readOnly}
+  - _status : CardStatus
+  - _pinAttempts : int {readOnly}
+  + Card(number : string, expirationDate : DateTime)
+  + IsValid() : bool
+  + RegisterFailedAttempt() : int
+  + Block() : void
+}
+
+class Account {
+  - _cbu : string {readOnly}
+  - _availableBalance : decimal
+  - _totalBalance : decimal
+  + Account(cbu : string, availableBalance : decimal, totalBalance : decimal)
+  + UpdateBalance(available : decimal, total : decimal) : void
+}
+
+class Session {
+  - _state : SessionState {readOnly}
+  - _startTime : DateTime {readOnly}
+  - _message : string {readOnly}
+  + Session()
+  + InsertCard(number : string, expirationDate : DateTime) : bool
+  + Authenticate(pin : string) : bool
+  + Execute(operation : Operation) : bool
+  + NewBalanceInquiry() : Operation
+  + NewCashWithdrawal(amount : decimal) : Operation
+  + NewTransfer(destinationCbu : string, amount : decimal) : Operation
+  + Finish() : void
+  + GenerateReceipt() : string
+  + Close() : void
+}
+
+abstract class Operation {
+  # _amount : decimal
+  # _timestamp : DateTime {readOnly}
+  # _referenceNumber : string
+  # _message : string
+  + {abstract} OperationType : string {readOnly}
+  # Operation(central : CentralDB, card : Card, account : Account, amount : decimal)
+  + {abstract} Execute() : bool
+  + ToString() : string
+}
+
+class BalanceInquiry {
+  + BalanceInquiry(central : CentralDB, card : Card, account : Account)
+  + Execute() : bool
+}
+
+class CashWithdrawal {
+  + CashWithdrawal(central : CentralDB, card : Card, account : Account, amount : decimal)
+  + Execute() : bool
+}
+
+class Transfer {
+  - _destinationCbu : string
+  + Transfer(central : CentralDB, card : Card, account : Account, destinationCbu : string, amount : decimal)
+  + Execute() : bool
+}
+
+Operation <|-- BalanceInquiry
+Operation <|-- CashWithdrawal
+Operation <|-- Transfer
+
+Session "1" *-- "0..*" Operation : records >
+Session "1" --> "0..1" Card : uses >
+Session "1" --> "1" Account : operates on >
+Session "1" --> "1" Customer : serves >
+Operation "0..*" --> "1" Card : identifies with >
+Operation "0..*" --> "1" Account : affects >
+
+note as layers
+  Clases de la consigna (nombres en inglés): Cliente = Customer, Tarjeta = Card, Cuenta = Account,
+  Sesion = Session, Operacion = Operation, Consulta = BalanceInquiry, Extraccion = CashWithdrawal,
+  Transferencia = Transfer. Las propiedades públicas (get/set) de cada atributo no se dibujan.
+  BranchDB (SucursalDB), CentralDB (capa Data) y AtmForm (FormCajero, capa Presentation,
+  la :PantallaCajero de las secuencias) no forman parte de las 8 clases.
+end note
+@enduml

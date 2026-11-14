@@ -1,0 +1,49 @@
+@startuml 09_objetos
+title Diagrama de Objetos - Sesión con una consulta y una extracción
+skinparam shadowing false
+
+object "<u>session1 : Session</u>" as session1 {
+  _state = Operating
+  _startTime = 14/11/2026 10:32
+}
+
+object "<u>customer1 : Customer</u>" as customer1 {
+  _name = "Cliente Demo"
+  _nationalId = "30111222"
+}
+
+object "<u>card1 : Card</u>" as card1 {
+  _number = "1234567890123456"
+  _expirationDate = 31/12/2030
+  _status = Valid
+  _pinAttempts = 0
+}
+
+object "<u>account1 : Account</u>" as account1 {
+  _cbu = "0170099920000012345678"
+  _availableBalance = 140000,00
+  _totalBalance = 140000,00
+}
+
+object "<u>inquiry1 : BalanceInquiry</u>" as inquiry1 {
+  _amount = 0,00
+  _timestamp = 14/11/2026 10:33
+  _referenceNumber = ""
+}
+
+object "<u>withdrawal1 : CashWithdrawal</u>" as withdrawal1 {
+  _amount = 10000,00
+  _timestamp = 14/11/2026 10:34
+  _referenceNumber = "TX48213907"
+}
+
+session1 --> customer1 : serves
+session1 --> card1 : uses
+session1 --> account1 : operates on
+session1 *-- inquiry1 : records
+session1 *-- withdrawal1 : records
+inquiry1 --> card1 : identifies with
+inquiry1 --> account1 : affects
+withdrawal1 --> card1 : identifies with
+withdrawal1 --> account1 : affects
+@enduml

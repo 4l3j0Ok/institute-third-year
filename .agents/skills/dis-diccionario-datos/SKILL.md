@@ -33,7 +33,7 @@ Tabla Markdown con **4 columnas**: `Nombre | Descripción | Composición | Valor
 4. La notación es la correcta (`=`, `+`, `()`, `{}`, `[ | ]`).
 5. No hay datos en el diccionario que no se usen en el DFD ni en las composiciones.
 6. Los valores permitidos son concretos y verificables con el código: `Número de tarjeta = 16{Dígito}16`, `CBU = 22{Dígito}22`, `PIN = 4{Dígito}4`, límite diario de extracción `$100.000`. Si el código cambia una regla, cambiar el diccionario.
-7. Mismos nombres que el DFD y que los atributos de las clases: `Número de comprobante` ⇔ `_numeroComprobante`.
+7. El diccionario es vocabulario de análisis y va en español, igual que el DFD. Cada elemento que el código implementa se corresponde con un atributo en inglés (`Número de comprobante` ⇔ `_referenceNumber`, `Número de tarjeta` ⇔ `_number`, `Importe disponible` ⇔ `_availableBalance`); el mapeo completo está en `dis-convenciones/references/glosario.md`.
 8. Sin abreviaturas.
 
 ## Errores frecuentes

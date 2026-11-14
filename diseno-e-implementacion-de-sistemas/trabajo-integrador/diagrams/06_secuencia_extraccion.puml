@@ -1,0 +1,27 @@
+@startuml 06_secuencia_extraccion
+title Diagrama de Secuencia - CU Extraer Efectivo
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor Cliente
+participant "<u>:AtmForm</u>" as PC
+participant "<u>:CentralDB</u>" as CDB
+
+note over PC : :AtmForm es la :PantallaCajero de la consigna
+
+Cliente -> PC : SelectOperation("Extraer efectivo")
+activate PC
+PC --> Cliente : //amountRequest//
+deactivate PC
+
+Cliente -> PC : EnterAmount(amount)
+activate PC
+PC -> CDB : AuthorizeDebit(cardNumber, amount)
+activate CDB
+CDB --> PC : //debitAuthorization(transactionNumber, remainingBalance)//
+deactivate CDB
+PC -> PC : DispenseCash(amount)
+PC -> PC : RegisterOperation(transactionNumber)
+PC --> Cliente : //successfulOperation(remainingBalance)//
+deactivate PC
+@enduml

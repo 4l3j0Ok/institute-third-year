@@ -1,6 +1,6 @@
 ---
 name: dis-diagrama-secuencia
-description: Crear, revisar o corregir los Diagramas de Secuencia del Cajero Automático (Autenticar Usuario en diagrams/05_secuencia_autenticar.puml y una operación a elección, Extraer Efectivo, en 06_secuencia_extraccion.puml). Usar cuando se hable de secuencia, líneas de vida, mensajes sincrónicos, retornos, focos de control, activaciones o participantes como :PantallaCajero, :SucursalDB y :CentralDB.
+description: Crear, revisar o corregir los Diagramas de Secuencia del Cajero Automático (Autenticar Usuario en diagrams/05_secuencia_autenticar.puml y una operación a elección, Extraer Efectivo, en 06_secuencia_extraccion.puml). Usar cuando se hable de secuencia, líneas de vida, mensajes sincrónicos, retornos, focos de control, activaciones o participantes como :AtmForm (la :PantallaCajero de la consigna), :BranchDB (SucursalDB) y :CentralDB.
 ---
 
 # Diagramas de Secuencia
@@ -12,31 +12,32 @@ description: Crear, revisar o corregir los Diagramas de Secuencia del Cajero Aut
 - Debrauwer cap. 5 (línea de vida, mensajes, retorno no sistemático, autoenvío, escenario). Guía U3 §3.4. Consigna ítems 6 y 7.
 
 ## Reglas
-1. **Participantes** (consigna ítem 6): `Cliente` (actor) y los objetos `:PantallaCajero`, `:SucursalDB`, `:CentralDB`. La extracción usa `Cliente`, `:PantallaCajero` y `:CentralDB`. `:PantallaCajero` representa al cajero (capas Presentación y Lógica: `FormCajero` y `Sesion`).
-2. **Nombres de objetos subrayados**: `participant "<u>:PantallaCajero</u>" as PC`.
-3. **Todos los mensajes sincrónicos** (`->`, punta rellena), con **parámetros**: `ValidarTarjeta(numero, vencimiento)`. Sin mensajes asincrónicos (`->>`).
-4. **Nombres de mensajes** = métodos del código en PascalCase (`ValidarPin`, `AutorizarDebito`) con los mismos parámetros que el método C#.
-5. **Retornos en línea discontinua** (`-->`), en itálica y con el valor devuelto: `PC --> Cliente : //solicitudPin//`. Un retorno responde a un mensaje anterior: las solicitudes del cajero al cliente (pedir PIN, pedir monto) se modelan como el retorno de la llamada del cliente, no como llamadas nuevas.
+1. **Participantes** (consigna ítem 6): `Cliente` (actor) y los objetos `:AtmForm`, `:BranchDB`, `:CentralDB`. La extracción usa `Cliente`, `:AtmForm` y `:CentralDB`. `:AtmForm` es la `:PantallaCajero` de la consigna y representa al cajero (capas `Presentation` y `Logic`: `AtmForm` y `Session`); `BranchDB` es `SucursalDB`. Una nota en el diagrama da la equivalencia.
+2. **Nombres de objetos subrayados**: `participant "<u>:AtmForm</u>" as PC`.
+3. **Todos los mensajes sincrónicos** (`->`, punta rellena), con **parámetros**: `ValidateCard(number, expirationDate)`. Sin mensajes asincrónicos (`->>`).
+4. **Nombres de mensajes** = métodos del código en PascalCase (`ValidatePin`, `AuthorizeDebit`) con los mismos parámetros que el método C#.
+5. **Retornos en línea discontinua** (`-->`), en itálica y con el valor devuelto: `PC --> Cliente : //pinRequest//`. Un retorno responde a un mensaje anterior: las solicitudes del cajero al cliente (pedir PIN, pedir monto) se modelan como el retorno de la llamada del cliente, no como llamadas nuevas.
 6. **Focos de control**: `activate` cuando el objeto empieza a ejecutar el método y `deactivate` cuando devuelve. Siempre balanceados; el foco del receptor contiene al del emisor que espera.
-7. **Autoenvío** para acciones internas del cajero (`DispensarEfectivo(monto)`, `RegistrarOperacion(...)`) con `PC -> PC`.
+7. **Autoenvío** para acciones internas del cajero (`DispenseCash(amount)`, `RegisterOperation(...)`) con `PC -> PC`.
 8. **Escenario principal**, sin alternativas (el CU lo describe como flujo principal). Las ramas de error van en el diagrama de actividad.
-9. El orden y los datos siguen el flujo del PNG del CU, paso por paso.
+9. Mensajes y valores devueltos en inglés (`pinRequest`, `cardStatus`); `Cliente` queda como actor de la consigna.
+10. El orden y los datos siguen el flujo del PNG del CU, paso por paso.
 
 ## Sintaxis
 ```
 @startuml 05_secuencia_autenticar
 skinparam sequenceMessageAlign center
 actor Cliente
-participant "<u>:PantallaCajero</u>" as PC
-participant "<u>:SucursalDB</u>" as SDB
+participant "<u>:AtmForm</u>" as PC
+participant "<u>:BranchDB</u>" as SDB
 
-Cliente -> PC : InsertarTarjeta(numero, vencimiento)
+Cliente -> PC : InsertCard(number, expirationDate)
 activate PC
-PC -> SDB : ValidarTarjeta(numero, vencimiento)
+PC -> SDB : ValidateCard(number, expirationDate)
 activate SDB
-SDB --> PC : //estadoTarjeta//
+SDB --> PC : //cardStatus//
 deactivate SDB
-PC --> Cliente : //solicitudPin//
+PC --> Cliente : //pinRequest//
 deactivate PC
 @enduml
 ```

@@ -11,7 +11,7 @@ description: Crear, revisar o corregir el Diagrama de Actividad del SISTEMA comp
 - `Guia_DiagramaActividad_DIS_2026.pdf` (notación §3, errores §8, checklist §9), `ejemploDiagramaActividad.html`, `resources/CU_*.png`, Debrauwer cap. 9, EIDOS cap. 6 pp. 72-78, consigna ítem 9.
 
 ## Reglas
-1. **Un nodo inicial** y al menos un nodo final. Es el flujo de todo el sistema: tarjeta → PIN → operaciones → ticket → devolución, no solo «Operar Cajero».
+1. **Un nodo inicial** y al menos un nodo final. Es el flujo de todo el sistema (texto de dominio en español): tarjeta → PIN → operaciones → ticket → devolución, no solo «Operar Cajero».
 2. **Actividades** con verbo en infinitivo + objeto específico, esquinas redondeadas: `Validar tarjeta`, no `Tarjeta` ni `Procesar`. Cada una con al menos una entrada y una salida.
 3. **Calles (swimlanes)**, como el ejemplo del docente: `Cliente`, `Cajero`, `Sucursal`, `Red Central`. Cada actividad pertenece a una sola calle; las transiciones cruzan calles.
 4. **Bifurcación** (rombo): la pregunta va en el rombo y las guardas **entre corchetes** sobre las flechas de salida: `¿Tarjeta válida?` → `[sí]` / `[no]`. Guardas **excluyentes y exhaustivas**; usar `else` para el resto.

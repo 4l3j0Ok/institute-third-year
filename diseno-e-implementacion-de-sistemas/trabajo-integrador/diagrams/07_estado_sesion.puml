@@ -1,0 +1,27 @@
+@startuml 07_estado_sesion
+title Diagrama de Estado - Clase Session (Sesion)
+skinparam shadowing false
+
+state Started : Iniciada
+state Authenticating : Autenticando (tarjeta)
+state Authenticating : do / ValidateCard (Sucursal)
+state Validating : Validando (PIN)
+state Validating : do / ValidatePin (Red Central)
+state Operating : Operando
+state Closing : Cerrando
+state Closing : do / GenerateReceipt (si el cliente lo pide)
+state Closed : Cerrada
+
+[*] --> Started
+Started --> Authenticating : InsertCard(number, expirationDate)
+Authenticating --> Validating : [tarjeta válida]
+Authenticating --> Closing : [tarjeta bloqueada o vencida]
+Validating --> Operating : Authenticate(pin) [PIN correcto]
+Validating --> Validating : Authenticate(pin) [PIN incorrecto e intentos < 3]
+Validating --> Closing : Authenticate(pin) [PIN incorrecto e intentos = 3] / BlockCard
+Validating --> Closing : Finish() [el cliente cancela]
+Operating --> Operating : Execute(operation) [operación exitosa] / RegisterOperation
+Operating --> Closing : Finish()
+Closing --> Closed : Close() / ReturnCard, RemoveAuthenticationData
+Closed --> [*]
+@enduml
