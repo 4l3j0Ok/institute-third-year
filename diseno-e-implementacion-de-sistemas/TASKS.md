@@ -4,7 +4,7 @@ status: in progress
 
 # TASKS
 
-Consigna: «Entrega de TP grupal DIS2026» (`resources/tasks/entrega_tp_grupal.txt`). Grupos de hasta 4 personas, 1 entrega por representante. Sin fecha en Classroom.
+Consigna formal completa: [CONSIGNA.md](CONSIGNA.md). Fuente original: `resources/tasks/entrega_tp_grupal.txt`. Grupos de hasta 4 personas, 1 entrega por representante. Sin fecha en Classroom.
 
 ## Supuestos (la consigna cita secciones 3, 5, 6.1 y 6.2 que no están en el Classroom)
 
