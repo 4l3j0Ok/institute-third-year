@@ -1,19 +1,42 @@
-@startuml 01_contexto
-title Diagrama de Contexto - Sistema Cajero Automático
-left to right direction
-skinparam shadowing false
+@startdot 01_contexto
+digraph contexto {
+  label=<<B>Diagrama de Contexto - Sistema Cajero Automático</B>>; labelloc=t; fontname="Helvetica"; fontsize=14;
+  rankdir=LR; nodesep=0.35; ranksep=2.6;
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10];
 
-rectangle "Cliente" as CLI
-rectangle "Sucursal" as SUC
-rectangle "Red Central" as RED
-usecase "0\nCajero Automático" as SYS
+  CLI [shape=box, width=1.4, height=0.6, label="Cliente"];
+  SUC [shape=box, width=1.4, height=0.6, label="Sucursal"];
+  RED [shape=box, width=1.4, height=0.6, label="Red Central"];
+  SYS [shape=circle, width=2.2, label="0\nCajero\nAutomático"];
 
-CLI --> SYS : Datos de tarjeta, PIN,\nopción elegida, monto,\nCBU destino, confirmación
-SYS --> CLI : Solicitud de PIN, menú de operaciones,\nsaldo consultado, efectivo dispensado,\ncomprobante transferencia, ticket impreso,\ntarjeta devuelta
+  CLI -> SYS [label="Datos de tarjeta"];
+  CLI -> SYS [label="PIN"];
+  CLI -> SYS [label="Opción elegida"];
+  CLI -> SYS [label="Monto"];
+  CLI -> SYS [label="CBU destino"];
+  CLI -> SYS [label="Confirmación"];
 
-SUC --> SYS : Estado de tarjeta\n(válida / bloqueada / vencida)
-SYS --> SUC : Solicitud de validación\nde tarjeta
+  SYS -> CLI [label="Solicitud de PIN"];
+  SYS -> CLI [label="Menú de operaciones"];
+  SYS -> CLI [label="Saldo consultado"];
+  SYS -> CLI [label="Efectivo dispensado"];
+  SYS -> CLI [label="Comprobante transferencia"];
+  SYS -> CLI [label="Ticket impreso"];
+  SYS -> CLI [label="Tarjeta devuelta"];
 
-RED --> SYS : Confirmación de PIN, saldo disponible,\nautorización de débito,\nconfirmación de transferencia,\nnúmero de comprobante
-SYS --> RED : Solicitud de validación de PIN,\nsolicitud de consulta de saldo,\ninstrucción de débito,\ninstrucción de transferencia
-@enduml
+  SUC -> SYS [label="Estado de tarjeta"];
+  SYS -> SUC [label="Solicitud de validación de tarjeta"];
+
+  RED -> SYS [label="Confirmación de PIN"];
+  RED -> SYS [label="Saldo disponible"];
+  RED -> SYS [label="Autorización de débito"];
+  RED -> SYS [label="Confirmación de transferencia"];
+  RED -> SYS [label="Número de comprobante"];
+
+  SYS -> RED [label="Solicitud de validación de PIN"];
+  SYS -> RED [label="Solicitud de consulta de saldo"];
+  SYS -> RED [label="Instrucción de débito"];
+  SYS -> RED [label="Instrucción de transferencia"];
+}
+@enddot

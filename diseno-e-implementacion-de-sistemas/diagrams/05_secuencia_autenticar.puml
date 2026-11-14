@@ -4,22 +4,25 @@ skinparam shadowing false
 skinparam sequenceMessageAlign center
 
 actor Cliente
-participant ":PantallaCajero" as PC
-participant ":SucursalDB" as SDB
-participant ":CentralDB" as CDB
+participant "<u>:PantallaCajero</u>" as PC
+participant "<u>:SucursalDB</u>" as SDB
+participant "<u>:CentralDB</u>" as CDB
 
-Cliente -> PC : insertarTarjeta(numero, vencimiento)
+Cliente -> PC : InsertarTarjeta(numero, vencimiento)
 activate PC
-PC -> SDB : validarTarjeta(numero, vencimiento)
+PC -> SDB : ValidarTarjeta(numero, vencimiento)
 activate SDB
-SDB --> PC : estadoTarjeta
+SDB --> PC : //estadoTarjeta//
 deactivate SDB
-PC --> Cliente : solicitarPin()
-Cliente -> PC : ingresarPin(pin)
-PC -> CDB : validarPin(numero, pinEncriptado)
+PC --> Cliente : //solicitudPin//
+deactivate PC
+
+Cliente -> PC : IngresarPin(pin)
+activate PC
+PC -> CDB : ValidarPin(numeroTarjeta, pinEncriptado)
 activate CDB
-CDB --> PC : pinValido
+CDB --> PC : //confirmacionPin//
 deactivate CDB
-PC --> Cliente : menuOperaciones
+PC --> Cliente : //menuOperaciones//
 deactivate PC
 @enduml

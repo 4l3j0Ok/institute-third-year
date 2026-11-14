@@ -1,61 +1,80 @@
-@startuml 02_dfd_nivel0
-title DFD Nivel 0 - Sistema Cajero Automático
-left to right direction
-skinparam shadowing false
-skinparam defaultTextAlignment center
+@startdot 02_dfd_nivel0
+digraph dfd_nivel0 {
+  label=<<B>DFD Nivel 0 - Sistema Cajero Automático</B><BR/><FONT POINT-SIZE="10">Terminadores repetidos (marcados con una línea extra) para evitar el cruce de flujos</FONT>>; labelloc=t; fontname="Helvetica"; fontsize=14;
+  rankdir=LR; nodesep=0.35; ranksep=1.1;
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=9];
 
-rectangle "Cliente" as CLI
-rectangle "Sucursal" as SUC
-rectangle "Red Central" as RED
+  CLI  [shape=box, width=1.3, height=0.55, label="Cliente"];
+  CLI2 [shape=none, margin=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="9" BORDER="1" SIDES="R"> </TD><TD WIDTH="75" HEIGHT="34">Cliente</TD></TR></TABLE>>];
+  CLI3 [shape=none, margin=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="9" BORDER="1" SIDES="R"> </TD><TD WIDTH="75" HEIGHT="34">Cliente</TD></TR></TABLE>>];
+  CLI4 [shape=none, margin=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="9" BORDER="1" SIDES="R"> </TD><TD WIDTH="75" HEIGHT="34">Cliente</TD></TR></TABLE>>];
+  CLI5 [shape=none, margin=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="9" BORDER="1" SIDES="R"> </TD><TD WIDTH="75" HEIGHT="34">Cliente</TD></TR></TABLE>>];
+  SUC  [shape=box, width=1.3, height=0.55, label="Sucursal"];
+  RED  [shape=box, width=1.3, height=0.55, label="Red Central"];
+  RED2 [shape=none, margin=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="9" BORDER="1" SIDES="R"> </TD><TD WIDTH="75" HEIGHT="34">Red Central</TD></TR></TABLE>>];
+  RED3 [shape=none, margin=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="9" BORDER="1" SIDES="R"> </TD><TD WIDTH="75" HEIGHT="34">Red Central</TD></TR></TABLE>>];
+  RED4 [shape=none, margin=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="9" BORDER="1" SIDES="R"> </TD><TD WIDTH="75" HEIGHT="34">Red Central</TD></TR></TABLE>>];
 
-usecase "1\nLeer tarjeta" as P1
-usecase "2\nValidar tarjeta" as P2
-usecase "3\nValidar PIN" as P3
-usecase "4\nConsultar saldo" as P4
-usecase "5\nExtraer efectivo" as P5
-usecase "6\nRealizar transferencia" as P6
-usecase "7\nRegistrar transacción" as P7
-usecase "8\nEmitir ticket y\ndevolver tarjeta" as P8
+  P1 [shape=circle, width=1.3, label="1\nLeer\ntarjeta"];
+  P2 [shape=circle, width=1.3, label="2\nValidar\ntarjeta"];
+  P3 [shape=circle, width=1.3, label="3\nValidar\nPIN"];
+  P4 [shape=circle, width=1.3, label="4\nConsultar\nsaldo"];
+  P5 [shape=circle, width=1.3, label="5\nExtraer\nefectivo"];
+  P6 [shape=circle, width=1.45, label="6\nRealizar\ntransferencia"];
+  P7 [shape=circle, width=1.45, label="7\nRegistrar\ntransacción"];
+  P8 [shape=circle, width=1.6, label="8\nEmitir ticket y\ndevolver tarjeta"];
 
-database "D1 Sesión" as D1
-database "D2 Tarjetas leídas" as D2
-database "D3 Log de transacciones" as D3
+  D1 [shape=none, margin=0, label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6"><TR><TD SIDES="TB">D1</TD><TD SIDES="TB">Sesiones</TD></TR></TABLE>>];
+  D2 [shape=none, margin=0, label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6"><TR><TD SIDES="TB">D2</TD><TD SIDES="TB">Tarjetas leídas</TD></TR></TABLE>>];
+  D3 [shape=none, margin=0, label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6"><TR><TD SIDES="TB">D3</TD><TD SIDES="TB">Transacciones</TD></TR></TABLE>>];
 
-CLI --> P1 : Datos de tarjeta
-P1 --> D2 : Datos de tarjeta leídos
-D2 --> P2 : Datos de tarjeta
-P2 --> SUC : Solicitud de validación de tarjeta
-SUC --> P2 : Estado de tarjeta
-P2 --> D1 : Tarjeta validada
-P2 --> CLI : Solicitud de PIN
-CLI --> P3 : PIN
-D1 --> P3 : Tarjeta validada
-P3 --> RED : Solicitud de validación de PIN
-RED --> P3 : Confirmación de PIN
-P3 --> D1 : Sesión autenticada
-P3 --> CLI : Menú de operaciones
+  CLI -> P1 [label="Datos de tarjeta"];
+  P1 -> D2 [label="Datos de tarjeta leídos"];
+  D2 -> P2 [label="Datos de tarjeta leídos"];
+  P2 -> SUC [label="Solicitud de validación de tarjeta"];
+  SUC -> P2 [label="Estado de tarjeta"];
+  P2 -> D1 [label="Tarjeta validada"];
+  P2 -> CLI [label="Solicitud de PIN"];
 
-CLI --> P4 : Opción elegida
-P4 --> RED : Solicitud de consulta de saldo
-RED --> P4 : Saldo disponible
-P4 --> CLI : Saldo consultado
-P4 --> P7 : Datos de consulta
+  CLI -> P3 [label="PIN"];
+  D1 -> P3 [label="Tarjeta validada"];
+  P3 -> RED [label="Solicitud de validación de PIN"];
+  RED -> P3 [label="Confirmación de PIN"];
+  P3 -> D1 [label="Sesión autenticada"];
+  P3 -> CLI [label="Menú de operaciones"];
 
-CLI --> P5 : Opción elegida, monto
-P5 --> RED : Instrucción de débito
-RED --> P5 : Autorización de débito
-P5 --> CLI : Efectivo dispensado
-P5 --> P7 : Datos de extracción
+  CLI2 -> P4 [label="Opción elegida"];
+  D1 -> P4 [label="Datos de sesión"];
+  P4 -> RED2 [label="Solicitud de consulta de saldo"];
+  RED2 -> P4 [label="Saldo disponible"];
+  P4 -> CLI2 [label="Saldo consultado"];
+  P4 -> P7 [label="Datos de consulta"];
 
-CLI --> P6 : Opción elegida, CBU destino,\nmonto, confirmación
-P6 --> RED : Instrucción de transferencia
-RED --> P6 : Confirmación de transferencia,\nnúmero de comprobante
-P6 --> CLI : Comprobante transferencia
-P6 --> P7 : Datos de transferencia
+  CLI3 -> P5 [label="Opción elegida"];
+  CLI3 -> P5 [label="Monto"];
+  D1 -> P5 [label="Datos de sesión"];
+  P5 -> RED3 [label="Instrucción de débito"];
+  RED3 -> P5 [label="Autorización de débito"];
+  P5 -> CLI3 [label="Efectivo dispensado"];
+  P5 -> P7 [label="Datos de extracción"];
 
-P7 --> D3 : Transacción registrada
-D3 --> P8 : Transacciones de la sesión
-D1 --> P8 : Datos de sesión
-CLI --> P8 : Confirmación
-P8 --> CLI : Ticket impreso, tarjeta devuelta
-@enduml
+  CLI4 -> P6 [label="Opción elegida"];
+  CLI4 -> P6 [label="CBU destino"];
+  CLI4 -> P6 [label="Monto"];
+  CLI4 -> P6 [label="Confirmación"];
+  D1 -> P6 [label="Datos de sesión"];
+  P6 -> RED4 [label="Instrucción de transferencia"];
+  RED4 -> P6 [label="Confirmación de transferencia"];
+  RED4 -> P6 [label="Número de comprobante"];
+  P6 -> CLI4 [label="Comprobante transferencia"];
+  P6 -> P7 [label="Datos de transferencia"];
+
+  P7 -> D3 [label="Transacción registrada"];
+  D3 -> P8 [label="Transacciones de la sesión"];
+  D1 -> P8 [label="Datos de sesión"];
+  CLI5 -> P8 [label="Confirmación"];
+  P8 -> CLI5 [label="Ticket impreso"];
+  P8 -> CLI5 [label="Tarjeta devuelta"];
+}
+@enddot

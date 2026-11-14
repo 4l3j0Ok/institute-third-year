@@ -1,83 +1,91 @@
 @startuml 04_clases
-title Diagrama de Clases - Cajero Automático
+title Diagrama de Clases - Cajero Automático (capa Lógica)
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 
 class Cliente {
-  - _nombre : String
-  - _dni : String
-  + getNombre() : String
-  + setNombre(nombre : String) : void
-  + getDni() : String
-  + setDni(dni : String) : void
+  - _nombre : string
+  - _dni : string
+  + Cliente(nombre : string, dni : string)
 }
 
 class Tarjeta {
-  - _numero : String
-  - _vencimiento : Date
-  - _estado : String
-  - _intentosPin : int
-  + getNumero() : String
-  + getEstado() : String
-  + estaVigente() : boolean
-  + bloquear() : void
-  + registrarIntentoFallido() : int
+  + {static} MaximoIntentos : int = 3
+  - _numero : string {readOnly}
+  - _vencimiento : DateTime {readOnly}
+  - _estado : EstadoTarjeta
+  - _intentosPin : int {readOnly}
+  + Tarjeta(numero : string, vencimiento : DateTime)
+  + EstaVigente() : bool
+  + RegistrarIntentoFallido() : int
+  + Bloquear() : void
 }
 
 class Cuenta {
-  - _cbu : String
-  - _saldoDisponible : double
-  - _saldoTotal : double
-  - _limiteDiario : double
-  + getSaldoDisponible() : double
-  + getSaldoTotal() : double
-  + debitar(monto : double) : boolean
-  + acreditar(monto : double) : void
+  - _cbu : string {readOnly}
+  - _saldoDisponible : decimal
+  - _saldoTotal : decimal
+  + Cuenta(cbu : string, saldoDisponible : decimal, saldoTotal : decimal)
+  + ActualizarSaldo(disponible : decimal, total : decimal) : void
 }
 
 class Sesion {
-  - _estado : String
-  - _fechaInicio : DateTime
-  - _log : List<String>
-  + autenticar(pin : String) : boolean
-  + agregarOperacion(op : Operacion) : void
-  + registrarLog(detalle : String) : void
-  + cerrar() : void
+  - _estado : EstadoSesion {readOnly}
+  - _fechaInicio : DateTime {readOnly}
+  - _mensaje : string {readOnly}
+  + Sesion()
+  + IngresarTarjeta(numero : string, vencimiento : DateTime) : bool
+  + Autenticar(pin : string) : bool
+  + Ejecutar(operacion : Operacion) : bool
+  + NuevaConsulta() : Operacion
+  + NuevaExtraccion(monto : decimal) : Operacion
+  + NuevaTransferencia(cbuDestino : string, monto : decimal) : Operacion
+  + Finalizar() : void
+  + GenerarTicket() : string
+  + Cerrar() : void
 }
 
 abstract class Operacion {
-  # _monto : double
-  # _fecha : DateTime
-  # _nroComprobante : String
-  + {abstract} ejecutar() : boolean
-  + getNroComprobante() : String
+  # _monto : decimal
+  # _fecha : DateTime {readOnly}
+  # _numeroComprobante : string
+  # _mensaje : string
+  + {abstract} Tipo : string {readOnly}
+  # Operacion(central : CentralDB, tarjeta : Tarjeta, cuenta : Cuenta, monto : decimal)
+  + {abstract} Ejecutar() : bool
+  + ToString() : string
 }
 
 class Consulta {
-  + ejecutar() : boolean
-  + getSaldo() : double
+  + Consulta(central : CentralDB, tarjeta : Tarjeta, cuenta : Cuenta)
+  + Ejecutar() : bool
 }
 
 class Extraccion {
-  - _montoRetirado : double
-  + ejecutar() : boolean
-  + verificarLimite() : boolean
+  + Extraccion(central : CentralDB, tarjeta : Tarjeta, cuenta : Cuenta, monto : decimal)
+  + Ejecutar() : bool
 }
 
 class Transferencia {
-  - _cbuDestino : String
-  + ejecutar() : boolean
-  + validarCbu() : boolean
+  - _cbuDestino : string
+  + Transferencia(central : CentralDB, tarjeta : Tarjeta, cuenta : Cuenta, cbuDestino : string, monto : decimal)
+  + Ejecutar() : bool
 }
 
 Operacion <|-- Consulta
 Operacion <|-- Extraccion
 Operacion <|-- Transferencia
 
-Cliente "1" -- "1..*" Tarjeta : posee >
-Cuenta "1" -- "1..*" Tarjeta : asociada a >
-Cliente "1" -- "1..*" Cuenta : titular de >
-Sesion "1" -- "1" Tarjeta : usa >
-Sesion "1" *-- "0..*" Operacion : contiene >
-Operacion "0..*" -- "1" Cuenta : afecta >
+Sesion "1" *-- "0..*" Operacion : registra >
+Sesion "1" --> "0..1" Tarjeta : usa >
+Sesion "1" --> "1" Cuenta : opera sobre >
+Sesion "1" --> "1" Cliente : atiende a >
+Operacion "0..*" --> "1" Tarjeta : identifica con >
+Operacion "0..*" --> "1" Cuenta : afecta >
+
+note as capas
+  Las propiedades públicas (get/set) de cada atributo no se dibujan.
+  SucursalDB y CentralDB (capa Datos) y FormCajero (capa Presentación,
+  la :PantallaCajero de las secuencias) no forman parte de las 8 clases.
+end note
 @enduml

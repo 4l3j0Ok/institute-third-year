@@ -1,0 +1,8 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Aplica las reglas de nombres de .editorconfig durante dotnet build -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+</Project>

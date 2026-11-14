@@ -1,0 +1,81 @@
+# Convenciones de C# del TP (ver .agents/skills/dis-convenciones). `dotnet build` las exige.
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+dotnet_sort_system_directives_first = true
+
+# ---- Estilos ----
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_style.interfaz.required_prefix = I
+dotnet_naming_style.interfaz.capitalization = pascal_case
+dotnet_naming_style.campo_privado.required_prefix = _
+dotnet_naming_style.campo_privado.capitalization = camel_case
+dotnet_naming_style.campo_estatico_privado.required_prefix = s_
+dotnet_naming_style.campo_estatico_privado.capitalization = camel_case
+
+# ---- Símbolos ----
+dotnet_naming_symbols.constantes.applicable_kinds = field
+dotnet_naming_symbols.constantes.required_modifiers = const
+
+dotnet_naming_symbols.campos_estaticos_privados.applicable_kinds = field
+dotnet_naming_symbols.campos_estaticos_privados.applicable_accessibilities = private
+dotnet_naming_symbols.campos_estaticos_privados.required_modifiers = static
+
+dotnet_naming_symbols.campos_privados.applicable_kinds = field
+dotnet_naming_symbols.campos_privados.applicable_accessibilities = private, protected, private_protected
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+
+dotnet_naming_symbols.miembros_y_tipos.applicable_kinds = namespace, class, struct, enum, delegate, event, method, property, field, local_function
+dotnet_naming_symbols.miembros_y_tipos.applicable_accessibilities = public, internal, protected, protected_internal, private_protected
+
+dotnet_naming_symbols.metodos_privados.applicable_kinds = method, property, event, local_function, class, struct, enum
+dotnet_naming_symbols.metodos_privados.applicable_accessibilities = private
+
+dotnet_naming_symbols.parametros_y_locales.applicable_kinds = parameter, local
+
+# ---- Reglas (la primera que coincide gana, el orden importa) ----
+dotnet_naming_rule.constantes_pascal.symbols = constantes
+dotnet_naming_rule.constantes_pascal.style = pascal_case
+dotnet_naming_rule.constantes_pascal.severity = error
+
+dotnet_naming_rule.interfaces_con_i.symbols = interfaces
+dotnet_naming_rule.interfaces_con_i.style = interfaz
+dotnet_naming_rule.interfaces_con_i.severity = error
+
+dotnet_naming_rule.campos_estaticos_privados_s.symbols = campos_estaticos_privados
+dotnet_naming_rule.campos_estaticos_privados_s.style = campo_estatico_privado
+dotnet_naming_rule.campos_estaticos_privados_s.severity = error
+
+dotnet_naming_rule.campos_privados_guion_bajo.symbols = campos_privados
+dotnet_naming_rule.campos_privados_guion_bajo.style = campo_privado
+dotnet_naming_rule.campos_privados_guion_bajo.severity = error
+
+dotnet_naming_rule.publicos_pascal.symbols = miembros_y_tipos
+dotnet_naming_rule.publicos_pascal.style = pascal_case
+dotnet_naming_rule.publicos_pascal.severity = error
+
+dotnet_naming_rule.privados_pascal.symbols = metodos_privados
+dotnet_naming_rule.privados_pascal.style = pascal_case
+dotnet_naming_rule.privados_pascal.severity = error
+
+dotnet_naming_rule.parametros_y_locales_camel.symbols = parametros_y_locales
+dotnet_naming_rule.parametros_y_locales_camel.style = camel_case
+dotnet_naming_rule.parametros_y_locales_camel.severity = error
+
+# Los parámetros posicionales de un record son propiedades públicas: llevan PascalCase
+[*.cs]
+dotnet_diagnostic.IDE1006.severity = error
+
+# El diseñador de Windows Forms genera campos de controles como btnAceptar / lblMensaje
+[*.Designer.cs]
+generated_code = true
+dotnet_diagnostic.IDE1006.severity = none

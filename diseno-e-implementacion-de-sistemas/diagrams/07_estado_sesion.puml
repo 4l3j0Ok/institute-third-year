@@ -2,15 +2,20 @@
 title Diagrama de Estado - Clase Sesion
 skinparam shadowing false
 
+state Autenticando : do / ValidarTarjeta (Sucursal)
+state Validando : do / ValidarPin (Red Central)
+state Cerrando : do / GenerarTicket (si el cliente lo pide)
+
 [*] --> Iniciada
-Iniciada --> Autenticando : tarjetaInsertada()
-Autenticando --> Validando : tarjetaValida()
-Autenticando --> Cerrando : tarjetaInvalida() / devolverTarjeta
-Validando --> Operando : pinCorrecto()
-Validando --> Validando : pinIncorrecto() [intentos < 3]
-Validando --> Cerrando : pinIncorrecto() [intentos = 3] / bloquearTarjeta
-Operando --> Operando : operacionCompletada() [realizarOtra]
-Operando --> Cerrando : finalizar()
-Cerrando --> Cerrada : ticketEmitido() / devolverTarjeta
+Iniciada --> Autenticando : IngresarTarjeta(numero, vencimiento)
+Autenticando --> Validando : [tarjeta válida]
+Autenticando --> Cerrando : [tarjeta bloqueada o vencida]
+Validando --> Operando : Autenticar(pin) [PIN correcto]
+Validando --> Validando : Autenticar(pin) [PIN incorrecto e intentos < 3]
+Validando --> Cerrando : Autenticar(pin) [PIN incorrecto e intentos = 3] / BloquearTarjeta
+Validando --> Cerrando : Finalizar() [el cliente cancela]
+Operando --> Operando : Ejecutar(operacion) [operación exitosa] / RegistrarOperacion
+Operando --> Cerrando : Finalizar()
+Cerrando --> Cerrada : Cerrar() / DevolverTarjeta, EliminarDatosAutenticacion
 Cerrada --> [*]
 @enduml

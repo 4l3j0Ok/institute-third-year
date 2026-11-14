@@ -24,13 +24,21 @@ CLI --> CU5
 CU2 ..> CU1 : <<include>>
 CU3 ..> CU1 : <<include>>
 CU4 ..> CU1 : <<include>>
+
 CU5 ..> CU2 : <<extend>>
 CU5 ..> CU3 : <<extend>>
 CU5 ..> CU4 : <<extend>>
 
-CU1 -- SUC
-CU1 -- RED
-CU2 -- RED
-CU3 -- RED
-CU4 -- RED
+CU1 --> SUC
+CU1 --> RED
+CU2 --> RED
+CU3 --> RED
+CU4 --> RED
+
+note bottom of CU5
+  Punto de extensión: «Finalizar».
+  Se ejecuta cuando el cliente elige Finalizar
+  o completa la última operación, y solo si
+  decide imprimir el comprobante.
+end note
 @enduml

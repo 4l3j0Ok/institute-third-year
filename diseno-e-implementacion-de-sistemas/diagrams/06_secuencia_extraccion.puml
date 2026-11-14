@@ -4,19 +4,22 @@ skinparam shadowing false
 skinparam sequenceMessageAlign center
 
 actor Cliente
-participant ":PantallaCajero" as PC
-participant ":CentralDB" as CDB
+participant "<u>:PantallaCajero</u>" as PC
+participant "<u>:CentralDB</u>" as CDB
 
-Cliente -> PC : seleccionarOperacion("Extraer Efectivo")
+Cliente -> PC : SeleccionarOperacion("Extraer efectivo")
 activate PC
-PC --> Cliente : solicitarMonto()
-Cliente -> PC : ingresarMonto(monto)
-PC -> CDB : autorizarDebito(numeroTarjeta, monto)
+PC --> Cliente : //solicitudMonto//
+deactivate PC
+
+Cliente -> PC : IngresarMonto(monto)
+activate PC
+PC -> CDB : AutorizarDebito(numeroTarjeta, monto)
 activate CDB
-CDB --> PC : autorizacion(nroTransaccion, saldoRestante)
+CDB --> PC : //autorizacionDebito(numeroTransaccion, saldoRestante)//
 deactivate CDB
-PC -> PC : dispensarEfectivo(monto)
-PC -> PC : registrarLog(nroTransaccion)
-PC --> Cliente : operacionExitosa(saldoRestante)
+PC -> PC : DispensarEfectivo(monto)
+PC -> PC : RegistrarOperacion(numeroTransaccion)
+PC --> Cliente : //operacionExitosa(saldoRestante)//
 deactivate PC
 @enduml
