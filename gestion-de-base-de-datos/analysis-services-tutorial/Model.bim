@@ -368,6 +368,13 @@
             "name": "CommuteDistance",
             "dataType": "string",
             "sourceColumn": "CommuteDistance"
+          },
+          {
+            "type": "calculated",
+            "name": "CountryRegionName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('DimGeography'[EnglishCountryRegionName])"
           }
         ],
         "partitions": [
@@ -452,6 +459,28 @@
                 "    #\"Columnas quitadas\""
               ]
             }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Geografía",
+            "levels": [
+              {
+                "name": "EnglishCountryRegionName",
+                "ordinal": 0,
+                "column": "EnglishCountryRegionName"
+              },
+              {
+                "name": "StateProvinceName",
+                "ordinal": 1,
+                "column": "StateProvinceName"
+              },
+              {
+                "name": "City",
+                "ordinal": 2,
+                "column": "City"
+              }
+            ]
           }
         ]
       },
@@ -1040,61 +1069,6 @@
             ]
           },
           {
-            "name": "InternetTotalSales",
-            "expression": "SUM([SalesAmount])",
-            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
-            "kpi": {
-              "targetExpression": "1000000",
-              "targetFormatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
-              "statusGraphic": "Shapes",
-              "statusExpression": [
-                "var x='FactInternetSales'[InternetTotalSales] return",
-                "            if(ISBLANK(x),BLANK(),",
-                "                    If(x<800000,-1,",
-                "\t                If(x<1000000,0,1)",
-                "                )",
-                "            )",
-                "            "
-              ],
-              "annotations": [
-                {
-                  "name": "GoalType",
-                  "value": "StaticValue"
-                },
-                {
-                  "name": "KpiStatusType",
-                  "value": "Linear"
-                },
-                {
-                  "name": "KpiThresholdType",
-                  "value": "Absolute"
-                },
-                {
-                  "name": "KpiThresholdOrdering",
-                  "value": "Ascending"
-                },
-                {
-                  "name": "KpiThresholdCount",
-                  "value": "2"
-                },
-                {
-                  "name": "KpiThreshold_0",
-                  "value": "800000"
-                },
-                {
-                  "name": "KpiThreshold_1",
-                  "value": "1000000"
-                }
-              ]
-            },
-            "annotations": [
-              {
-                "name": "Format",
-                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
-              }
-            ]
-          },
-          {
             "name": "InternetTotalMargin",
             "expression": "SUM([Margin])",
             "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
@@ -1246,8 +1220,8 @@
             }
           },
           {
-            "name": "InternetAugSalesAmount",
-            "expression": "SUM([SalesAmount])",
+            "name": "InternetAvgSalesAmount",
+            "expression": "AVERAGE([SalesAmount])",
             "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
             "annotations": [
               {
@@ -1271,6 +1245,61 @@
             "name": "InternetMinSalesAmount",
             "expression": "MIN([SalesAmount])",
             "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\" Accuracy=\"2\" ThousandSeparator=\"True\"><Currency LCID=\"11274\" DisplayName=\"$ Español (Argentina)\" Symbol=\"$\" PositivePattern=\"2\" NegativePattern=\"9\" /></Format>"
+              }
+            ]
+          },
+          {
+            "name": "InternetTotalSales",
+            "expression": "SUM([SalesAmount])",
+            "formatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+            "kpi": {
+              "targetExpression": "1000000",
+              "targetFormatString": "\\$ #,0.00;-\\$ #,0.00;\\$ #,0.00",
+              "statusGraphic": "Shapes",
+              "statusExpression": [
+                "var x='FactInternetSales'[InternetTotalSales] return",
+                "            if(ISBLANK(x),BLANK(),",
+                "                    If(x<800000,-1,",
+                "\t                If(x<1000000,0,1)",
+                "                )",
+                "            )",
+                "            "
+              ],
+              "annotations": [
+                {
+                  "name": "GoalType",
+                  "value": "StaticValue"
+                },
+                {
+                  "name": "KpiStatusType",
+                  "value": "Linear"
+                },
+                {
+                  "name": "KpiThresholdType",
+                  "value": "Absolute"
+                },
+                {
+                  "name": "KpiThresholdOrdering",
+                  "value": "Ascending"
+                },
+                {
+                  "name": "KpiThresholdCount",
+                  "value": "2"
+                },
+                {
+                  "name": "KpiThreshold_0",
+                  "value": "800000"
+                },
+                {
+                  "name": "KpiThreshold_1",
+                  "value": "1000000"
+                }
+              ]
+            },
             "annotations": [
               {
                 "name": "Format",

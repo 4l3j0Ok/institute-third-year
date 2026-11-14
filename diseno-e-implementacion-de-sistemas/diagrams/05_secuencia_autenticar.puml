@@ -1,0 +1,25 @@
+@startuml 05_secuencia_autenticar
+title Diagrama de Secuencia - CU Autenticar Usuario
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor Cliente
+participant ":PantallaCajero" as PC
+participant ":SucursalDB" as SDB
+participant ":CentralDB" as CDB
+
+Cliente -> PC : insertarTarjeta(numero, vencimiento)
+activate PC
+PC -> SDB : validarTarjeta(numero, vencimiento)
+activate SDB
+SDB --> PC : estadoTarjeta
+deactivate SDB
+PC --> Cliente : solicitarPin()
+Cliente -> PC : ingresarPin(pin)
+PC -> CDB : validarPin(numero, pinEncriptado)
+activate CDB
+CDB --> PC : pinValido
+deactivate CDB
+PC --> Cliente : menuOperaciones
+deactivate PC
+@enduml

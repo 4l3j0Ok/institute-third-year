@@ -1,0 +1,16 @@
+@startuml 07_estado_sesion
+title Diagrama de Estado - Clase Sesion
+skinparam shadowing false
+
+[*] --> Iniciada
+Iniciada --> Autenticando : tarjetaInsertada()
+Autenticando --> Validando : tarjetaValida()
+Autenticando --> Cerrando : tarjetaInvalida() / devolverTarjeta
+Validando --> Operando : pinCorrecto()
+Validando --> Validando : pinIncorrecto() [intentos < 3]
+Validando --> Cerrando : pinIncorrecto() [intentos = 3] / bloquearTarjeta
+Operando --> Operando : operacionCompletada() [realizarOtra]
+Operando --> Cerrando : finalizar()
+Cerrando --> Cerrada : ticketEmitido() / devolverTarjeta
+Cerrada --> [*]
+@enduml

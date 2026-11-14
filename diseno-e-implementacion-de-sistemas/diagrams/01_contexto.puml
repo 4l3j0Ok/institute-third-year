@@ -1,0 +1,19 @@
+@startuml 01_contexto
+title Diagrama de Contexto - Sistema Cajero Automático
+left to right direction
+skinparam shadowing false
+
+rectangle "Cliente" as CLI
+rectangle "Sucursal" as SUC
+rectangle "Red Central" as RED
+usecase "0\nCajero Automático" as SYS
+
+CLI --> SYS : Datos de tarjeta, PIN,\nopción elegida, monto,\nCBU destino, confirmación
+SYS --> CLI : Solicitud de PIN, menú de operaciones,\nsaldo consultado, efectivo dispensado,\ncomprobante transferencia, ticket impreso,\ntarjeta devuelta
+
+SUC --> SYS : Estado de tarjeta\n(válida / bloqueada / vencida)
+SYS --> SUC : Solicitud de validación\nde tarjeta
+
+RED --> SYS : Confirmación de PIN, saldo disponible,\nautorización de débito,\nconfirmación de transferencia,\nnúmero de comprobante
+SYS --> RED : Solicitud de validación de PIN,\nsolicitud de consulta de saldo,\ninstrucción de débito,\ninstrucción de transferencia
+@enduml

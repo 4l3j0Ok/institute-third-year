@@ -1,0 +1,22 @@
+@startuml 06_secuencia_extraccion
+title Diagrama de Secuencia - CU Extraer Efectivo
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor Cliente
+participant ":PantallaCajero" as PC
+participant ":CentralDB" as CDB
+
+Cliente -> PC : seleccionarOperacion("Extraer Efectivo")
+activate PC
+PC --> Cliente : solicitarMonto()
+Cliente -> PC : ingresarMonto(monto)
+PC -> CDB : autorizarDebito(numeroTarjeta, monto)
+activate CDB
+CDB --> PC : autorizacion(nroTransaccion, saldoRestante)
+deactivate CDB
+PC -> PC : dispensarEfectivo(monto)
+PC -> PC : registrarLog(nroTransaccion)
+PC --> Cliente : operacionExitosa(saldoRestante)
+deactivate PC
+@enduml

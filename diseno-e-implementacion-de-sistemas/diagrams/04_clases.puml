@@ -1,0 +1,83 @@
+@startuml 04_clases
+title Diagrama de Clases - Cajero Automático
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+class Cliente {
+  - _nombre : String
+  - _dni : String
+  + getNombre() : String
+  + setNombre(nombre : String) : void
+  + getDni() : String
+  + setDni(dni : String) : void
+}
+
+class Tarjeta {
+  - _numero : String
+  - _vencimiento : Date
+  - _estado : String
+  - _intentosPin : int
+  + getNumero() : String
+  + getEstado() : String
+  + estaVigente() : boolean
+  + bloquear() : void
+  + registrarIntentoFallido() : int
+}
+
+class Cuenta {
+  - _cbu : String
+  - _saldoDisponible : double
+  - _saldoTotal : double
+  - _limiteDiario : double
+  + getSaldoDisponible() : double
+  + getSaldoTotal() : double
+  + debitar(monto : double) : boolean
+  + acreditar(monto : double) : void
+}
+
+class Sesion {
+  - _estado : String
+  - _fechaInicio : DateTime
+  - _log : List<String>
+  + autenticar(pin : String) : boolean
+  + agregarOperacion(op : Operacion) : void
+  + registrarLog(detalle : String) : void
+  + cerrar() : void
+}
+
+abstract class Operacion {
+  # _monto : double
+  # _fecha : DateTime
+  # _nroComprobante : String
+  + {abstract} ejecutar() : boolean
+  + getNroComprobante() : String
+}
+
+class Consulta {
+  + ejecutar() : boolean
+  + getSaldo() : double
+}
+
+class Extraccion {
+  - _montoRetirado : double
+  + ejecutar() : boolean
+  + verificarLimite() : boolean
+}
+
+class Transferencia {
+  - _cbuDestino : String
+  + ejecutar() : boolean
+  + validarCbu() : boolean
+}
+
+Operacion <|-- Consulta
+Operacion <|-- Extraccion
+Operacion <|-- Transferencia
+
+Cliente "1" -- "1..*" Tarjeta : posee >
+Cuenta "1" -- "1..*" Tarjeta : asociada a >
+Cliente "1" -- "1..*" Cuenta : titular de >
+Sesion "1" -- "1" Tarjeta : usa >
+Sesion "1" *-- "0..*" Operacion : contiene >
+Operacion "0..*" -- "1" Cuenta : afecta >
+@enduml

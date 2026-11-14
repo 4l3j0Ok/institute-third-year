@@ -1,0 +1,76 @@
+https://classroom.google.com/w/ODcwNjI4NTgyOTYx/t/all
+
+Ir al contenido principal
+Menú principal
+Classroom
+DIS2026
+Inicio
+Calendar
+Clases impartidas
+Para revisar
+2
+2A - Programación Orientada a Objetos 2026
+Prof. Ing. Leandro A. Pini - Ayudante de Cátedra: Alejo Sarmiento
+Cursos en los que te has inscrito
+Tareas pendientes
+E
+EDIWEB2026
+D
+DIS2026
+A
+Análisis matemático II
+TSAS 2°B
+P
+Probabilidad y Estadística - 2° A, ISFT 93°
+P
+Práctica Profesional
+T
+Teleinformática 2026
+I
+Investigación Operativa
+Introducción
+G
+Gestion de Base de Datos 2026 (ISFT Nº93)
+Tecnicatura Superior en analisis, desarrollo y programación de aplicaciones
+Clases archivadas
+Ajustes
+Tablón
+Trabajo de clase
+Personas
+Google Calendar
+Carpeta de Drive de la clase
+assignment_ind
+Ver tu trabajo
+Ocultar todo
+Ocultar todas las secciones
+Sin tema
+Ocultar tema
+Tarea
+assignment
+Entrega de TP grupal DIS2026
+Sin fecha de entrega
+more_vert
+Más opciones
+Publicado: 2 nov
+Asignado
+Estigfend
+1. Diagrama de Contexto: construir el Diagrama de Contexto del sistema "Cajero Automático" con los 3 terminadores (Cliente, Sucursal, Red Central) y todos los flujos de entrada y salida identificados en la sección 6.1. Verificar que todos los flujos tienen nombre.
+    2. DFD Nivel 0: construir el DFD Nivel 0 con los 8 procesos de la sección 6.2, los 3 almacenes (D1, D2, D3) y los flujos que los conectan. Verificar el balanceo con el Diagrama de Contexto: cada flujo externo del Contexto debe aparecer en el Nivel 0.
+    3. Diccionario de Datos: completar el DD: nombre, descripción, composición y valores permitidos.
+    4. Diagrama de Casos de Uso: construir el Diagrama de CU con los 5 casos de uso de la sección 3, los 3 actores, y las relaciones «include» y «extend» correctamente aplicadas. Los actores secundarios deben aparecer a la derecha del sistema.
+    5. Diagrama de Clases: construir el Diagrama de Clases completo con: las 8 clases de la sección 5 con atributos (tipo + visibilidad) y métodos (retorno + visibilidad), las relaciones de herencia de Consulta/Extraccion/Transferencia desde Operacion, las relaciones de composición y asociación con multiplicidad en todos los extremos. Los nombres de los OBJETOS van subrayados en el diagrama.
+    6. Diagrama de Secuencia del CU "Autenticar Usuario": construir el Diagrama de Secuencia del CU 1 con los 4 participantes (Cliente, :PantallaCajero, :SucursalDB, :CentralDB), todos los mensajes sincrónicos con parámetros, los mensajes de retorno en línea discontinua y los focos de control correctamente ubicados.
+    7. Diagrama de Secuencia de UNA operación a elección (Consulta, Extracción o Transferencia): mismo criterio que el ítem anterior.
+    8. Diagrama de Estado de la clase Sesion: modelar los estados Iniciada, Autenticando (tarjeta), Validando (PIN), Operando, Cerrando y Cerrada con sus transiciones y eventos disparadores.
+    9. Diagrama de Actividad del SISTEMA: flujo completo.
+    10. Solución en capas.
+                     Capa Datos: implementar SucursalDB y CentralDB con métodos que simulen la comunicación con los sistemas externos (pueden devolver valores hardcodeados o aleatorios para simular respuestas).
+                     Capa Lógica: implementar las clases Operacion (abstracta), Consulta, Extraccion y Transferencia (concretas, con override de ejecutar()), Cliente, Tarjeta, Cuenta y Sesion con sus atributos privados (con _ guión bajo), propiedades públicas (get/set), constructores y métodos.
+                     Capa Presentación: implementar un formulario principal (FormCajero) que permita al menos simular el flujo de autenticación (ingresar número de tarjeta, ingresar PIN, mostrar menú) y UNA de las tres operaciones a elección, mostrando el resultado en pantalla.
+    11. Incluir un archivo README.md con: descripción del sistema, integrantes del equipo y cómo ejecutar el proyecto. 
+
+Recuerden mencionar en el README los integrantes del grupo (hasta 4 personas inclusive) 
+Se entrega 1 trabajo por grupo. Elijen un representante por grupo, y esa persona entrega el TP.
+Ver instrucciones
+Ayuda y comentarios
+Entrega de TP grupal DIS2026 se ha mostrado

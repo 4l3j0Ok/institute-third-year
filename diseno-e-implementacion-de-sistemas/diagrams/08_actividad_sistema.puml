@@ -1,0 +1,59 @@
+@startuml 08_actividad_sistema
+title Diagrama de Actividad - Sistema Cajero Automático (completo)
+skinparam shadowing false
+
+start
+:Cliente introduce la tarjeta;
+:Leer datos de la tarjeta;
+:Enviar datos a Sucursal para validación;
+if (¿Tarjeta válida?) then (sí)
+  :intentos = 0;
+  repeat
+    :Solicitar PIN;
+    :Cliente ingresa PIN;
+    :Enviar PIN encriptado a Red Central;
+    backward:intentos = intentos + 1;
+  repeat while (¿PIN incorrecto y intentos < 3?) is (sí) not (no)
+  if (¿PIN correcto?) then (sí)
+    repeat
+      :Mostrar menú de operaciones;
+      switch (¿Opción elegida?)
+      case (Consultar saldo)
+        :Solicitar saldo a Red Central;
+        :Mostrar saldo disponible y total;
+      case (Extraer efectivo)
+        :Solicitar monto;
+        :Solicitar autorización de débito a Red Central;
+        if (¿Autorizado?) then (sí)
+          :Dispensar efectivo;
+          :Mostrar operación exitosa y saldo restante;
+        else (no)
+          :Mostrar error (saldo/límite insuficiente);
+        endif
+      case (Transferir)
+        :Solicitar CBU destino y monto;
+        :Mostrar resumen y pedir confirmación;
+        if (¿Confirma?) then (sí)
+          :Enviar instrucción de transferencia a Red Central;
+          :Mostrar comprobante;
+        else (no)
+          :Cancelar transferencia;
+        endif
+      endswitch
+      :Registrar transacción en log de sesión;
+    repeat while (¿Realizar otra operación?) is (sí) not (finalizar)
+  else (no)
+    :Bloquear tarjeta;
+    :Informar bloqueo;
+  endif
+else (no)
+  :Informar tarjeta bloqueada o vencida;
+endif
+if (¿Desea comprobante?) then (sí)
+  :Imprimir ticket de la sesión;
+else (no)
+endif
+:Devolver tarjeta;
+:Cerrar sesión y borrar datos de memoria;
+stop
+@enduml

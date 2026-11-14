@@ -1,0 +1,61 @@
+@startuml 02_dfd_nivel0
+title DFD Nivel 0 - Sistema Cajero Automático
+left to right direction
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+rectangle "Cliente" as CLI
+rectangle "Sucursal" as SUC
+rectangle "Red Central" as RED
+
+usecase "1\nLeer tarjeta" as P1
+usecase "2\nValidar tarjeta" as P2
+usecase "3\nValidar PIN" as P3
+usecase "4\nConsultar saldo" as P4
+usecase "5\nExtraer efectivo" as P5
+usecase "6\nRealizar transferencia" as P6
+usecase "7\nRegistrar transacción" as P7
+usecase "8\nEmitir ticket y\ndevolver tarjeta" as P8
+
+database "D1 Sesión" as D1
+database "D2 Tarjetas leídas" as D2
+database "D3 Log de transacciones" as D3
+
+CLI --> P1 : Datos de tarjeta
+P1 --> D2 : Datos de tarjeta leídos
+D2 --> P2 : Datos de tarjeta
+P2 --> SUC : Solicitud de validación de tarjeta
+SUC --> P2 : Estado de tarjeta
+P2 --> D1 : Tarjeta validada
+P2 --> CLI : Solicitud de PIN
+CLI --> P3 : PIN
+D1 --> P3 : Tarjeta validada
+P3 --> RED : Solicitud de validación de PIN
+RED --> P3 : Confirmación de PIN
+P3 --> D1 : Sesión autenticada
+P3 --> CLI : Menú de operaciones
+
+CLI --> P4 : Opción elegida
+P4 --> RED : Solicitud de consulta de saldo
+RED --> P4 : Saldo disponible
+P4 --> CLI : Saldo consultado
+P4 --> P7 : Datos de consulta
+
+CLI --> P5 : Opción elegida, monto
+P5 --> RED : Instrucción de débito
+RED --> P5 : Autorización de débito
+P5 --> CLI : Efectivo dispensado
+P5 --> P7 : Datos de extracción
+
+CLI --> P6 : Opción elegida, CBU destino,\nmonto, confirmación
+P6 --> RED : Instrucción de transferencia
+RED --> P6 : Confirmación de transferencia,\nnúmero de comprobante
+P6 --> CLI : Comprobante transferencia
+P6 --> P7 : Datos de transferencia
+
+P7 --> D3 : Transacción registrada
+D3 --> P8 : Transacciones de la sesión
+D1 --> P8 : Datos de sesión
+CLI --> P8 : Confirmación
+P8 --> CLI : Ticket impreso, tarjeta devuelta
+@enduml

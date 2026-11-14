@@ -1,0 +1,36 @@
+@startuml 03_casos_de_uso
+title Diagrama de Casos de Uso - Cajero Automático
+left to right direction
+skinparam shadowing false
+
+actor "Cliente" as CLI
+actor "Sucursal" as SUC
+actor "Red Central" as RED
+
+rectangle "Cajero Automático" {
+  usecase "Autenticar Usuario" as CU1
+  usecase "Consultar Saldo" as CU2
+  usecase "Extraer Efectivo" as CU3
+  usecase "Realizar Transferencia" as CU4
+  usecase "Emitir Ticket y\nDevolver Tarjeta" as CU5
+}
+
+CLI --> CU1
+CLI --> CU2
+CLI --> CU3
+CLI --> CU4
+CLI --> CU5
+
+CU2 ..> CU1 : <<include>>
+CU3 ..> CU1 : <<include>>
+CU4 ..> CU1 : <<include>>
+CU5 ..> CU2 : <<extend>>
+CU5 ..> CU3 : <<extend>>
+CU5 ..> CU4 : <<extend>>
+
+CU1 -- SUC
+CU1 -- RED
+CU2 -- RED
+CU3 -- RED
+CU4 -- RED
+@enduml
