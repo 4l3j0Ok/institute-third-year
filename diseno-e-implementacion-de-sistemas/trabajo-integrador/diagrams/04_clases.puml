@@ -87,7 +87,7 @@ note as layers
   Clases de la consigna (nombres en inglés): Cliente = Customer, Tarjeta = Card, Cuenta = Account,
   Sesion = Session, Operacion = Operation, Consulta = BalanceInquiry, Extraccion = CashWithdrawal,
   Transferencia = Transfer. Las propiedades públicas (get/set) de cada atributo no se dibujan.
-  BranchDB (SucursalDB), CentralDB (capa Data) y AtmForm (FormCajero, capa Presentation,
+  BranchDB (SucursalDB), CentralDB (capa Data) y CajeroForm (FormCajero, capa Presentation,
   la :PantallaCajero de las secuencias) no forman parte de las 8 clases.
 end note
 @enduml

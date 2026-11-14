@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NUnit" Version="4.1.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+  </ItemGroup>
+
+  <!-- Las capas Data y Logic no dependen de Windows Forms: se compilan acá para poder probarlas en cualquier SO -->
+  <ItemGroup>
+    <Compile Include="..\Cajero\Data\*.cs" LinkBase="Data" />
+    <Compile Include="..\Cajero\Logic\*.cs" LinkBase="Logic" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+</Project>

@@ -85,9 +85,9 @@ Cada ítem de la consigna oficial es una subtarea. «Estado» indica el avance d
 
 | Capa             | Requisitos                                                                                                                                                                                                                                    | Ubicación                  | Estado |
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------ |
-| **Datos**        | `SucursalDB` y `CentralDB` con métodos que simulan la comunicación con los sistemas externos (valores fijos o aleatorios)                                                                                                                     | `src/Atm/Data/`            | Hecho  |
-| **Lógica**       | `Operacion` (abstracta); `Consulta`, `Extraccion` y `Transferencia` (concretas, con override de `Ejecutar()`); `Cliente`, `Tarjeta`, `Cuenta` y `Sesion`. Atributos privados con `_`, propiedades públicas (get/set), constructores y métodos | `src/Atm/Logic/`           | Hecho  |
-| **Presentación** | Formulario principal `FormCajero` que simule la autenticación (número de tarjeta, PIN, menú) y **al menos UNA** operación, mostrando el resultado en pantalla. La capa no contiene lógica de negocio                                          | `src/Atm/Presentation/`    | Hecho  |
+| **Datos**        | `SucursalDB` y `CentralDB` con métodos que simulan la comunicación con los sistemas externos (valores fijos o aleatorios)                                                                                                                     | `src/Cajero/Data/`            | Hecho  |
+| **Lógica**       | `Operacion` (abstracta); `Consulta`, `Extraccion` y `Transferencia` (concretas, con override de `Ejecutar()`); `Cliente`, `Tarjeta`, `Cuenta` y `Sesion`. Atributos privados con `_`, propiedades públicas (get/set), constructores y métodos | `src/Cajero/Logic/`           | Hecho  |
+| **Presentación** | Formulario principal `FormCajero` que simule la autenticación (número de tarjeta, PIN, menú) y **al menos UNA** operación, mostrando el resultado en pantalla. La capa no contiene lógica de negocio                                          | `src/Cajero/Presentation/`    | Hecho  |
 
 Reglas de dependencia entre capas: Presentación → Lógica → Datos. Nunca al revés.
 
@@ -107,7 +107,7 @@ Reglas de dependencia entre capas: Presentación → Lógica → Datos. Nunca al
 6. Probar la aplicación a mano con los escenarios de la sección 6.
 7. Completar integrantes en el README, comprobar que el proyecto arranca desde cero y entregar.
 
-Los identificadores del código y de los diagramas de diseño están en inglés (equivalencias con los nombres de esta consigna en el README y en `.agents/skills/dis-convenciones/references/glosario.md`; p. ej. `FormCajero` = `AtmForm`, `Sesion` = `Session`). Confirmar con el docente que acepta nombres en inglés. Los diagramas se regeneran con `scripts/render_diagrams.sh` y se verifican con `python3 scripts/verificar_diagramas.py`. Las reglas y fuentes de cada diagrama están en las skills `.agents/skills/dis-*` (empezar por `dis-convenciones`). El código sigue las convenciones de C# de esa skill y `dotnet build` las exige (`src/.editorconfig`).
+Los identificadores del código y de los diagramas de diseño están en inglés (equivalencias con los nombres de esta consigna en el README y en `.agents/skills/dis-convenciones/references/glosario.md`; p. ej. `FormCajero` = `CajeroForm`, `Sesion` = `Session`). Confirmar con el docente que acepta nombres en inglés. Los diagramas se regeneran con `scripts/render_diagrams.sh` y se verifican con `python3 scripts/verificar_diagramas.py`. Las reglas y fuentes de cada diagrama están en las skills `.agents/skills/dis-*` (empezar por `dis-convenciones`). El código sigue las convenciones de C# de esa skill y `dotnet build` las exige (`src/.editorconfig`).
 
 ## 6. Criterios de verificación (checklist de autoevaluación)
 

@@ -18,7 +18,7 @@ Las reglas y fuentes de cada diagrama están en las skills `.agents/skills/dis-*
 | 9 | Actividad: Sistema completo | [08_actividad_sistema.puml](diagrams/08_actividad_sistema.puml) | [png](diagrams/08_actividad_sistema.png) | `dis-diagrama-actividad` |
 
 Notas:
-- Clases, Objetos, Secuencias y Estado usan los identificadores en inglés del código (`Session`, `AtmForm`, `Execute()`); cada diagrama lleva la equivalencia con los nombres de la consigna. Contexto, DFD, Casos de Uso, Diccionario y Actividad usan el vocabulario de análisis en español.
+- Clases, Objetos, Secuencias y Estado usan los identificadores en inglés del código (`Session`, `CajeroForm`, `Execute()`); cada diagrama lleva la equivalencia con los nombres de la consigna. Contexto, DFD, Casos de Uso, Diccionario y Actividad usan el vocabulario de análisis en español.
 - Contexto y DFD usan notación Yourdon (burbujas, almacenes de dos líneas paralelas) con Graphviz embebido en PlantUML (`@startdot`). En el DFD los terminadores repetidos llevan una línea extra.
 - Los rombos sin texto del diagrama de actividad son fusiones de alternativa (válidas, Debrauwer cap. 9); el diagrama lo aclara en una leyenda.
 - PlantUML no valida UML ni subraya objetos en un diagrama de clases: por eso existe el diagrama de objetos. Si el docente exige StarUML, los `.puml` sirven de guía.

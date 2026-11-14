@@ -277,8 +277,8 @@ def verificar_casos_de_uso() -> None:
 # ---------- Diagramas contra código ----------
 
 def verificar_contra_codigo() -> None:
-    """Cada clase, atributo, método y estado de los diagramas existe en src/Atm/ y al revés (clases y estados)."""
-    logica = RAIZ / "src" / "Atm" / "Logic"
+    """Cada clase, atributo, método y estado de los diagramas existe en src/Cajero/ y al revés (clases y estados)."""
+    logica = RAIZ / "src" / "Cajero" / "Logic"
     fuente = leer("04_clases.puml")
     clases = re.findall(r"^\s*(?:abstract\s+)?class\s+(\w+)", fuente, flags=re.M)
     for clase in clases:
@@ -321,8 +321,8 @@ def verificar_contra_codigo() -> None:
         for mensaje in re.findall(r"->\s*(?:PC|SDB|CDB|\w+)\s*:\s*(\w+)\(", leer(nombre)):
             if mensaje in {"InsertCard", "EnterPin", "SelectOperation", "EnterAmount",
                            "DispenseCash", "RegisterOperation"}:
-                continue  # acciones del cajero (:AtmForm = :PantallaCajero de la consigna: Presentation + Logic), no métodos de la capa Datos
-            datos = "".join(f.read_text(encoding="utf-8") for f in (RAIZ / "src" / "Atm" / "Data").glob("*.cs"))
+                continue  # acciones del cajero (:CajeroForm = :PantallaCajero de la consigna: Presentation + Logic), no métodos de la capa Datos
+            datos = "".join(f.read_text(encoding="utf-8") for f in (RAIZ / "src" / "Cajero" / "Data").glob("*.cs"))
             if not re.search(rf"\b{mensaje}\(", datos):
                 error("Código", f"el mensaje {mensaje}() de {nombre} no existe en la capa Datos")
 

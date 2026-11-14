@@ -4,11 +4,11 @@ skinparam shadowing false
 skinparam sequenceMessageAlign center
 
 actor Cliente
-participant "<u>:AtmForm</u>" as PC
+participant "<u>:CajeroForm</u>" as PC
 participant "<u>:BranchDB</u>" as SDB
 participant "<u>:CentralDB</u>" as CDB
 
-note over PC : :AtmForm es la :PantallaCajero de la consigna\n(BranchDB = SucursalDB)
+note over PC : :CajeroForm es la :PantallaCajero de la consigna\n(BranchDB = SucursalDB)
 
 Cliente -> PC : InsertCard(number, expirationDate)
 activate PC

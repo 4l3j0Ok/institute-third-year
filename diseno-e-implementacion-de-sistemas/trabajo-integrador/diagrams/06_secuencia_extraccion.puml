@@ -4,10 +4,10 @@ skinparam shadowing false
 skinparam sequenceMessageAlign center
 
 actor Cliente
-participant "<u>:AtmForm</u>" as PC
+participant "<u>:CajeroForm</u>" as PC
 participant "<u>:CentralDB</u>" as CDB
 
-note over PC : :AtmForm es la :PantallaCajero de la consigna
+note over PC : :CajeroForm es la :PantallaCajero de la consigna
 
 Cliente -> PC : SelectOperation("Extraer efectivo")
 activate PC

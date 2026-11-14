@@ -19,7 +19,7 @@ Consigna formal completa: [CONSIGNA.md](CONSIGNA.md). Fuente original: `resource
 
 - [x] Recursos descargados en `resources/` y listados en `RESOURCES.md`
 - [x] Script de scraping `scripts/scrape_classroom.py`
-- [x] Base del proyecto C# + Windows Forms (`src/Atm`), migrada desde Python + PySide6 porque el equipo conoce C#
+- [x] Base del proyecto C# + Windows Forms (`src/Cajero`), migrada desde Python + PySide6 porque el equipo conoce C#
 
 ## Diagramas (borrador generado por el agente; el usuario debe revisarlos)
 
@@ -40,17 +40,17 @@ Reglas y fuentes en las skills `.agents/skills/dis-*`. Verificación: `python3 s
 
 ## Código (C# + Windows Forms, 3 capas)
 
-- [x] Capa Datos (`src/Atm/Data`): `BranchDB` (SucursalDB), `CentralDB` simulados (PIN recibido encriptado con SHA-256)
-- [x] Capa Lógica (`src/Atm/Logic`): Operacion (abstracta), Consulta, Extraccion, Transferencia, Cliente, Tarjeta, Cuenta, Sesion (campos `_x`, propiedades get/set, constructores explícitos, un tipo por archivo)
-- [x] Capa Presentación (`src/Atm/Presentation`): `AtmForm` = FormCajero (Designer de Windows Forms) con skin de cajero (tarjeta → PIN → menú → las 3 operaciones → ticket)
+- [x] Capa Datos (`src/Cajero/Data`): `BranchDB` (SucursalDB), `CentralDB` simulados (PIN recibido encriptado con SHA-256)
+- [x] Capa Lógica (`src/Cajero/Logic`): Operacion (abstracta), Consulta, Extraccion, Transferencia, Cliente, Tarjeta, Cuenta, Sesion (campos `_x`, propiedades get/set, constructores explícitos, un tipo por archivo)
+- [x] Capa Presentación (`src/Cajero/Presentation`): `CajeroForm` = FormCajero (Designer de Windows Forms) con skin de cajero (tarjeta → PIN → menú → las 3 operaciones → ticket)
 - [x] Identificadores en inglés (textos de pantalla y análisis en español); equivalencias en README y glosario
 - [x] Convenciones de C# exigidas por `dotnet build` (`src/.editorconfig`)
-- [x] Pruebas unitarias de Datos y Lógica (`src/Atm.Tests`, incluye los estados del diagrama y los 3 intentos de PIN)
+- [x] Pruebas unitarias de Datos y Lógica (`src/Cajero.Tests`, incluye los estados del diagrama y los 3 intentos de PIN)
 - [ ] Probar la app a mano y ajustar el código a los diagramas definitivos
-- [ ] Abrir `AtmForm` en el diseñador de Visual Studio y ajustar el aspecto (ya se probó que arranca en Linux con Wine (`src/ejecutar-linux.sh`); falta verlo en Windows)
+- [ ] Abrir `CajeroForm` en el diseñador de Visual Studio y ajustar el aspecto (ya se probó que arranca en Linux con Wine (`src/ejecutar-linux.sh`); falta verlo en Windows)
 
 ## Entrega
 
 - [ ] Completar integrantes en `README.md`
 - [ ] Pedir al docente fecha de entrega y formato
-- [ ] Confirmar con el docente que acepta nombres de clases en inglés (`AtmForm` en lugar de `FormCajero`)
+- [ ] Confirmar con el docente que acepta nombres de clases en inglés (`CajeroForm` en lugar de `FormCajero`)
