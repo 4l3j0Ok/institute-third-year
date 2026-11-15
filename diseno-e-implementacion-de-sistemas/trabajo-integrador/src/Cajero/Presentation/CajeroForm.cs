@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -30,7 +31,7 @@ public partial class CajeroForm : Form
     private static readonly Color s_banknote = Color.FromArgb(0xCF, 0xE3, 0xC2);
     private static readonly Color s_inactiveButtonColor = Color.FromArgb(0x6A, 0x70, 0x7B);
 
-    private static readonly Bitmap s_whiteLogo = LoadLogo("LogoSantanderBlanco.png");
+    private static readonly Lazy<Bitmap?> s_whiteLogo = new(() => LoadLogo("LogoSantanderBlanco.png"));
 
     private static readonly DemoCard[] s_demoCards =
     [
@@ -56,6 +57,11 @@ public partial class CajeroForm : Form
 
         _sideButtons = [btnSide0, btnSide1, btnSide2, btnSide3, btnSide4, btnSide5, btnSide6, btnSide7];
         _sideLabels = [lblLabel0, lblLabel1, lblLabel2, lblLabel3, lblLabel4, lblLabel5, lblLabel6, lblLabel7];
+
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+        {
+            return;
+        }
 
         foreach (var panel in new[] { pnlMarquee, pnlBezel, pnlScreen, pnlKeypad, pnlCardReader, pnlPrinter, pnlDispenser })
         {
@@ -149,9 +155,13 @@ public partial class CajeroForm : Form
 
     #region Drawing
 
-    private static Bitmap LoadLogo(string name)
+    private static Bitmap? LoadLogo(string name)
     {
-        using var stream = typeof(CajeroForm).Assembly.GetManifestResourceStream($"Cajero.Resources.{name}")!;
+        using var stream = typeof(CajeroForm).Assembly.GetManifestResourceStream($"Cajero.Resources.{name}");
+        if (stream is null)
+        {
+            return null;
+        }
         using var original = new Bitmap(stream);
         return new Bitmap(original);
     }
@@ -203,10 +213,15 @@ public partial class CajeroForm : Form
 
     private static void DrawLogo(Graphics graphics, Point origin, int height)
     {
+        var logo = s_whiteLogo.Value;
+        if (logo is null)
+        {
+            return;
+        }
         graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
         graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-        var width = height * s_whiteLogo.Width / s_whiteLogo.Height;
-        graphics.DrawImage(s_whiteLogo, new Rectangle(origin.X, origin.Y, width, height));
+        var width = height * logo.Width / logo.Height;
+        graphics.DrawImage(logo, new Rectangle(origin.X, origin.Y, width, height));
     }
 
     private void OnFormPaint(object? sender, PaintEventArgs e)
