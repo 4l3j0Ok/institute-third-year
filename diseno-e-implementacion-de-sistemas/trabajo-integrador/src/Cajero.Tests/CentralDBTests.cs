@@ -1,5 +1,4 @@
 using Cajero.Data;
-using Cajero.Logic;
 
 namespace Cajero.Tests;
 
@@ -8,19 +7,19 @@ public class CentralDBTests
     private const string ValidCard = "1234567890123456";
 
     [Test]
-    public void ValidatePin_AcceptsTheEncryptedPin()
+    public void ValidatePin_AcceptsTheClearPin()
     {
         var central = new CentralDB();
 
-        Assert.That(central.ValidatePin(ValidCard, Encryption.EncryptPin("1234")), Is.True);
+        Assert.That(central.ValidatePin(ValidCard, "1234"), Is.True);
     }
 
     [Test]
-    public void ValidatePin_RejectsTheClearPin()
+    public void ValidatePin_RejectsAnIncorrectPin()
     {
         var central = new CentralDB();
 
-        Assert.That(central.ValidatePin(ValidCard, "1234"), Is.False);
+        Assert.That(central.ValidatePin(ValidCard, "1235"), Is.False);
     }
 
     [Test]
@@ -28,7 +27,7 @@ public class CentralDBTests
     {
         var central = new CentralDB();
 
-        Assert.That(central.ValidatePin("0000000000000000", Encryption.EncryptPin("1234")), Is.False);
+        Assert.That(central.ValidatePin("0000000000000000", "1234"), Is.False);
     }
 
     [Test]

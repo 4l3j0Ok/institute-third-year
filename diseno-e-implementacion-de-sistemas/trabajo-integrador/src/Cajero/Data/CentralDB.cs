@@ -11,20 +11,20 @@ public class CentralDB
 
     private static readonly Random s_random = new();
 
-    // SHA-256 of each PIN: the Central Network never receives or stores the clear PIN
-    private readonly Dictionary<string, string> _encryptedPins = new()
+    // PIN de prueba en texto plano, solo para la presentación.
+    private readonly Dictionary<string, string> _pins = new()
     {
-        ["1234567890123456"] = "03AC674216F3E15C761EE1A5E255F067953623C8B388B4459E13F978D7C846F4",
-        ["5555666677778888"] = "9AF15B336E6A9619928537DF30B2E6A2376569FCF9D7E773ECCEDE65606529A0",
-        ["1111222233334444"] = "9AF15B336E6A9619928537DF30B2E6A2376569FCF9D7E773ECCEDE65606529A0",
+        ["1234567890123456"] = "1234",
+        ["5555666677778888"] = "0000",
+        ["1111222233334444"] = "0000",
     };
 
     private decimal _balance = 150_000m;
     private decimal _withdrawnToday;
 
-    public bool ValidatePin(string cardNumber, string encryptedPin)
+    public bool ValidatePin(string cardNumber, string pin)
     {
-        return _encryptedPins.TryGetValue(cardNumber, out var expected) && expected == encryptedPin;
+        return _pins.TryGetValue(cardNumber, out var expected) && expected == pin;
     }
 
     public BalanceResponse GetBalance(string cardNumber)

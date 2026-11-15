@@ -40,7 +40,7 @@ Reglas y fuentes en las skills `.agents/skills/dis-*`. Verificación: `python3 s
 
 ## Código (C# + Windows Forms, 3 capas)
 
-- [x] Capa Datos (`src/Cajero/Data`): `BranchDB` (SucursalDB), `CentralDB` simulados (PIN recibido encriptado con SHA-256)
+- [x] Capa Datos (`src/Cajero/Data`): `BranchDB` (SucursalDB), `CentralDB` simulados (PIN de prueba en texto plano para la presentación)
 - [x] Capa Lógica (`src/Cajero/Logic`): Operacion (abstracta), Consulta, Extraccion, Transferencia, Cliente, Tarjeta, Cuenta, Sesion (campos `_x`, propiedades get/set, constructores explícitos, un tipo por archivo)
 - [x] Capa Presentación (`src/Cajero/Presentation`): `CajeroForm` = FormCajero (Designer de Windows Forms) con skin de cajero (tarjeta → PIN → menú → las 3 operaciones → ticket)
 - [x] Identificadores en inglés (textos de pantalla y análisis en español); equivalencias en README y glosario

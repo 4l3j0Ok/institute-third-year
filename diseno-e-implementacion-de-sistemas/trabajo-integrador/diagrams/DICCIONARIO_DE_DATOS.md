@@ -15,7 +15,7 @@ Cubre todos los flujos y almacenes del [Diagrama de Contexto](01_contexto.puml) 
 | Tarjeta validada | Tarjeta aceptada por la Sucursal, guardada en la sesión | Tarjeta validada = Número de tarjeta + Estado de tarjeta | Estado de tarjeta = Válida |
 | Solicitud de PIN | Mensaje en pantalla que pide la clave al cliente | Solicitud de PIN = Mensaje de pantalla | Mensaje de pantalla = "INGRESE SU PIN" |
 | PIN | Clave secreta que el cliente tipea en el teclado numérico | PIN = 4{Dígito}4 | 4 dígitos numéricos |
-| Solicitud de validación de PIN | Pedido a Red Central para verificar la clave contra la cuenta | Solicitud de validación de PIN = Número de tarjeta + PIN encriptado | Ver cada elemento |
+| Solicitud de validación de PIN | Pedido a Red Central para verificar la clave contra la cuenta | Solicitud de validación de PIN = Número de tarjeta + PIN | Ver cada elemento |
 | Confirmación de PIN | Respuesta de Red Central sobre la clave | Confirmación de PIN = [ "Correcto" \| "Incorrecto" ] | Una de las dos opciones |
 | Sesión autenticada | Marca de que el cliente acreditó su identidad | Sesión autenticada = Número de tarjeta + Fecha y hora de inicio + Estado de sesión | Estado de sesión = Operando |
 | Menú de operaciones | Opciones que el cajero muestra al cliente autenticado | Menú de operaciones = 1{Opción de menú}4 | Hasta 4 opciones |
@@ -64,7 +64,6 @@ Cubre todos los flujos y almacenes del [Diagrama de Contexto](01_contexto.puml) 
 | Letra | Letra del alfabeto sin tildes | Letra = [ A-Z \| a-z ] | A a Z, mayúscula o minúscula |
 | Espacio | Separador entre palabras | Espacio = * carácter de espacio * | Un espacio |
 | Mensaje de pantalla | Texto que el cajero muestra al cliente | Mensaje de pantalla = {Carácter legal} | Texto |
-| PIN encriptado | PIN cifrado antes de salir del cajero | PIN encriptado = 64{Dígito hexadecimal}64 | Resumen SHA-256 del PIN |
 | Dígito hexadecimal | Carácter de un número hexadecimal | Dígito hexadecimal = [ 0-9 \| A-F ] | 0 a 9 y A a F |
 | Opción de menú | Operación que ofrece el cajero | Opción de menú = [ "Consultar saldo" \| "Extraer efectivo" \| "Transferir" \| "Finalizar" ] | Una de las cuatro |
 | Tipo de operación | Clase de operación realizada | Tipo de operación = [ "Consulta de saldo" \| "Extracción" \| "Transferencia" ] | Una de las tres |

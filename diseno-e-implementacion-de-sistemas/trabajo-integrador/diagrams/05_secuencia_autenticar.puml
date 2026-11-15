@@ -21,7 +21,7 @@ deactivate PC
 
 Cliente -> PC : EnterPin(pin)
 activate PC
-PC -> CDB : ValidatePin(cardNumber, encryptedPin)
+PC -> CDB : ValidatePin(cardNumber, pin)
 activate CDB
 CDB --> PC : //pinConfirmation//
 deactivate CDB

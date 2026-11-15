@@ -20,7 +20,7 @@ if (¿Tarjeta válida?) then ([sí])
     |Cliente|
     :Ingresar PIN;
     |Cajero|
-    :Enviar PIN encriptado;
+    :Enviar PIN;
     |Red Central|
     :Validar PIN;
     |Cajero|

@@ -93,7 +93,7 @@ public class Session
         {
             return false;
         }
-        if (_central.ValidatePin(_card.Number, Encryption.EncryptPin(pin)))
+        if (_central.ValidatePin(_card.Number, pin))
         {
             _state = SessionState.Operating;
             return true;

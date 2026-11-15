@@ -303,7 +303,7 @@ def verificar_contra_codigo() -> None:
     for archivo in sorted(logica.glob("*.cs")):
         tipo = archivo.stem
         declaracion = re.search(rf"\b(class|enum)\s+{tipo}\b", archivo.read_text(encoding="utf-8"))
-        if declaracion and declaracion.group(1) == "class" and tipo not in clases and tipo not in {"MoneyFormatter", "Encryption"}:
+        if declaracion and declaracion.group(1) == "class" and tipo not in clases and tipo not in {"MoneyFormatter"}:
             error("Código", f"la clase {tipo} del código no está en el diagrama de clases")
 
     enum = (logica / "SessionState.cs").read_text(encoding="utf-8")
