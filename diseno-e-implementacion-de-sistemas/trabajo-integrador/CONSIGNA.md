@@ -107,7 +107,7 @@ Reglas de dependencia entre capas: Presentación → Lógica → Datos. Nunca al
 6. Probar la aplicación a mano con los escenarios de la sección 6.
 7. Completar integrantes en el README, comprobar que el proyecto arranca desde cero y entregar.
 
-Los identificadores del código y de los diagramas de diseño están en inglés (equivalencias con los nombres de esta consigna en el README y en `.agents/skills/dis-convenciones/references/glosario.md`; p. ej. `FormCajero` = `CajeroForm`, `Sesion` = `Session`). Confirmar con el docente que acepta nombres en inglés. Los diagramas se regeneran con `scripts/render_diagrams.sh` y se verifican con `python3 scripts/verificar_diagramas.py`. Las reglas y fuentes de cada diagrama están en las skills `.agents/skills/dis-*` (empezar por `dis-convenciones`). El código sigue las convenciones de C# de esa skill y `dotnet build` las exige (`src/.editorconfig`).
+Los identificadores del código y de los diagramas de diseño están en español, con los mismos nombres que esta consigna (`FormCajero`, `Sesion`, `Operacion`, etc.): el docente confirmó que no acepta nombres en inglés. Los diagramas se regeneran con `scripts/render_diagrams.sh` y se verifican con `python3 scripts/verificar_diagramas.py`. Las reglas y fuentes de cada diagrama están en las skills `.agents/skills/dis-*` (empezar por `dis-convenciones`). El código sigue las convenciones de C# de esa skill y `dotnet build` las exige (`src/.editorconfig`).
 
 ## 6. Criterios de verificación (checklist de autoevaluación)
 

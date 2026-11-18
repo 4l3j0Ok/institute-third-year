@@ -1,27 +1,27 @@
 @startuml 07_estado_sesion
-title Diagrama de Estado - Clase Session (Sesion)
+title Diagrama de Estado - Clase Sesion
 skinparam shadowing false
 
-state Started : Iniciada
-state Authenticating : Autenticando (tarjeta)
-state Authenticating : do / ValidateCard (Sucursal)
-state Validating : Validando (PIN)
-state Validating : do / ValidatePin (Red Central)
-state Operating : Operando
-state Closing : Cerrando
-state Closing : do / GenerateReceipt (si el cliente lo pide)
-state Closed : Cerrada
+state Iniciada : Iniciada
+state Autenticando : Autenticando (tarjeta)
+state Autenticando : do / ValidarTarjeta (Sucursal)
+state Validando : Validando (PIN)
+state Validando : do / ValidarPin (Red Central)
+state Operando : Operando
+state Cerrando : Cerrando
+state Cerrando : do / GenerarComprobante (si el cliente lo pide)
+state Cerrada : Cerrada
 
-[*] --> Started
-Started --> Authenticating : InsertCard(number, expirationDate)
-Authenticating --> Validating : [tarjeta válida]
-Authenticating --> Closing : [tarjeta bloqueada o vencida]
-Validating --> Operating : Authenticate(pin) [PIN correcto]
-Validating --> Validating : Authenticate(pin) [PIN incorrecto e intentos < 3]
-Validating --> Closing : Authenticate(pin) [PIN incorrecto e intentos = 3] / BlockCard
-Validating --> Closing : Finish() [el cliente cancela]
-Operating --> Operating : Execute(operation) [operación exitosa] / RegisterOperation
-Operating --> Closing : Finish()
-Closing --> Closed : Close() / ReturnCard, RemoveAuthenticationData
-Closed --> [*]
+[*] --> Iniciada
+Iniciada --> Autenticando : InsertarTarjeta(numero, fechaVencimiento)
+Autenticando --> Validando : [tarjeta válida]
+Autenticando --> Cerrando : [tarjeta bloqueada o vencida]
+Validando --> Operando : Autenticar(pin) [PIN correcto]
+Validando --> Validando : Autenticar(pin) [PIN incorrecto e intentos < 3]
+Validando --> Cerrando : Autenticar(pin) [PIN incorrecto e intentos = 3] / BloquearTarjeta
+Validando --> Cerrando : Finalizar() [el cliente cancela]
+Operando --> Operando : Ejecutar(operacion) [operación exitosa] / RegistrarOperacion
+Operando --> Cerrando : Finalizar()
+Cerrando --> Cerrada : Cerrar() / DevolverTarjeta, EliminarDatosAutenticacion
+Cerrada --> [*]
 @enduml

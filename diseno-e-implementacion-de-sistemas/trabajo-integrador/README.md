@@ -6,22 +6,12 @@ TP integrador de Diseño e Implementación de Sistemas (ISFT N° 93, 2026).
 
 Simulación de un cajero automático con aspecto de ATM real (pantalla con botones laterales, teclado numérico, ranura de tarjeta, comprobante y salida de efectivo). Permite autenticación con tarjeta y PIN (3 intentos), consulta de saldo, extracción, transferencia y emisión de ticket. Aplicación de escritorio en C# con Windows Forms (.NET 10), en tres capas:
 
-- `src/Cajero/Data`: `BranchDB` (SucursalDB) y `CentralDB` (simulados, datos en memoria).
-- `src/Cajero/Logic`: `Operation` (abstracta), `BalanceInquiry`, `CashWithdrawal`, `Transfer`, `Customer`, `Card`, `Account`, `Session`.
-- `src/Cajero/Presentation`: `CajeroForm` (ventana principal, el `FormCajero` de la consigna; `CajeroForm.cs` + `CajeroForm.Designer.cs`).
+- `src/Cajero/Data`: `SucursalDB` y `CentralDB` (simulados, datos en memoria).
+- `src/Cajero/Logic`: `Operacion` (abstracta), `Consulta`, `Extraccion`, `Transferencia`, `Cliente`, `Tarjeta`, `Cuenta`, `Sesion`.
+- `src/Cajero/Presentation`: `FormCajero` (ventana principal; `FormCajero.cs` + `FormCajero.Designer.cs`).
 - `src/Cajero.Tests`: pruebas unitarias (NUnit) de las capas de datos y lógica.
 
-Los identificadores del código están en inglés; los textos de pantalla y el vocabulario de análisis (DFD, Casos de Uso, Diccionario de Datos) están en español. Equivalencias con los nombres de la consigna:
-
-| Consigna | Código |
-|---|---|
-| FormCajero | `CajeroForm` |
-| SucursalDB / CentralDB | `BranchDB` / `CentralDB` |
-| Operacion, Consulta, Extraccion, Transferencia | `Operation`, `BalanceInquiry`, `CashWithdrawal`, `Transfer` |
-| Cliente, Tarjeta, Cuenta, Sesion | `Customer`, `Card`, `Account`, `Session` |
-| método `ejecutar()` | `Execute()` |
-
-Glosario completo: `.agents/skills/dis-convenciones/references/glosario.md`.
+Los identificadores del código y de los diagramas de diseño están en español, igual que los nombres de la consigna (el docente no acepta nombres en inglés).
 
 ## Integrantes
 
@@ -33,7 +23,7 @@ Requiere el [SDK de .NET 10](https://dotnet.microsoft.com/download).
 
 ### Windows
 
-Abrir `src/Cajero.slnx` en Visual Studio y ejecutar (F5). El diseñador visual edita `CajeroForm` con doble clic sobre `CajeroForm.cs`. También desde consola, en `src`:
+Abrir `src/Cajero.slnx` en Visual Studio y ejecutar (F5). El diseñador visual edita `FormCajero` con doble clic sobre `FormCajero.cs`. También desde consola, en `src`:
 
 ```
 dotnet run --project Cajero

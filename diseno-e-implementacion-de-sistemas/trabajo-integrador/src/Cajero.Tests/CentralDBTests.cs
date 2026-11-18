@@ -11,7 +11,7 @@ public class CentralDBTests
     {
         var central = new CentralDB();
 
-        Assert.That(central.ValidatePin(ValidCard, "1234"), Is.True);
+        Assert.That(central.ValidarPin(ValidCard, "1234"), Is.True);
     }
 
     [Test]
@@ -19,7 +19,7 @@ public class CentralDBTests
     {
         var central = new CentralDB();
 
-        Assert.That(central.ValidatePin(ValidCard, "1235"), Is.False);
+        Assert.That(central.ValidarPin(ValidCard, "1235"), Is.False);
     }
 
     [Test]
@@ -27,7 +27,7 @@ public class CentralDBTests
     {
         var central = new CentralDB();
 
-        Assert.That(central.ValidatePin("0000000000000000", "1234"), Is.False);
+        Assert.That(central.ValidarPin("0000000000000000", "1234"), Is.False);
     }
 
     [Test]
@@ -35,10 +35,10 @@ public class CentralDBTests
     {
         var central = new CentralDB();
 
-        var response = central.AuthorizeDebit(ValidCard, 1_000m);
+        var response = central.AutorizarDebito(ValidCard, 1_000m);
 
-        Assert.That(response.Authorized, Is.True);
-        Assert.That(response.TransactionNumber, Does.Match("^TX[0-9]{8}$"));
+        Assert.That(response.Autorizado, Is.True);
+        Assert.That(response.NumeroTransaccion, Does.Match("^TX[0-9]{8}$"));
     }
 
     [Test]
@@ -46,9 +46,9 @@ public class CentralDBTests
     {
         var central = new CentralDB();
 
-        var response = central.ExecuteTransfer(ValidCard, "0170099920000012345678", 1_000m);
+        var response = central.EjecutarTransferencia(ValidCard, "0170099920000012345678", 1_000m);
 
-        Assert.That(response.Executed, Is.True);
-        Assert.That(response.ReceiptNumber, Does.Match("^TR[0-9]{8}$"));
+        Assert.That(response.Ejecutada, Is.True);
+        Assert.That(response.NumeroComprobante, Does.Match("^TR[0-9]{8}$"));
     }
 }

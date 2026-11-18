@@ -235,7 +235,7 @@ def verificar_secuencias() -> None:
 
 def verificar_estado() -> None:
     fuente = leer("07_estado_sesion.puml")
-    esperados = {"Started", "Authenticating", "Validating", "Operating", "Closing", "Closed"}
+    esperados = {"Iniciada", "Autenticando", "Validando", "Operando", "Cerrando", "Cerrada"}
     estados = set(re.findall(r"^\s*(\w+)\s*-->|-->\s*(\w+)", fuente, flags=re.M))
     nombres = {n for par in estados for n in par if n and n not in {"[*]"}}
     if nombres != esperados:
@@ -303,25 +303,25 @@ def verificar_contra_codigo() -> None:
     for archivo in sorted(logica.glob("*.cs")):
         tipo = archivo.stem
         declaracion = re.search(rf"\b(class|enum)\s+{tipo}\b", archivo.read_text(encoding="utf-8"))
-        if declaracion and declaracion.group(1) == "class" and tipo not in clases and tipo not in {"MoneyFormatter"}:
+        if declaracion and declaracion.group(1) == "class" and tipo not in clases and tipo not in {"FormateadorMonedas"}:
             error("Código", f"la clase {tipo} del código no está en el diagrama de clases")
 
-    enum = (logica / "SessionState.cs").read_text(encoding="utf-8")
+    enum = (logica / "EstadoSesion.cs").read_text(encoding="utf-8")
     estados_codigo = set(re.findall(r"^\s*(\w+),", enum, flags=re.M))
-    estados_diagrama = set(re.findall(r"\b(Started|Authenticating|Validating|Operating|Closing|Closed)\b", leer("07_estado_sesion.puml")))
+    estados_diagrama = set(re.findall(r"\b(Iniciada|Autenticando|Validando|Operando|Cerrando|Cerrada)\b", leer("07_estado_sesion.puml")))
     if estados_codigo != estados_diagrama:
-        error("Código", f"SessionState {sorted(estados_codigo)} difiere del diagrama de estado {sorted(estados_diagrama)}")
-    sesion = (logica / "Session.cs").read_text(encoding="utf-8")
+        error("Código", f"EstadoSesion {sorted(estados_codigo)} difiere del diagrama de estado {sorted(estados_diagrama)}")
+    sesion = (logica / "Sesion.cs").read_text(encoding="utf-8")
     eventos = set(re.findall(r"--> \w+ : (\w+)\(", leer("07_estado_sesion.puml")))
     for evento in sorted(eventos):
         if f"public " not in sesion or not re.search(rf"\b{evento}\(", sesion):
-            error("Código", f"el evento {evento}() del diagrama de estado no existe en Session.cs")
+            error("Código", f"el evento {evento}() del diagrama de estado no existe en Sesion.cs")
 
     for nombre in ("05_secuencia_autenticar.puml", "06_secuencia_extraccion.puml"):
         for mensaje in re.findall(r"->\s*(?:PC|SDB|CDB|\w+)\s*:\s*(\w+)\(", leer(nombre)):
-            if mensaje in {"InsertCard", "EnterPin", "SelectOperation", "EnterAmount",
-                           "DispenseCash", "RegisterOperation"}:
-                continue  # acciones del cajero (:CajeroForm = :PantallaCajero de la consigna: Presentation + Logic), no métodos de la capa Datos
+            if mensaje in {"InsertarTarjeta", "IngresarPin", "SeleccionarOperacion", "IngresarMonto",
+                           "DispensarEfectivo", "RegistrarOperacion"}:
+                continue  # acciones del cajero (:FormCajero = :PantallaCajero de la consigna: Presentation + Logic), no métodos de la capa Datos
             datos = "".join(f.read_text(encoding="utf-8") for f in (RAIZ / "src" / "Cajero" / "Data").glob("*.cs"))
             if not re.search(rf"\b{mensaje}\(", datos):
                 error("Código", f"el mensaje {mensaje}() de {nombre} no existe en la capa Datos")

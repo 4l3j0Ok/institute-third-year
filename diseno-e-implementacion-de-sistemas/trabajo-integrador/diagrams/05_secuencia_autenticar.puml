@@ -4,27 +4,27 @@ skinparam shadowing false
 skinparam sequenceMessageAlign center
 
 actor Cliente
-participant "<u>:CajeroForm</u>" as PC
-participant "<u>:BranchDB</u>" as SDB
+participant "<u>:FormCajero</u>" as PC
+participant "<u>:SucursalDB</u>" as SDB
 participant "<u>:CentralDB</u>" as CDB
 
-note over PC : :CajeroForm es la :PantallaCajero de la consigna\n(BranchDB = SucursalDB)
+note over PC : :FormCajero es la :PantallaCajero de la consigna
 
-Cliente -> PC : InsertCard(number, expirationDate)
+Cliente -> PC : InsertarTarjeta(numero, fechaVencimiento)
 activate PC
-PC -> SDB : ValidateCard(number, expirationDate)
+PC -> SDB : ValidarTarjeta(numero, fechaVencimiento)
 activate SDB
-SDB --> PC : //cardStatus//
+SDB --> PC : //estadoTarjeta//
 deactivate SDB
-PC --> Cliente : //pinRequest//
+PC --> Cliente : //solicitudPin//
 deactivate PC
 
-Cliente -> PC : EnterPin(pin)
+Cliente -> PC : IngresarPin(pin)
 activate PC
-PC -> CDB : ValidatePin(cardNumber, pin)
+PC -> CDB : ValidarPin(numeroTarjeta, pin)
 activate CDB
-CDB --> PC : //pinConfirmation//
+CDB --> PC : //confirmacionPin//
 deactivate CDB
-PC --> Cliente : //operationsMenu//
+PC --> Cliente : //menuOperaciones//
 deactivate PC
 @enduml

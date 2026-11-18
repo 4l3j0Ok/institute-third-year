@@ -10,7 +10,7 @@ using Cajero.Logic;
 
 namespace Cajero.Presentation;
 
-public partial class CajeroForm : Form
+public partial class FormCajero : Form
 {
     private const int OptionCount = 8;
     private const int HeaderHeight = 44;
@@ -45,13 +45,13 @@ public partial class CajeroForm : Form
     private readonly string[] _sideTexts = new string[OptionCount];
     private readonly Action?[] _sideActions = new Action?[OptionCount];
 
-    private Session _session = new();
+    private Sesion _sesion = new();
     private InputRequest? _input;
-    private string _destinationCbu = "";
-    private decimal _transferAmount;
+    private string _cbuDestino = "";
+    private decimal _montoTransferencia;
     private bool _isLightOn;
 
-    public CajeroForm()
+    public FormCajero()
     {
         InitializeComponent();
 
@@ -116,7 +116,7 @@ public partial class CajeroForm : Form
         var visible = input.IsHidden ? new string('*', input.Text.Length) : input.Text;
         if (input.IsMoney && input.Text.Length > 0)
         {
-            visible = MoneyFormatter.Format(decimal.Parse(input.Text));
+            visible = FormateadorMonedas.Formatear(decimal.Parse(input.Text));
         }
         lblMessage.Text = input.Title;
         lblInput.Text = visible.Length == 0 ? "_" : visible;
@@ -139,7 +139,7 @@ public partial class CajeroForm : Form
 
     private void DispenseCash(decimal amount)
     {
-        lblCash.Text = MoneyFormatter.Format(amount);
+        lblCash.Text = FormateadorMonedas.Formatear(amount);
         lblCash.BackColor = s_banknote;
         pnlDispenser.Invalidate();
     }
@@ -157,7 +157,7 @@ public partial class CajeroForm : Form
 
     private static Bitmap? LoadLogo(string name)
     {
-        using var stream = typeof(CajeroForm).Assembly.GetManifestResourceStream($"Cajero.Resources.{name}");
+        using var stream = typeof(FormCajero).Assembly.GetManifestResourceStream($"Cajero.Resources.{name}");
         if (stream is null)
         {
             return null;
@@ -445,7 +445,7 @@ public partial class CajeroForm : Form
         {
             input.OnCancel();
         }
-        else if (_session.State == SessionState.Operating)
+        else if (_sesion.Estado == EstadoSesion.Operando)
         {
             AskForReceipt();
         }
@@ -453,7 +453,7 @@ public partial class CajeroForm : Form
 
     private void OnCardClick(object? sender, EventArgs e)
     {
-        if (_session.State != SessionState.Started)
+        if (_sesion.Estado != EstadoSesion.Iniciada)
         {
             ShowWelcome();
             return;
@@ -461,13 +461,13 @@ public partial class CajeroForm : Form
         var card = (DemoCard)cmbCard.SelectedItem!;
         cmbCard.Enabled = false;
         UpdateCardButton("Retirar tarjeta", enabled: false);
-        if (_session.InsertCard(card.Number, card.ExpirationDate))
+        if (_sesion.InsertarTarjeta(card.Number, card.ExpirationDate))
         {
             RequestPin();
         }
         else
         {
-            EndSession(_session.Message);
+            EndSession(_sesion.Mensaje);
         }
     }
 
@@ -477,7 +477,7 @@ public partial class CajeroForm : Form
 
     private void ShowWelcome()
     {
-        _session = new Session();
+        _sesion = new Sesion();
         lblReceipt.Text = "";
         lblReceipt.Visible = false;
         ClearCash();
@@ -497,17 +497,17 @@ public partial class CajeroForm : Form
         {
             return;
         }
-        if (_session.Authenticate(pin))
+        if (_sesion.Autenticar(pin))
         {
             ShowMenu();
         }
-        else if (_session.State == SessionState.Closing)
+        else if (_sesion.Estado == EstadoSesion.Cerrando)
         {
-            EndSession(_session.Message);
+            EndSession(_sesion.Mensaje);
         }
         else
         {
-            ShowScreen(_session.Message, [new("Reintentar", RequestPin)]);
+            ShowScreen(_sesion.Mensaje, [new("Reintentar", RequestPin)]);
         }
     }
 
@@ -525,24 +525,24 @@ public partial class CajeroForm : Form
     {
         if (succeeded)
         {
-            ShowScreen(_session.Message, [new("Otra operación", ShowMenu), null, null, null, new("Finalizar", AskForReceipt)]);
+            ShowScreen(_sesion.Mensaje, [new("Otra operación", ShowMenu), null, null, null, new("Finalizar", AskForReceipt)]);
         }
         else
         {
-            ShowScreen($"ERROR\n\n{_session.Message}", [new("Reintentar", onRetry), new("Menú", ShowMenu)]);
+            ShowScreen($"ERROR\n\n{_sesion.Mensaje}", [new("Reintentar", onRetry), new("Menú", ShowMenu)]);
         }
     }
 
     private void CheckBalance()
     {
-        ShowResult(_session.Execute(_session.NewBalanceInquiry()), ShowMenu);
+        ShowResult(_sesion.Ejecutar(_sesion.NuevaConsulta()), ShowMenu);
     }
 
     private void ShowWithdrawalMenu()
     {
         decimal[] amounts = [1000, 5000, 10000, 20000];
         var options = amounts
-            .Select(amount => new Option(MoneyFormatter.Format(amount).Split(',')[0], () => WithdrawCash(amount)))
+            .Select(amount => new Option(FormateadorMonedas.Formatear(amount).Split(',')[0], () => WithdrawCash(amount)))
             .Cast<Option?>()
             .ToList();
         options.AddRange([new Option("Otro monto", RequestWithdrawalAmount), null, null, new Option("Volver", ShowMenu)]);
@@ -566,7 +566,7 @@ public partial class CajeroForm : Form
 
     private void WithdrawCash(decimal amount)
     {
-        var succeeded = _session.Execute(_session.NewCashWithdrawal(amount));
+        var succeeded = _sesion.Ejecutar(_sesion.NuevaExtraccion(amount));
         if (succeeded)
         {
             DispenseCash(amount);
@@ -583,7 +583,7 @@ public partial class CajeroForm : Form
     {
         if (destinationCbu.Length == 22)
         {
-            _destinationCbu = destinationCbu;
+            _cbuDestino = destinationCbu;
             RequestInput("MONTO A TRANSFERIR", 7, OnTransferAmountEntered, ShowMenu, isMoney: true);
         }
     }
@@ -594,9 +594,9 @@ public partial class CajeroForm : Form
         {
             return;
         }
-        _transferAmount = decimal.Parse(text);
+        _montoTransferencia = decimal.Parse(text);
         ShowScreen(
-            $"CONFIRME LA OPERACIÓN\n\nDestino: {_destinationCbu[..11]}\n{_destinationCbu[11..]}\nMonto: {MoneyFormatter.Format(_transferAmount)}",
+            $"CONFIRME LA OPERACIÓN\n\nDestino: {_cbuDestino[..11]}\n{_cbuDestino[11..]}\nMonto: {FormateadorMonedas.Formatear(_montoTransferencia)}",
             [new("Confirmar", ExecuteTransfer), null, null, null, new("Cancelar", ShowMenu)]);
         // ACEPTAR on the keypad also confirms the transfer
         _input = new InputRequest("", 0, _ => ExecuteTransfer(), ShowMenu);
@@ -604,12 +604,12 @@ public partial class CajeroForm : Form
 
     private void ExecuteTransfer()
     {
-        ShowResult(_session.Execute(_session.NewTransfer(_destinationCbu, _transferAmount)), RequestDestinationCbu);
+        ShowResult(_sesion.Ejecutar(_sesion.NuevaTransferencia(_cbuDestino, _montoTransferencia)), RequestDestinationCbu);
     }
 
     private void AskForReceipt()
     {
-        _session.Finish();
+        _sesion.Finalizar();
         ShowScreen("¿DESEA COMPROBANTE IMPRESO?",
         [
             new("Sí", () => EndSession("¡Gracias!", withReceipt: true)), null, null, null,
@@ -619,16 +619,16 @@ public partial class CajeroForm : Form
 
     private void EndSession(string message, bool withReceipt = false)
     {
-        if (_session.State != SessionState.Closing)
+        if (_sesion.Estado != EstadoSesion.Cerrando)
         {
-            _session.Finish();
+            _sesion.Finalizar();
         }
         if (withReceipt)
         {
-            lblReceipt.Text = _session.GenerateReceipt();
+            lblReceipt.Text = _sesion.GenerarComprobante();
             lblReceipt.Visible = true;
         }
-        _session.Close();
+        _sesion.Cerrar();
         UpdateCardButton("Retirar tarjeta", enabled: true);
         ShowScreen($"{message}\n\nRETIRE SU TARJETA");
     }

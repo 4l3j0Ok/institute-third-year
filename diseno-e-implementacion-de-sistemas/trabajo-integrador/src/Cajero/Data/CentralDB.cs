@@ -4,73 +4,72 @@ using System.Linq;
 
 namespace Cajero.Data;
 
-/// <summary>Simulates communication with the Central Network (Red Central); in-memory data.</summary>
+/// <summary>Simula la comunicación con la Red Central; datos en memoria.</summary>
 public class CentralDB
 {
-    public const decimal DailyLimit = 100_000m;
+    public const decimal LimiteDiario = 100_000m;
 
     private static readonly Random s_random = new();
 
-    // PIN de prueba en texto plano, solo para la presentación.
-    private readonly Dictionary<string, string> _pins = new()
+    private readonly Dictionary<string, string> _pines = new()
     {
         ["1234567890123456"] = "1234",
         ["5555666677778888"] = "0000",
         ["1111222233334444"] = "0000",
     };
 
-    private decimal _balance = 150_000m;
-    private decimal _withdrawnToday;
+    private decimal _saldo = 150_000m;
+    private decimal _extraidoHoy;
 
-    public bool ValidatePin(string cardNumber, string pin)
+    public bool ValidarPin(string numeroTarjeta, string pin)
     {
-        return _pins.TryGetValue(cardNumber, out var expected) && expected == pin;
+        return _pines.TryGetValue(numeroTarjeta, out var esperado) && esperado == pin;
     }
 
-    public BalanceResponse GetBalance(string cardNumber)
+    public RespuestaSaldo ObtenerSaldo(string numeroTarjeta)
     {
-        return new BalanceResponse(_balance, _balance);
+        return new RespuestaSaldo(_saldo, _saldo);
     }
 
-    public DebitResponse AuthorizeDebit(string cardNumber, decimal amount)
+    public RespuestaDebito AutorizarDebito(string numeroTarjeta, decimal monto)
     {
-        if (amount <= 0)
+        if (monto <= 0)
         {
-            return new DebitResponse(false, "", _balance, "Monto inválido");
+            return new RespuestaDebito(false, "", _saldo, "Monto inválido");
         }
-        if (amount > _balance)
+        if (monto > _saldo)
         {
-            return new DebitResponse(false, "", _balance, "Saldo insuficiente");
+            return new RespuestaDebito(false, "", _saldo, "Saldo insuficiente");
         }
-        if (_withdrawnToday + amount > DailyLimit)
+        if (_extraidoHoy + monto > LimiteDiario)
         {
-            return new DebitResponse(false, "", _balance, "Supera el límite diario");
+            return new RespuestaDebito(false, "", _saldo, "Supera el límite diario");
         }
-        _balance -= amount;
-        _withdrawnToday += amount;
-        return new DebitResponse(true, GenerateNumber("TX"), _balance);
+        _saldo -= monto;
+        _extraidoHoy += monto;
+        return new RespuestaDebito(true, GenerarNumero("TX"), _saldo);
     }
 
-    public TransferResponse ExecuteTransfer(string cardNumber, string destinationCbu, decimal amount)
+    public RespuestaTransferencia EjecutarTransferencia(string numeroTarjeta, string cbuDestino, decimal monto)
     {
-        if (destinationCbu.Length != 22 || !destinationCbu.All(char.IsAsciiDigit))
+        if (cbuDestino.Length != 22 || !cbuDestino.All(char.IsAsciiDigit))
         {
-            return new TransferResponse(false, "", "CBU inválido");
+            return new RespuestaTransferencia(false, "", "CBU inválido");
         }
-        if (amount <= 0)
+        if (monto <= 0)
         {
-            return new TransferResponse(false, "", "Monto inválido");
+            return new RespuestaTransferencia(false, "", "Monto inválido");
         }
-        if (amount > _balance)
+        if (monto > _saldo)
         {
-            return new TransferResponse(false, "", "Saldo insuficiente");
+            return new RespuestaTransferencia(false, "", "Saldo insuficiente");
         }
-        _balance -= amount;
-        return new TransferResponse(true, GenerateNumber("TR"));
+        _saldo -= monto;
+        return new RespuestaTransferencia(true, GenerarNumero("TR"));
     }
 
-    private static string GenerateNumber(string prefix)
+    private static string GenerarNumero(string prefijo)
     {
-        return $"{prefix}{s_random.Next(10_000_000, 100_000_000)}";
+        return $"{prefijo}{s_random.Next(10_000_000, 100_000_000)}";
     }
 }

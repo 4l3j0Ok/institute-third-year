@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace Cajero.Presentation;
 
-partial class CajeroForm
+partial class FormCajero
 {
     /// <summary>Required designer variable.</summary>
     private System.ComponentModel.IContainer components = null;
@@ -741,7 +741,7 @@ partial class CajeroForm
         // 
         pnlDispenser.Controls.Add(lblCash);
         // 
-        // CajeroForm
+        // FormCajero
         // 
         AutoScaleMode = AutoScaleMode.None;
         BackColor = System.Drawing.ColorTranslator.FromHtml("#C3C8CF");
@@ -761,7 +761,7 @@ partial class CajeroForm
         Controls.Add(pnlDispenser);
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
-        Name = "CajeroForm";
+        Name = "FormCajero";
         StartPosition = FormStartPosition.CenterScreen;
         Text = "Cajero Automático Santander";
         Paint += OnFormPaint;

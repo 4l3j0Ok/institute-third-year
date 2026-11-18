@@ -40,17 +40,17 @@ Reglas y fuentes en las skills `.agents/skills/dis-*`. Verificación: `python3 s
 
 ## Código (C# + Windows Forms, 3 capas)
 
-- [x] Capa Datos (`src/Cajero/Data`): `BranchDB` (SucursalDB), `CentralDB` simulados (PIN de prueba en texto plano para la presentación)
+- [x] Capa Datos (`src/Cajero/Data`): `SucursalDB`, `CentralDB` simulados (PIN recibido en texto plano, sin encriptar)
 - [x] Capa Lógica (`src/Cajero/Logic`): Operacion (abstracta), Consulta, Extraccion, Transferencia, Cliente, Tarjeta, Cuenta, Sesion (campos `_x`, propiedades get/set, constructores explícitos, un tipo por archivo)
-- [x] Capa Presentación (`src/Cajero/Presentation`): `CajeroForm` = FormCajero (Designer de Windows Forms) con skin de cajero (tarjeta → PIN → menú → las 3 operaciones → ticket)
-- [x] Identificadores en inglés (textos de pantalla y análisis en español); equivalencias en README y glosario
+- [x] Capa Presentación (`src/Cajero/Presentation`): `FormCajero` (Designer de Windows Forms) con skin de cajero (tarjeta → PIN → menú → las 3 operaciones → ticket)
+- [x] Identificadores en español (clases, atributos y métodos), igual que la consigna y los diagramas
 - [x] Convenciones de C# exigidas por `dotnet build` (`src/.editorconfig`)
 - [x] Pruebas unitarias de Datos y Lógica (`src/Cajero.Tests`, incluye los estados del diagrama y los 3 intentos de PIN)
 - [ ] Probar la app a mano y ajustar el código a los diagramas definitivos
-- [ ] Abrir `CajeroForm` en el diseñador de Visual Studio y ajustar el aspecto (ya se probó que arranca en Linux con Wine (`src/ejecutar-linux.sh`); falta verlo en Windows)
+- [ ] Abrir `FormCajero` en el diseñador de Visual Studio y ajustar el aspecto (ya se probó que arranca en Linux con Wine (`src/ejecutar-linux.sh`); falta verlo en Windows)
 
 ## Entrega
 
 - [ ] Completar integrantes en `README.md`
 - [ ] Pedir al docente fecha de entrega y formato
-- [ ] Confirmar con el docente que acepta nombres de clases en inglés (`CajeroForm` en lugar de `FormCajero`)
+- [x] Confirmado con el docente: no acepta nombres de clases en inglés; código y diagramas se tradujeron a los nombres de la consigna (`FormCajero`, `Sesion`, etc.)
