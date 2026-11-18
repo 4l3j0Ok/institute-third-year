@@ -1,8 +1,14 @@
 # Diccionario de Datos - Cajero Automático
 
-Notación (`resources/DD.pdf`): `=` está compuesto de · `+` y · `( )` optativo · `{ }` iteración (`n{x}m` acota) · `[ a | b ]` selección · `* texto *` comentario.
 
-Cubre todos los flujos y almacenes del [Diagrama de Contexto](01_contexto.puml) y del [DFD Nivel 0](02_dfd_nivel0.puml). Los nombres son los mismos de los diagramas y del código (`Número de comprobante` ⇔ `_numeroComprobante`).
+**Materia**: Diseño e Implementación de Sistemas  
+**Profesor**: Mariano Spala  
+**Integrantes**:
+- Alejo Sarmiento
+- Alejo Romero
+- Lautaro Dabrowsky
+
+---
 
 ## Flujos de datos
 
@@ -64,7 +70,6 @@ Cubre todos los flujos y almacenes del [Diagrama de Contexto](01_contexto.puml) 
 | Letra | Letra del alfabeto sin tildes | Letra = [ A-Z \| a-z ] | A a Z, mayúscula o minúscula |
 | Espacio | Separador entre palabras | Espacio = * carácter de espacio * | Un espacio |
 | Mensaje de pantalla | Texto que el cajero muestra al cliente | Mensaje de pantalla = {Carácter legal} | Texto |
-
 | Opción de menú | Operación que ofrece el cajero | Opción de menú = [ "Consultar saldo" \| "Extraer efectivo" \| "Transferir" \| "Finalizar" ] | Una de las cuatro |
 | Tipo de operación | Clase de operación realizada | Tipo de operación = [ "Consulta de saldo" \| "Extracción" \| "Transferencia" ] | Una de las tres |
 | Importe | Cantidad de dinero en pesos | Importe = * pesos, 2 decimales * | Para una extracción: mayor que 0, no supera el saldo ni el límite diario de $100.000 |
