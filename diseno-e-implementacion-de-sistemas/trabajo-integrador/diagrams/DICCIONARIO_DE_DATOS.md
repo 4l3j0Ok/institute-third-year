@@ -64,7 +64,7 @@ Cubre todos los flujos y almacenes del [Diagrama de Contexto](01_contexto.puml) 
 | Letra | Letra del alfabeto sin tildes | Letra = [ A-Z \| a-z ] | A a Z, mayúscula o minúscula |
 | Espacio | Separador entre palabras | Espacio = * carácter de espacio * | Un espacio |
 | Mensaje de pantalla | Texto que el cajero muestra al cliente | Mensaje de pantalla = {Carácter legal} | Texto |
-| Dígito hexadecimal | Carácter de un número hexadecimal | Dígito hexadecimal = [ 0-9 \| A-F ] | 0 a 9 y A a F |
+
 | Opción de menú | Operación que ofrece el cajero | Opción de menú = [ "Consultar saldo" \| "Extraer efectivo" \| "Transferir" \| "Finalizar" ] | Una de las cuatro |
 | Tipo de operación | Clase de operación realizada | Tipo de operación = [ "Consulta de saldo" \| "Extracción" \| "Transferencia" ] | Una de las tres |
 | Importe | Cantidad de dinero en pesos | Importe = * pesos, 2 decimales * | Para una extracción: mayor que 0, no supera el saldo ni el límite diario de $100.000 |

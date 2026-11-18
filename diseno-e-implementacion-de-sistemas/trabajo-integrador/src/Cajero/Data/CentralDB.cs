@@ -14,8 +14,8 @@ public class CentralDB
     private readonly Dictionary<string, string> _pines = new()
     {
         ["1234567890123456"] = "1234",
-        ["5555666677778888"] = "0000",
-        ["1111222233334444"] = "0000",
+        ["5555666677778888"] = "1234",
+        ["1111222233334444"] = "1234",
     };
 
     private decimal _saldo = 150_000m;

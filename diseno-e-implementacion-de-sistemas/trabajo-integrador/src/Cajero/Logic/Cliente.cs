@@ -16,8 +16,6 @@ public class Cliente
         get => _nombre;
         set => _nombre = value;
     }
-
-    /// <summary>DNI, el documento nacional de identidad argentino.</summary>
     public string Dni
     {
         get => _dni;

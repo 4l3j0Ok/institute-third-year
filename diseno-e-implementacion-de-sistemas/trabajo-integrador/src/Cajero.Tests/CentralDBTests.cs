@@ -7,7 +7,7 @@ public class CentralDBTests
     private const string ValidCard = "1234567890123456";
 
     [Test]
-    public void ValidatePin_AcceptsTheClearPin()
+    public void ValidatePin_AcceptsTheCorrectPin()
     {
         var central = new CentralDB();
 
@@ -15,11 +15,11 @@ public class CentralDBTests
     }
 
     [Test]
-    public void ValidatePin_RejectsAnIncorrectPin()
+    public void ValidatePin_RejectsTheWrongPin()
     {
         var central = new CentralDB();
 
-        Assert.That(central.ValidarPin(ValidCard, "1235"), Is.False);
+        Assert.That(central.ValidarPin(ValidCard, "0000"), Is.False);
     }
 
     [Test]
