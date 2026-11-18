@@ -16,5 +16,7 @@ command -v dot >/dev/null || { echo "Falta Graphviz (dot): Contexto y DFD lo nec
 ARCHIVOS=("$@")
 [ ${#ARCHIVOS[@]} -gt 0 ] || ARCHIVOS=(diagrams/*.puml)
 
-"${PLANTUML[@]}" -tpng -charset UTF-8 "${ARCHIVOS[@]}"
+for archivo in "${ARCHIVOS[@]}"; do
+    "${PLANTUML[@]}" -tpng -charset UTF-8 "$archivo"
+done
 echo "Generados: ${#ARCHIVOS[@]} archivo(s) fuente"
