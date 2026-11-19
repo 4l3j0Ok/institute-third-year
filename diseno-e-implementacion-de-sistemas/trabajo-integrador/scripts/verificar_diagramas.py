@@ -317,14 +317,20 @@ def verificar_contra_codigo() -> None:
         if f"public " not in sesion or not re.search(rf"\b{evento}\(", sesion):
             error("Código", f"el evento {evento}() del diagrama de estado no existe en Sesion.cs")
 
+    datos = "".join(f.read_text(encoding="utf-8") for f in (RAIZ / "src" / "Cajero" / "Data").glob("*.cs"))
+    cajero = "".join(
+        f.read_text(encoding="utf-8")
+        for carpeta in ("Logic", "Presentation")
+        for f in (RAIZ / "src" / "Cajero" / carpeta).glob("*.cs")
+    )
     for nombre in ("05_secuencia_autenticar.puml", "06_secuencia_extraccion.puml"):
-        for mensaje in re.findall(r"->\s*(?:PC|SDB|CDB|\w+)\s*:\s*(\w+)\(", leer(nombre)):
-            if mensaje in {"InsertarTarjeta", "IngresarPin", "ElegirOperacion", "IngresarMonto",
-                           "DispensarEfectivo", "RegistrarOperacion"}:
-                continue  # acciones del cajero (:FormCajero = :PantallaCajero de la consigna: Presentation + Logic), no métodos de la capa Datos
-            datos = "".join(f.read_text(encoding="utf-8") for f in (RAIZ / "src" / "Cajero" / "Data").glob("*.cs"))
-            if not re.search(rf"\b{mensaje}\(", datos):
-                error("Código", f"el mensaje {mensaje}() de {nombre} no existe en la capa Datos")
+        for emisor, mensaje in re.findall(r"(\w+)\s*->\s*(?:PC|SDB|CDB|\w+)\s*:\s*(\w+)\(", leer(nombre)):
+            # mensajes de Cliente o autoenvíos de PC: acciones del cajero (:FormCajero = :PantallaCajero
+            # de la consigna, capas Presentation + Logic), no métodos de la capa Datos
+            codigo = cajero if emisor in {"Cliente", "PC"} else datos
+            capa = "Presentation/Logic" if codigo is cajero else "Datos"
+            if not re.search(rf"\b{mensaje}\(", codigo):
+                error("Código", f"el mensaje {mensaje}() de {nombre} no existe en la capa {capa}")
 
 
 def main() -> int:

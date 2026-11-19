@@ -1,5 +1,15 @@
 # Cajero Automático
 
+
+**Materia**: Diseño e Implementación de Sistemas  
+**Profesor**: Mariano Spala  
+**Integrantes**:
+- Alejo Sarmiento
+- Alejo Romero
+- Lautaro Dabrowsky
+
+---
+
 TP integrador de Diseño e Implementación de Sistemas (ISFT N° 93, 2026).
 
 ## Descripción

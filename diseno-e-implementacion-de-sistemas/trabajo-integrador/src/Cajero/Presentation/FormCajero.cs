@@ -71,7 +71,7 @@ public partial class FormCajero : Form
         cmbCard.Items.AddRange(s_demoCards);
         cmbCard.SelectedIndex = 0;
 
-        ShowWelcome();
+        MostrarBienvenida();
         tmrBlink.Start();
     }
 
@@ -137,14 +137,14 @@ public partial class FormCajero : Form
         pnlCardReader.Invalidate();
     }
 
-    private void DispenseCash(decimal amount)
+    private void DispensarEfectivo(decimal monto)
     {
-        lblCash.Text = FormateadorMonedas.Formatear(amount);
+        lblCash.Text = FormateadorMonedas.Formatear(monto);
         lblCash.BackColor = s_banknote;
         pnlDispenser.Invalidate();
     }
 
-    private void ClearCash()
+    private void LimpiarEfectivo()
     {
         lblCash.Text = "";
         lblCash.BackColor = s_slot;
@@ -447,7 +447,7 @@ public partial class FormCajero : Form
         }
         else if (_sesion.Estado == EstadoSesion.Operando)
         {
-            AskForReceipt();
+            SolicitarComprobante();
         }
     }
 
@@ -455,7 +455,7 @@ public partial class FormCajero : Form
     {
         if (_sesion.Estado != EstadoSesion.Iniciada)
         {
-            ShowWelcome();
+            MostrarBienvenida();
             return;
         }
         var card = (DemoCard)cmbCard.SelectedItem!;
@@ -463,11 +463,11 @@ public partial class FormCajero : Form
         UpdateCardButton("Retirar tarjeta", enabled: false);
         if (_sesion.InsertarTarjeta(card.Number, card.ExpirationDate))
         {
-            RequestPin();
+            SolicitarPin();
         }
         else
         {
-            EndSession(_sesion.Mensaje);
+            CerrarSesion(_sesion.Mensaje);
         }
     }
 
@@ -475,23 +475,23 @@ public partial class FormCajero : Form
 
     #region Flow
 
-    private void ShowWelcome()
+    private void MostrarBienvenida()
     {
         _sesion = new Sesion();
         lblReceipt.Text = "";
         lblReceipt.Visible = false;
-        ClearCash();
+        LimpiarEfectivo();
         cmbCard.Enabled = true;
         UpdateCardButton("Insertar tarjeta", enabled: true);
         ShowScreen("BIENVENIDO\n\nInserte su tarjeta");
     }
 
-    private void RequestPin()
+    private void SolicitarPin()
     {
-        RequestInput("INGRESE SU PIN", 4, AuthenticatePin, () => EndSession("Operación cancelada"), isHidden: true);
+        RequestInput("INGRESE SU PIN", 4, AutenticarPin, () => CerrarSesion("Operación cancelada"), isHidden: true);
     }
 
-    private void AuthenticatePin(string pin)
+    private void AutenticarPin(string pin)
     {
         if (pin.Length != 4)
         {
@@ -499,138 +499,138 @@ public partial class FormCajero : Form
         }
         if (_sesion.Autenticar(pin))
         {
-            ShowMenu();
+            MostrarMenu();
         }
         else if (_sesion.Estado == EstadoSesion.Cerrando)
         {
-            EndSession(_sesion.Mensaje);
+            CerrarSesion(_sesion.Mensaje);
         }
         else
         {
-            ShowScreen(_sesion.Mensaje, [new("Reintentar", RequestPin)]);
+            ShowScreen(_sesion.Mensaje, [new("Reintentar", SolicitarPin)]);
         }
     }
 
-    private void ShowMenu()
+    private void MostrarMenu()
     {
         ShowScreen("SELECCIONE UNA OPERACIÓN",
         [
-            new("Consultar saldo", CheckBalance), new("Extraer efectivo", ShowWithdrawalMenu),
+            new("Consultar saldo", ConsultarSaldo), new("Extraer efectivo", MostrarMenuExtraccion),
             null, null,
-            new("Transferir", RequestDestinationCbu), new("Finalizar", AskForReceipt),
+            new("Transferir", SolicitarCbuDestino), new("Finalizar", SolicitarComprobante),
         ]);
     }
 
-    private void ShowResult(bool succeeded, Action onRetry)
+    private void MostrarResultado(bool exito, Action reintentar)
     {
-        if (succeeded)
+        if (exito)
         {
-            ShowScreen(_sesion.Mensaje, [new("Otra operación", ShowMenu), null, null, null, new("Finalizar", AskForReceipt)]);
+            ShowScreen(_sesion.Mensaje, [new("Otra operación", MostrarMenu), null, null, null, new("Finalizar", SolicitarComprobante)]);
         }
         else
         {
-            ShowScreen($"ERROR\n\n{_sesion.Mensaje}", [new("Reintentar", onRetry), new("Menú", ShowMenu)]);
+            ShowScreen($"ERROR\n\n{_sesion.Mensaje}", [new("Reintentar", reintentar), new("Menú", MostrarMenu)]);
         }
     }
 
-    private void CheckBalance()
+    private void ConsultarSaldo()
     {
-        ShowResult(_sesion.Ejecutar(_sesion.NuevaConsulta()), ShowMenu);
+        MostrarResultado(_sesion.Ejecutar(_sesion.NuevaConsulta()), MostrarMenu);
     }
 
-    private void ShowWithdrawalMenu()
+    private void MostrarMenuExtraccion()
     {
-        decimal[] amounts = [1000, 5000, 10000, 20000];
-        var options = amounts
-            .Select(amount => new Option(FormateadorMonedas.Formatear(amount).Split(',')[0], () => WithdrawCash(amount)))
+        decimal[] montos = [1000, 5000, 10000, 20000];
+        var options = montos
+            .Select(monto => new Option(FormateadorMonedas.Formatear(monto).Split(',')[0], () => ExtraerEfectivo(monto)))
             .Cast<Option?>()
             .ToList();
-        options.AddRange([new Option("Otro monto", RequestWithdrawalAmount), null, null, new Option("Volver", ShowMenu)]);
+        options.AddRange([new Option("Otro monto", SolicitarMontoExtraccion), null, null, new Option("Volver", MostrarMenu)]);
         ShowScreen("EXTRAER EFECTIVO\n\nElija el monto", [.. options]);
     }
 
-    private void RequestWithdrawalAmount()
+    private void SolicitarMontoExtraccion()
     {
         RequestInput(
             "MONTO A RETIRAR", 7,
-            text =>
+            texto =>
             {
-                if (text.Length > 0)
+                if (texto.Length > 0)
                 {
-                    WithdrawCash(decimal.Parse(text));
+                    ExtraerEfectivo(decimal.Parse(texto));
                 }
             },
-            ShowWithdrawalMenu,
+            MostrarMenuExtraccion,
             isMoney: true);
     }
 
-    private void WithdrawCash(decimal amount)
+    private void ExtraerEfectivo(decimal monto)
     {
-        var succeeded = _sesion.Ejecutar(_sesion.NuevaExtraccion(amount));
-        if (succeeded)
+        var exito = _sesion.Ejecutar(_sesion.NuevaExtraccion(monto));
+        if (exito)
         {
-            DispenseCash(amount);
+            DispensarEfectivo(monto);
         }
-        ShowResult(succeeded, ShowWithdrawalMenu);
+        MostrarResultado(exito, MostrarMenuExtraccion);
     }
 
-    private void RequestDestinationCbu()
+    private void SolicitarCbuDestino()
     {
-        RequestInput("CBU DESTINO (22 dígitos)", 22, OnDestinationCbuEntered, ShowMenu);
+        RequestInput("CBU DESTINO (22 dígitos)", 22, IngresarCbuDestino, MostrarMenu);
     }
 
-    private void OnDestinationCbuEntered(string destinationCbu)
+    private void IngresarCbuDestino(string cbuDestino)
     {
-        if (destinationCbu.Length == 22)
+        if (cbuDestino.Length == 22)
         {
-            _cbuDestino = destinationCbu;
-            RequestInput("MONTO A TRANSFERIR", 7, OnTransferAmountEntered, ShowMenu, isMoney: true);
+            _cbuDestino = cbuDestino;
+            RequestInput("MONTO A TRANSFERIR", 7, IngresarMontoTransferencia, MostrarMenu, isMoney: true);
         }
     }
 
-    private void OnTransferAmountEntered(string text)
+    private void IngresarMontoTransferencia(string texto)
     {
-        if (text.Length == 0 || decimal.Parse(text) <= 0)
+        if (texto.Length == 0 || decimal.Parse(texto) <= 0)
         {
             return;
         }
-        _montoTransferencia = decimal.Parse(text);
+        _montoTransferencia = decimal.Parse(texto);
         ShowScreen(
             $"CONFIRME LA OPERACIÓN\n\nDestino: {_cbuDestino[..11]}\n{_cbuDestino[11..]}\nMonto: {FormateadorMonedas.Formatear(_montoTransferencia)}",
-            [new("Confirmar", ExecuteTransfer), null, null, null, new("Cancelar", ShowMenu)]);
+            [new("Confirmar", ConfirmarTransferencia), null, null, null, new("Cancelar", MostrarMenu)]);
         // ACEPTAR on the keypad also confirms the transfer
-        _input = new InputRequest("", 0, _ => ExecuteTransfer(), ShowMenu);
+        _input = new InputRequest("", 0, _ => ConfirmarTransferencia(), MostrarMenu);
     }
 
-    private void ExecuteTransfer()
+    private void ConfirmarTransferencia()
     {
-        ShowResult(_sesion.Ejecutar(_sesion.NuevaTransferencia(_cbuDestino, _montoTransferencia)), RequestDestinationCbu);
+        MostrarResultado(_sesion.Ejecutar(_sesion.NuevaTransferencia(_cbuDestino, _montoTransferencia)), SolicitarCbuDestino);
     }
 
-    private void AskForReceipt()
+    private void SolicitarComprobante()
     {
         _sesion.Finalizar();
         ShowScreen("¿DESEA COMPROBANTE IMPRESO?",
         [
-            new("Sí", () => EndSession("¡Gracias!", withReceipt: true)), null, null, null,
-            new("No", () => EndSession("¡Gracias!")),
+            new("Sí", () => CerrarSesion("¡Gracias!", conComprobante: true)), null, null, null,
+            new("No", () => CerrarSesion("¡Gracias!")),
         ]);
     }
 
-    private void EndSession(string message, bool withReceipt = false)
+    private void CerrarSesion(string mensaje, bool conComprobante = false)
     {
         if (_sesion.Estado != EstadoSesion.Cerrando)
         {
             _sesion.Finalizar();
         }
-        if (withReceipt)
+        if (conComprobante)
         {
             lblReceipt.Text = _sesion.GenerarComprobante();
             lblReceipt.Visible = true;
         }
         _sesion.Cerrar();
         UpdateCardButton("Retirar tarjeta", enabled: true);
-        ShowScreen($"{message}\n\nRETIRE SU TARJETA");
+        ShowScreen($"{mensaje}\n\nRETIRE SU TARJETA");
     }
 
     #endregion

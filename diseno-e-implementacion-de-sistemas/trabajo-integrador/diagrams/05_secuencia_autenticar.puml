@@ -19,7 +19,7 @@ deactivate SDB
 PC --> Cliente : //solicitudPin//
 deactivate PC
 
-Cliente -> PC : IngresarPin(pin)
+Cliente -> PC : Autenticar(pin)
 activate PC
 PC -> CDB : ValidarPin(numeroTarjeta, pin)
 activate CDB

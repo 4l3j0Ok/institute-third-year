@@ -1,15 +1,6 @@
 # Diccionario de Datos - Cajero Automático
 
 
-**Materia**: Diseño e Implementación de Sistemas  
-**Profesor**: Mariano Spala  
-**Integrantes**:
-- Alejo Sarmiento
-- Alejo Romero
-- Lautaro Dabrowsky
-
----
-
 ## Flujos de datos
 
 | Nombre | Descripción | Composición | Valores permitidos |
