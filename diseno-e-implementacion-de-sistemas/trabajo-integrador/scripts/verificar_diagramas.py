@@ -319,7 +319,7 @@ def verificar_contra_codigo() -> None:
 
     for nombre in ("05_secuencia_autenticar.puml", "06_secuencia_extraccion.puml"):
         for mensaje in re.findall(r"->\s*(?:PC|SDB|CDB|\w+)\s*:\s*(\w+)\(", leer(nombre)):
-            if mensaje in {"InsertarTarjeta", "IngresarPin", "SeleccionarOperacion", "IngresarMonto",
+            if mensaje in {"InsertarTarjeta", "IngresarPin", "ElegirOperacion", "IngresarMonto",
                            "DispensarEfectivo", "RegistrarOperacion"}:
                 continue  # acciones del cajero (:FormCajero = :PantallaCajero de la consigna: Presentation + Logic), no métodos de la capa Datos
             datos = "".join(f.read_text(encoding="utf-8") for f in (RAIZ / "src" / "Cajero" / "Data").glob("*.cs"))
