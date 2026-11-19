@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: nginx:1.29-alpine
+    image: nginx:1.30.7-alpine
     restart: no
     container_name: nginx-clase-2
     volumes:
